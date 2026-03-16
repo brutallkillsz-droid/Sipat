@@ -4,192 +4,168 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portal SIPAT - Shopee LMG-48</title>
-    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    colors: {
-                        shopee: { DEFAULT: '#EE4D2D', dark: '#d64428', light: '#fff0ed' },
-                        darkbg: '#1f2937', surface: '#ffffff'
-                    }
+                    colors: { shopee: { DEFAULT: '#EE4D2D', dark: '#d64428', light: '#fff0ed' } }
                 }
             }
         }
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <style>
         body { font-family: 'Inter', sans-serif; overflow: hidden; }
         .card-interaction { transition: all 0.2s ease; cursor: pointer; }
-        .card-interaction:hover { transform: translateY(-4px); border-color: #EE4D2D; box-shadow: 0 10px 15px rgba(238,77,45,0.2); }
-        
+        .card-interaction:hover { transform: translateY(-4px); box-shadow: 0 10px 15px rgba(238,77,45,0.2); }
         .slide-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(3px); z-index: 998; opacity: 0; pointer-events: none; transition: 0.3s; }
         .slide-overlay.active { opacity: 1; pointer-events: all; }
         .slide-panel { position: fixed; top: 0; right: 0; width: 100%; max-width: 450px; height: 100vh; background: #fff; z-index: 999; transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); display: flex; flex-direction: column; }
         .slide-panel.active { transform: translateX(0); }
-        
         .status-dropdown { position: fixed; background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); z-index: 9999; opacity: 0; pointer-events: none; transition: 0.1s; display: flex; flex-direction: column; min-width: 150px; }
         .status-dropdown.active { opacity: 1; pointer-events: all; }
-        
-        .hide-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800 flex flex-col h-screen">
 
 <div id="statusDropdown" class="status-dropdown">
-    <button class="w-full text-left px-3 py-2 rounded-md hover:bg-gray-100 text-yellow-600 font-bold text-sm" onclick="window.atualizarStatus('Pendente')">Pendente</button>
-    <button class="w-full text-left px-3 py-2 rounded-md hover:bg-gray-100 text-green-600 font-bold text-sm" onclick="window.atualizarStatus('Resolvido')">Resolvido</button>
-    <button class="w-full text-left px-3 py-2 rounded-md hover:bg-gray-100 text-red-600 font-bold text-sm" onclick="window.atualizarStatus('Cancelado')">Cancelado</button>
+    <button class="w-full text-left px-3 py-2 rounded-md hover:bg-gray-100 text-yellow-600 font-bold" onclick="window.atualizarStatus('Pendente')">Pendente</button>
+    <button class="w-full text-left px-3 py-2 rounded-md hover:bg-gray-100 text-green-600 font-bold" onclick="window.atualizarStatus('Resolvido')">Resolvido</button>
+    <button class="w-full text-left px-3 py-2 rounded-md hover:bg-gray-100 text-red-600 font-bold" onclick="window.atualizarStatus('Cancelado')">Cancelado</button>
 </div>
 
 <div id="slide-overlay" class="slide-overlay" onclick="window.fecharDetalhes()"></div>
-<div id="slide-panel" class="slide-panel">
-    <div class="p-6 border-b flex justify-between items-center">
-        <h2 class="font-bold text-lg">Ficha da Ocorrência</h2>
+<div id="slide-panel" class="slide-panel border-l">
+    <div class="p-6 border-b flex justify-between items-center bg-white">
+        <h2 class="font-black text-shopee uppercase">Ficha Técnica</h2>
         <button onclick="window.fecharDetalhes()"><i class="fa-solid fa-xmark text-xl text-gray-400"></i></button>
     </div>
     <div class="p-6 overflow-y-auto flex-1 space-y-6 bg-gray-50">
         <div id="detalhe-status-box"></div>
-        <div>
-            <h5 class="text-[10px] font-bold text-gray-400 uppercase mb-2">Inspetor</h5>
-            <div class="bg-white p-3 rounded-xl border flex items-center gap-3">
-                <div id="detalhe-avatar" class="w-8 h-8 rounded-full bg-shopee text-white flex items-center justify-center text-xs font-bold uppercase">?</div>
-                <span id="detalhe-autor" class="font-bold text-sm uppercase"></span>
+        <div class="bg-white p-4 rounded-2xl border shadow-sm">
+            <h5 class="text-[10px] font-black text-gray-400 uppercase mb-2">Relator</h5>
+            <div class="flex items-center gap-3">
+                <div id="detalhe-avatar" class="w-10 h-10 rounded-full bg-shopee text-white flex items-center justify-center font-bold">?</div>
+                <span id="detalhe-autor" class="font-bold text-gray-700"></span>
             </div>
         </div>
-        <div>
-            <h5 class="text-[10px] font-bold text-gray-400 uppercase mb-2">Local e Categoria</h5>
-            <p class="bg-white p-3 rounded-xl border text-sm shadow-sm"><strong id="detalhe-hub" class="text-shopee"></strong><br><span id="detalhe-categoria" class="text-gray-500 italic"></span></p>
+        <div class="bg-white p-4 rounded-2xl border shadow-sm">
+            <h5 class="text-[10px] font-black text-gray-400 uppercase mb-2">Ocorrência</h5>
+            <p class="text-sm"><strong id="detalhe-hub"></strong><br><span id="detalhe-categoria" class="text-gray-500"></span></p>
+            <p id="detalhe-data" class="text-[10px] text-gray-400 mt-2 font-bold"></p>
         </div>
-        <div>
-            <h5 class="text-[10px] font-bold text-gray-400 uppercase mb-2">Descrição</h5>
-            <p id="detalhe-texto" class="bg-white p-4 rounded-xl border text-sm text-gray-700 leading-relaxed"></p>
+        <div class="bg-white p-4 rounded-2xl border shadow-sm">
+            <h5 class="text-[10px] font-black text-gray-400 uppercase mb-2">Descrição</h5>
+            <p id="detalhe-texto" class="text-sm text-gray-600 leading-relaxed"></p>
         </div>
-        <div>
-            <h5 class="text-[10px] font-bold text-gray-400 uppercase mb-2">Fotos Anexadas</h5>
-            <div id="detalhe-galeria-fotos" class="grid grid-cols-2 gap-2"></div>
-        </div>
+        <div id="detalhe-galeria-fotos" class="grid grid-cols-2 gap-2"></div>
     </div>
 </div>
 
-<div id="login-screen" class="flex w-full h-full absolute inset-0 z-50 bg-white">
+<div id="login-screen" class="fixed inset-0 z-50 flex bg-white w-full h-full">
     <div class="hidden md:flex flex-1 bg-shopee flex-col justify-center items-center relative overflow-hidden">
-        <div class="absolute inset-0 bg-gradient-to-b from-shopee to-shopee-dark opacity-90"></div>
         <video autoplay loop muted playsinline class="w-64 h-64 rounded-[3rem] shadow-2xl z-10 bg-white p-2 object-cover">
             <source src="https://i.imgur.com/iKdPvMx.mp4" type="video/mp4">
         </video>
-        <h1 class="text-white text-3xl font-black mt-8 z-10 tracking-tighter">PORTAL SIPAT LMG-48</h1>
+        <h1 class="text-white text-3xl font-black mt-8 z-10">PORTAL SIPAT LMG-48</h1>
     </div>
     <div class="flex-1 flex justify-center items-center bg-gray-50 p-6">
-        <div class="w-full max-w-sm bg-white p-10 rounded-[2.5rem] shadow-xl border">
-            <div class="md:hidden flex justify-center mb-6">
-                <video autoplay loop muted playsinline class="w-24 h-24 rounded-2xl shadow-lg"><source src="https://i.imgur.com/iKdPvMx.mp4" type="video/mp4"></video>
+        <div class="w-full max-w-sm bg-white p-10 rounded-[2.5rem] shadow-2xl border">
+            <div class="md:hidden flex justify-center mb-8">
+                <video autoplay loop muted playsinline class="w-32 h-32 rounded-3xl shadow-lg border border-shopee/20"><source src="https://i.imgur.com/iKdPvMx.mp4" type="video/mp4"></video>
             </div>
-            <h2 class="text-xl font-bold text-center mb-8 text-gray-800 uppercase tracking-tighter">Login de Acesso</h2>
+            <h2 class="text-xl font-black text-center mb-10 text-gray-800 uppercase tracking-widest">Acesso</h2>
             <div class="space-y-4">
-                <input type="text" id="username" class="w-full bg-gray-50 border rounded-2xl px-5 py-4 focus:ring-2 focus:ring-shopee outline-none transition-all" placeholder="Usuário">
-                <input type="password" id="password" class="w-full bg-gray-50 border rounded-2xl px-5 py-4 focus:ring-2 focus:ring-shopee outline-none transition-all" placeholder="Senha">
-                <button onclick="window.fazerLogin()" class="w-full bg-shopee text-white font-black py-5 rounded-2xl shadow-lg hover:bg-shopee-dark transition-all uppercase tracking-widest">ENTRAR</button>
+                <input type="text" id="username" class="w-full bg-gray-50 border rounded-2xl px-5 py-4 outline-none focus:ring-2 focus:ring-shopee" placeholder="Usuário">
+                <input type="password" id="password" class="w-full bg-gray-50 border rounded-2xl px-5 py-4 outline-none focus:ring-2 focus:ring-shopee" placeholder="Senha">
+                <button onclick="window.fazerLogin()" class="w-full bg-shopee text-white font-black py-5 rounded-2xl shadow-lg hover:bg-shopee-dark transition-all uppercase tracking-widest">Entrar</button>
             </div>
         </div>
     </div>
 </div>
 
 <div id="app-layout" class="hidden flex-col h-full w-full bg-gray-50">
-    <header class="bg-white border-b sticky top-0 z-40 p-4">
+    <header class="bg-white border-b sticky top-0 z-40 p-4 shadow-sm">
         <div class="max-w-6xl mx-auto flex justify-between items-center">
             <div class="flex items-center">
-                <video autoplay loop muted playsinline class="h-10 w-10 rounded-lg mr-3 shadow-sm"><source src="https://i.imgur.com/iKdPvMx.mp4" type="video/mp4"></video>
-                <span class="font-black text-xl text-shopee tracking-tighter">SIPAT</span>
+                <video autoplay loop muted playsinline class="h-10 w-10 rounded-lg mr-3"><source src="https://i.imgur.com/iKdPvMx.mp4" type="video/mp4"></video>
+                <span class="font-black text-xl text-shopee">LMG-48</span>
             </div>
-            <div id="user-display-avatar" class="w-10 h-10 rounded-full bg-shopee text-white flex items-center justify-center font-bold cursor-pointer shadow-md" onclick="window.sair()">?</div>
+            <div id="user-display-avatar" class="w-10 h-10 rounded-full bg-shopee text-white flex items-center justify-center font-bold cursor-pointer" onclick="window.sair()">?</div>
         </div>
     </header>
 
     <main class="flex-1 overflow-y-auto p-4 md:p-8">
-        <div class="max-w-6xl mx-auto h-full relative">
+        <div id="aba-menu-inspetor" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4 max-w-xl mx-auto mt-6">
+            <button onclick="window.mudarAba('registro')" class="card-interaction col-span-1 md:col-span-2 bg-white border-2 border-shopee rounded-[2.5rem] p-12 flex flex-col items-center gap-4">
+                <i class="fa-solid fa-triangle-exclamation text-7xl text-shopee"></i>
+                <span class="font-black text-2xl uppercase text-gray-800">Relatar Risco</span>
+            </button>
+            <button onclick="window.mudarAba('progresso')" class="card-interaction bg-white rounded-3xl p-6 border-b-4 border-shopee flex flex-col items-center gap-2">
+                <i class="fa-solid fa-chart-line text-3xl text-shopee"></i>
+                <span class="font-bold text-[10px] uppercase">Meu Progresso</span>
+            </button>
+            <button onclick="window.sair()" class="card-interaction bg-white rounded-3xl p-6 border-b-4 border-gray-300 flex flex-col items-center gap-2">
+                <i class="fa-solid fa-power-off text-3xl text-gray-300"></i>
+                <span class="font-bold text-[10px] uppercase text-gray-400">Sair</span>
+            </button>
+        </div>
 
-            <div id="aba-menu-inspetor" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4 max-w-xl mx-auto mt-6">
-                <button onclick="window.mudarAba('registro')" class="card-interaction col-span-1 md:col-span-2 bg-white border-2 border-shopee rounded-3xl p-10 flex flex-col items-center gap-4">
-                    <i class="fa-solid fa-triangle-exclamation text-7xl text-shopee"></i>
-                    <span class="font-black text-2xl uppercase tracking-tighter">Relatar Risco Agora</span>
-                </button>
-                <button onclick="window.mudarAba('progresso')" class="card-interaction bg-white rounded-3xl p-6 border-b-4 border-shopee flex flex-col items-center gap-2">
-                    <i class="fa-solid fa-chart-line text-3xl text-shopee"></i>
-                    <span class="font-bold text-[10px] uppercase">Meu Progresso</span>
-                </button>
-                <button onclick="window.sair()" class="card-interaction bg-white rounded-3xl p-6 border-b-4 border-shopee flex flex-col items-center gap-2">
-                    <i class="fa-solid fa-power-off text-3xl text-gray-400"></i>
-                    <span class="font-bold text-[10px] uppercase text-gray-400">Deslogar</span>
-                </button>
-            </div>
-
-            <div id="aba-registro" class="hidden max-w-2xl mx-auto">
-                <div class="flex items-center gap-4 mb-6">
-                    <button onclick="window.voltarMenu()" class="w-10 h-10 rounded-full bg-white shadow flex items-center justify-center hover:bg-gray-100 transition-all"><i class="fa-solid fa-arrow-left text-shopee"></i></button>
-                    <h2 class="text-xl font-black uppercase tracking-tighter">Nova Auditoria de Risco</h2>
+        <div id="aba-registro" class="hidden max-w-2xl mx-auto">
+            <button onclick="window.voltarMenu()" class="mb-6 font-bold text-shopee uppercase text-xs tracking-widest"><i class="fa-solid fa-arrow-left"></i> Voltar</button>
+            <div class="bg-white p-8 rounded-[2.5rem] shadow-xl border space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <select id="hub_local" class="bg-gray-50 border p-4 rounded-2xl outline-none focus:ring-2 focus:ring-shopee">
+                        <option value="" disabled selected>Hub...</option>
+                        <option>Hub Uberaba</option><option>Hub Uberlândia</option><option>Hub Divinópolis</option>
+                    </select>
+                    <select id="categoria" class="bg-gray-50 border p-4 rounded-2xl outline-none focus:ring-2 focus:ring-shopee">
+                        <option value="" disabled selected>Risco...</option>
+                        <option>EPI</option><option>Organização</option><option>Infraestrutura</option>
+                    </select>
                 </div>
-                <div class="bg-white p-8 rounded-[2.5rem] shadow-xl border space-y-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <select id="hub_local" class="bg-gray-50 border p-4 rounded-2xl focus:ring-2 focus:ring-shopee outline-none">
-                            <option value="" disabled selected>Selecionar Base...</option>
-                            <option>Hub Uberaba</option><option>Hub Uberlândia</option><option>Hub Divinópolis</option><option>Hub Lagoa da Prata</option><option>Hub Patos de Minas</option>
-                        </select>
-                        <select id="categoria" class="bg-gray-50 border p-4 rounded-2xl focus:ring-2 focus:ring-shopee outline-none">
-                            <option value="" disabled selected>Tipo de Risco...</option>
-                            <option>Organização e Limpeza</option><option>Movimentação Volumosos</option><option>Uso de EPIs</option><option>Docas e Infraestrutura</option>
-                        </select>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <input type="date" id="data_ocorrencia" class="bg-gray-50 border p-4 rounded-2xl">
-                        <input type="time" id="hora_ocorrencia" class="bg-gray-50 border p-4 rounded-2xl">
-                    </div>
-                    <textarea id="detalhes" rows="3" class="w-full bg-gray-50 border p-4 rounded-2xl outline-none focus:ring-2 focus:ring-shopee" placeholder="Descreva tecnicamente o que foi encontrado..."></textarea>
-                    
-                    <div class="border-2 border-dashed border-gray-200 rounded-2xl p-8 text-center relative hover:bg-shopee-light transition-all group">
-                        <i class="fa-solid fa-camera text-3xl text-gray-300 mb-2 group-hover:text-shopee"></i>
-                        <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest" id="upload-text">Toque para adicionar fotos (Max 5)</p>
-                        <input type="file" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="window.processarNovaFoto(event)">
-                    </div>
-                    <div id="preview-fotos-container" class="grid grid-cols-5 gap-2 px-1"></div>
-                    
-                    <button id="btn-enviar" onclick="window.salvarFormulario()" class="w-full bg-shopee text-white font-black py-5 rounded-2xl shadow-xl uppercase tracking-widest hover:bg-shopee-dark transition-all">Transmitir Relatório</button>
+                <div class="grid grid-cols-2 gap-4">
+                    <input type="date" id="data_ocorrencia" class="bg-gray-50 border p-4 rounded-2xl">
+                    <input type="time" id="hora_ocorrencia" class="bg-gray-50 border p-4 rounded-2xl">
                 </div>
+                <textarea id="detalhes" rows="3" class="w-full bg-gray-50 border p-4 rounded-2xl outline-none" placeholder="Descrição detalhada..."></textarea>
+                <div class="border-2 border-dashed border-gray-200 rounded-2xl p-8 text-center relative hover:bg-orange-50">
+                    <i class="fa-solid fa-camera text-3xl text-gray-300 mb-2"></i>
+                    <p class="text-[10px] font-black text-gray-400 uppercase" id="upload-text">Toque para adicionar fotos (Max 5)</p>
+                    <input type="file" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="window.processarNovaFoto(event)">
+                </div>
+                <div id="preview-fotos-container" class="grid grid-cols-5 gap-2 px-1"></div>
+                <button id="btn-enviar" onclick="window.salvarFormulario()" class="w-full bg-shopee text-white font-black py-6 rounded-2xl shadow-xl uppercase tracking-widest">TRANSMITIR RELATÓRIO</button>
             </div>
+        </div>
 
-            <div id="aba-progresso" class="hidden max-w-4xl mx-auto">
-                <button onclick="window.voltarMenu()" class="mb-6 flex items-center gap-2 font-bold text-shopee uppercase text-xs tracking-widest"><i class="fa-solid fa-arrow-left"></i> Voltar ao Menu</button>
-                <div class="bg-white rounded-[2.5rem] shadow-xl overflow-hidden border">
-                    <table class="w-full text-left whitespace-nowrap">
-                        <thead class="bg-gray-50 border-b">
-                            <tr><th class="p-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">Unidade</th><th class="p-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">Status Atual</th></tr>
-                        </thead>
-                        <tbody id="tabela-meu-progresso" class="divide-y"></tbody>
-                    </table>
+        <div id="aba-dashboard" class="hidden space-y-6 max-w-6xl mx-auto pb-20">
+            <div class="grid grid-cols-3 gap-4">
+                <div class="bg-white p-6 rounded-3xl border shadow-sm text-center"><h4 class="text-[10px] font-bold text-gray-400 uppercase mb-1">Total</h4><h2 id="kpi-total" class="text-3xl font-black">0</h2></div>
+                <div class="bg-white p-6 rounded-3xl border shadow-sm text-center"><h4 class="text-[10px] font-bold text-gray-400 uppercase mb-1">Aguardando</h4><h2 id="kpi-pendentes" class="text-3xl font-black text-yellow-500">0</h2></div>
+                <div class="bg-white p-6 rounded-3xl border shadow-sm text-center"><h4 class="text-[10px] font-bold text-gray-400 uppercase mb-1">Sanado</h4><h2 id="kpi-resolvidos" class="text-3xl font-black text-green-500">0</h2></div>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="bg-white p-8 rounded-[2.5rem] border shadow-sm flex flex-col items-center">
+                    <canvas id="graficoStatus" class="max-h-48"></canvas>
+                </div>
+                <div class="lg:col-span-2 bg-white rounded-[2.5rem] border shadow-sm overflow-hidden">
+                    <div class="overflow-x-auto"><table class="w-full text-left text-sm whitespace-nowrap"><thead class="bg-gray-50 border-b"><tr class="text-[10px] font-black text-gray-400 uppercase"><th class="p-5">Unidade</th><th class="p-5">Inspetor</th><th class="p-5">Status</th><th class="p-5">Ação</th></tr></thead><tbody id="tabela-dados" class="divide-y divide-gray-100"></tbody></table></div>
                 </div>
             </div>
+        </div>
 
-            <div id="aba-dashboard" class="hidden space-y-6 pb-20">
-                <div class="grid grid-cols-3 gap-4">
-                    <div class="bg-white p-6 rounded-3xl border shadow-sm"><h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Total</h4><h2 id="kpi-total" class="text-3xl font-black">0</h2></div>
-                    <div class="bg-white p-6 rounded-3xl border shadow-sm"><h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Aguardando</h4><h2 id="kpi-pendentes" class="text-3xl font-black text-yellow-500">0</h2></div>
-                    <div class="bg-white p-6 rounded-3xl border shadow-sm"><h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Sanado</h4><h2 id="kpi-resolvidos" class="text-3xl font-black text-green-500">0</h2></div>
-                </div>
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div class="lg:col-span-1 bg-white p-8 rounded-[2.5rem] border shadow-sm flex flex-col items-center">
-                        <canvas id="graficoStatus" class="max-h-48"></canvas>
-                    </div>
-                    <div class="lg:col-span-2 bg-white rounded-[2.5rem] border shadow-sm overflow-hidden">
-                        <div class="overflow-x-auto"><table class="w-full text-left text-sm whitespace-nowrap"><thead><tr class="bg-gray-50 border-b"><th class="p-5 uppercase text-[10px] font-black text-gray-400 tracking-widest">Unidade</th><th class="p-5 uppercase text-[10px] font-black text-gray-400 tracking-widest">Inspetor</th><th class="p-5 uppercase text-[10px] font-black text-gray-400 tracking-widest">Status</th><th class="p-5"></th></tr></thead><tbody id="tabela-dados" class="divide-y"></tbody></table></div>
-                    </div>
-                </div>
+        <div id="aba-progresso" class="hidden max-w-4xl mx-auto">
+            <button onclick="window.voltarMenu()" class="mb-6 font-bold text-shopee uppercase text-xs tracking-widest"><i class="fa-solid fa-arrow-left"></i> Voltar</button>
+            <div class="bg-white rounded-[2.5rem] shadow-xl overflow-hidden border">
+                <table class="w-full text-left whitespace-nowrap">
+                    <thead class="bg-gray-50 border-b"><tr><th class="p-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">Unidade</th><th class="p-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">Status</th></tr></thead>
+                    <tbody id="tabela-meu-progresso" class="divide-y"></tbody>
+                </table>
             </div>
-
         </div>
     </main>
 </div>
@@ -215,31 +191,28 @@
     window.ocorrencias = [];
     window.usuarioAtual = '';
     window.nomeUsuarioAtual = '';
-    window.indiceEmEdicao = null;
     window.fotosBinariasTemporarias = [];
+    window.indiceEmEdicao = null;
     let graficoChartJS = null;
 
-    // Escuta Realtime do Firestore
+    // Escuta tempo real (Firestore)
     onSnapshot(query(collection(db, "ocorrencias_lmg48"), orderBy("timestamp", "desc")), (snap) => {
         window.ocorrencias = snap.docs.map(d => ({ id: d.id, ...d.data() }));
         if(window.usuarioAtual === 'admin') atualizarDashboardUI();
         if(window.usuarioAtual === 'davidsilveira') renderizarMeuProgresso();
     });
 
-    // Login Seguro
+    // Login
     window.fazerLogin = () => {
         const u = document.getElementById('username').value.trim();
         const p = document.getElementById('password').value.trim();
-        
         if(u === "admin" && p === "spxadminl#") {
             window.usuarioAtual = 'admin'; window.nomeUsuarioAtual = 'Gestor ADM';
             iniciarPortal('dashboard');
         } else if(u === "davidsilveira" && p === "1234") {
             window.usuarioAtual = 'davidsilveira'; window.nomeUsuarioAtual = 'David Silveira';
-            iniciarPortal('menu-inspetor');
-        } else {
-            alert("⚠️ Credenciais Inválidas!");
-        }
+            iniciarPortal('aba-menu-inspetor');
+        } else { alert("Dados incorretos!"); }
     };
 
     function iniciarPortal(aba) {
@@ -251,15 +224,15 @@
     }
 
     window.mudarAba = (a) => {
-        ['dashboard', 'registro', 'menu-inspetor', 'progresso'].forEach(i => {
-            const el = document.getElementById('aba-'+i);
+        ['dashboard', 'registro', 'aba-menu-inspetor', 'progresso'].forEach(i => {
+            const el = document.getElementById(i === 'aba-menu-inspetor' ? i : 'aba-'+i);
             if(el) el.classList.add('hidden');
         });
-        const target = document.getElementById('aba-'+a);
+        const target = document.getElementById(a === 'aba-menu-inspetor' ? a : 'aba-'+a);
         if(target) target.classList.remove('hidden');
     };
 
-    // Compressão Rápida para o Google Storage
+    // Compressão ultra-rápida (Blob)
     async function comprimir(file) {
         return new Promise(res => {
             const img = new Image();
@@ -271,7 +244,8 @@
                 let w = img.width, h = img.height;
                 if(w > MAX) { h *= MAX/w; w = MAX; }
                 canvas.width = w; canvas.height = h;
-                canvas.getContext('2d').drawImage(img, 0,0,w,h);
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0,0,w,h);
                 canvas.toBlob(blob => res({blob, preview: canvas.toDataURL('image/jpeg', 0.5)}), 'image/jpeg', 0.5);
             };
             img.src = url;
@@ -284,60 +258,60 @@
         document.getElementById('upload-text').innerText = "OTIMIZANDO...";
         const {blob, preview} = await comprimir(file);
         window.fotosBinariasTemporarias.push(blob);
-        const cont = document.getElementById('preview-fotos-container');
-        cont.innerHTML += `<div class="h-16 rounded-xl overflow-hidden border-2 border-white shadow-sm"><img src="${preview}" class="w-full h-full object-cover"></div>`;
-        document.getElementById('upload-text').innerText = "ADICIONAR MAIS ("+window.fotosBinariasTemporarias.length+"/5)";
-        e.target.value = '';
+        document.getElementById('preview-fotos-container').innerHTML += `<div class="h-16 rounded-xl border-2 border-white shadow-sm overflow-hidden"><img src="${preview}" class="w-full h-full object-cover"></div>`;
+        document.getElementById('upload-text').innerText = `Adicionar Foto (${window.fotosBinariasTemporarias.length}/5)`;
     };
 
     window.salvarFormulario = async () => {
-        const hub = document.getElementById('hub_local').value;
-        const cat = document.getElementById('categoria').value;
-        const det = document.getElementById('detalhes').value;
-        const dat = document.getElementById('data_ocorrencia').value;
-        const hor = document.getElementById('hora_ocorrencia').value;
-
-        if(!hub || !cat || !det || !dat || !hor) {
-            alert("⚠️ Por favor, preencha todos os campos e anexe as fotos.");
-            return;
-        }
-
         const btn = document.getElementById('btn-enviar');
+        const hub = document.getElementById('hub_local').value;
+        if(!hub) { alert("Selecione o Hub!"); return; }
         btn.disabled = true; btn.innerText = "TRANSMITINDO...";
-
         try {
             const uploadPromises = window.fotosBinariasTemporarias.map(async (blob, i) => {
                 const sRef = ref(storage, `lmg48/${Date.now()}_${i}.jpg`);
                 await uploadBytes(sRef, blob);
                 return getDownloadURL(sRef);
             });
-            
             const urls = await Promise.all(uploadPromises);
-            const dataBr = dat.split('-').reverse().join('/');
-            
+            const dataBr = document.getElementById('data_ocorrencia').value.split('-').reverse().join('/');
             await addDoc(collection(db, "ocorrencias_lmg48"), {
-                local: hub, categoria: cat, detalheCompleto: det,
-                data: `${dataBr} às ${hor}`, fotos_urls: urls,
-                status: "Pendente", autor: window.nomeUsuarioAtual, timestamp: serverTimestamp()
+                local: hub, categoria: document.getElementById('categoria').value,
+                data: `${dataBr} às ${document.getElementById('hora_ocorrencia').value}`,
+                detalheCompleto: document.getElementById('detalhes').value,
+                fotos_urls: urls, status: "Pendente", autor: window.nomeUsuarioAtual, timestamp: serverTimestamp()
             });
-
-            alert("✅ Relatório enviado com sucesso!");
-            location.reload();
-        } catch(e) {
-            alert("❌ Erro ao conectar com o servidor.");
-            btn.disabled = false; btn.innerText = "TENTAR NOVAMENTE";
-        }
+            alert("Sucesso!"); location.reload();
+        } catch(e) { alert("Erro!"); btn.disabled = false; }
     };
 
-    // UI Dash & Tabela
+    window.abrirDetalhes = (idx) => {
+        const o = window.ocorrencias[idx];
+        document.getElementById('detalhe-hub').innerText = o.local;
+        document.getElementById('detalhe-categoria').innerText = o.categoria;
+        document.getElementById('detalhe-data').innerText = o.data;
+        document.getElementById('detalhe-texto').innerText = o.detalheCompleto;
+        document.getElementById('detalhe-autor').innerText = o.autor;
+        document.getElementById('detalhe-avatar').innerText = o.autor.substring(0,2).toUpperCase();
+        document.getElementById('detalhe-status-box').innerHTML = `<span class="px-3 py-1 rounded-full text-[10px] font-black border uppercase ${o.status === 'Resolvido' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}">${o.status}</span>`;
+        document.getElementById('detalhe-galeria-fotos').innerHTML = (o.fotos_urls || []).map(u => `<a href="${u}" target="_blank"><img src="${u}" class="h-24 w-full object-cover rounded-xl border"></a>`).join('');
+        document.getElementById('slide-overlay').classList.add('active');
+        document.getElementById('slide-panel').classList.add('active');
+    };
+
+    window.fecharDetalhes = () => { document.getElementById('slide-overlay').classList.remove('active'); document.getElementById('slide-panel').classList.remove('active'); };
+    window.abrirDropdownStatus = (e, i) => { e.stopPropagation(); window.indiceEmEdicao = i; const d = document.getElementById('statusDropdown'); d.style.left = e.clientX+'px'; d.style.top = e.clientY+'px'; d.classList.add('active'); };
+    window.fecharDropdownStatus = () => document.getElementById('statusDropdown').classList.remove('active');
+    window.atualizarStatus = async (s) => { if(window.indiceEmEdicao !== null) { await updateDoc(doc(db, "ocorrencias_lmg48", window.ocorrencias[window.indiceEmEdicao].id), {status: s}); window.fecharDropdownStatus(); } };
+    window.sair = () => location.reload();
+    window.voltarMenu = () => window.mudarAba('aba-menu-inspetor');
+
     function atualizarDashboardUI() {
         const tb = document.getElementById('tabela-dados');
-        if(!tb) return;
         let p=0, r=0, c=0;
         tb.innerHTML = window.ocorrencias.map((o, i) => {
             if(o.status==='Pendente') p++; else if(o.status==='Resolvido') r++; else c++;
-            const ini = o.autor.substring(0,2).toUpperCase();
-            return `<tr class="hover:bg-gray-50"><td class="p-5 font-bold text-xs">${o.local}</td><td class="p-5"><div class="flex items-center gap-2"><div class="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center text-[10px] font-bold">${ini}</div><span class="text-[10px] font-bold uppercase text-gray-500">${o.autor}</span></div></td><td class="p-5"><button onclick="window.abrirDropdownStatus(event, ${i})" class="px-3 py-1 rounded-full text-[10px] font-black border uppercase ${o.status==='Resolvido'?'text-green-600 bg-green-50 border-green-200':'text-yellow-600 bg-yellow-50 border-yellow-200'}">${o.status}</button></td><td class="p-5 text-center"><button onclick="window.abrirDetalhes(${i})" class="text-shopee hover:scale-125 transition-transform"><i class="fa-solid fa-circle-chevron-right text-xl"></i></button></td></tr>`;
+            return `<tr><td class="p-5 font-bold text-xs uppercase text-gray-700">${o.local}</td><td class="p-5 text-[10px] font-bold text-gray-400 uppercase">${o.autor}</td><td class="p-5"><button onclick="window.abrirDropdownStatus(event, ${i})" class="px-3 py-1 rounded-full text-[10px] font-black border uppercase ${o.status==='Resolvido'?'bg-green-50 text-green-600':'bg-yellow-50 text-yellow-600'}">${o.status}</button></td><td class="p-5 text-center"><button onclick="window.abrirDetalhes(${i})" class="text-shopee"><i class="fa-solid fa-circle-chevron-right text-xl"></i></button></td></tr>`;
         }).join('');
         document.getElementById('kpi-total').innerText = window.ocorrencias.length;
         document.getElementById('kpi-pendentes').innerText = p; document.getElementById('kpi-resolvidos').innerText = r;
@@ -352,31 +326,11 @@
 
     function renderizarMeuProgresso() {
         const tb = document.getElementById('tabela-meu-progresso');
-        if(!tb) return;
-        tb.innerHTML = window.ocorrencias.filter(o => o.autor === window.nomeUsuarioAtual).map(o => `<tr><td class="p-6 font-bold text-xs">${o.local}</td><td class="p-6"><span class="px-3 py-1 rounded-full text-[10px] font-black border uppercase ${o.status==='Resolvido'?'text-green-600 bg-green-50':'text-yellow-600 bg-yellow-50'}">${o.status}</span></td></tr>`).join('');
+        tb.innerHTML = window.ocorrencias.filter(o => o.autor === window.nomeUsuarioAtual).map(o => `<tr><td class="p-6 font-bold text-xs uppercase">${o.local}</td><td class="p-6"><span class="px-3 py-1 rounded-full text-[10px] font-black border uppercase ${o.status==='Resolvido'?'text-green-600':'text-yellow-600'}">${o.status}</span></td></tr>`).join('');
     }
 
-    window.abrirDetalhes = (idx) => {
-        const o = window.ocorrencias[idx];
-        document.getElementById('detalhe-hub').innerText = o.local;
-        document.getElementById('detalhe-categoria').innerText = o.categoria;
-        document.getElementById('detalhe-data').innerText = o.data;
-        document.getElementById('detalhe-texto').innerText = o.detalheCompleto;
-        document.getElementById('detalhe-autor').innerText = o.autor;
-        document.getElementById('detalhe-avatar').innerText = o.autor.substring(0,2).toUpperCase();
-        const gal = document.getElementById('detalhe-galeria-fotos');
-        gal.innerHTML = (o.fotos_urls || []).map(u => `<a href="${u}" target="_blank"><img src="${u}" class="h-24 w-full object-cover rounded-xl border-2 border-white shadow-sm"></a>`).join('');
-        document.getElementById('slide-overlay').classList.add('active');
-        document.getElementById('slide-panel').classList.add('active');
-    };
-
-    window.fecharDetalhes = () => { document.getElementById('slide-overlay').classList.remove('active'); document.getElementById('slide-panel').classList.remove('active'); };
-    window.abrirDropdownStatus = (e, i) => { e.stopPropagation(); window.indiceEmEdicao = i; const d = document.getElementById('statusDropdown'); d.style.left = e.clientX+'px'; d.style.top = e.clientY+'px'; d.classList.add('active'); };
-    window.atualizarStatus = async (s) => { if(window.indiceEmEdicao !== null) { await updateDoc(doc(db, "ocorrencias_lmg48", window.ocorrencias[window.indiceEmEdicao].id), {status: s}); document.getElementById('statusDropdown').classList.remove('active'); } };
-    window.sair = () => location.reload();
-    window.voltarMenu = () => window.mudarAba('menu-inspetor');
-    document.addEventListener('click', () => document.getElementById('statusDropdown').classList.remove('active'));
-    document.addEventListener('keydown', e => { if(e.key==='Escape') { window.fecharDetalhes(); document.getElementById('statusDropdown').classList.remove('active'); } });
+    document.addEventListener('click', window.fecharDropdownStatus);
+    document.addEventListener('keydown', e => { if(e.key==='Escape') { window.fecharDetalhes(); window.fecharDropdownStatus(); } });
 </script>
 
 </body>
