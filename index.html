@@ -357,7 +357,6 @@
 </div>
 
 <script type="module">
-    // REPARE: REMOVI AS REFERÊNCIAS AO STORAGE PARA EVITAR QUALQUER ERRO
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
     import { getDatabase, ref, push, set, onValue, update, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
@@ -377,11 +376,11 @@
     window.usuarioAtual = '';
     window.nomeUsuarioAtual = '';
     window.indiceEmEdicao = null;
-    window.fotosMiniaturasTemporarias = []; // Guardará o Base64 das fotos diretamente
+    window.fotosMiniaturasTemporarias = []; // AGORA GUARDA O TEXTO DA IMAGEM DIRETO
     let graficoChartJS = null;
     const MAX_FOTOS = 5;
 
-    // Conexão com o Realtime Database
+    // Escuta Realtime
     onValue(ref(db, 'ocorrencias_lmg48'), (snapshot) => {
         const data = snapshot.val();
         window.ocorrencias = data ? Object.keys(data).map(key => ({ id: key, ...data[key] })).reverse() : [];
@@ -423,19 +422,20 @@
         if(window.usuarioAtual === 'davidsilveira') window.mudarAba('menu-inspetor');
     };
 
-    async function comprimir(file) {
+    // FUNÇÃO DE COMPRESSÃO QUE TRANSFORMA FOTO EM TEXTO PARA NÃO USAR O STORAGE BLOQUEADO
+    async function comprimirBase64(file) {
         return new Promise(resolve => {
             const img = new Image();
             const url = URL.createObjectURL(file);
             img.onload = () => {
                 URL.revokeObjectURL(url);
                 const canvas = document.createElement('canvas');
-                const MAX = 500; // Reduzido mais um pouco para ser super leve e ir direto no banco
+                const MAX = 640; 
                 let w = img.width, h = img.height;
                 if(w > MAX) { h *= MAX/w; w = MAX; }
                 canvas.width = w; canvas.height = h;
                 canvas.getContext('2d').drawImage(img, 0,0,w,h);
-                // Retorna diretamente a string Base64 compactada
+                // Devolve a imagem como um texto minúsculo direto
                 resolve(canvas.toDataURL('image/jpeg', 0.4));
             };
             img.src = url;
@@ -447,10 +447,10 @@
         if(!file) return;
         if(window.fotosMiniaturasTemporarias.length >= MAX_FOTOS) { alert(`Você atingiu o limite de ${MAX_FOTOS} fotos.`); return; }
         
-        document.getElementById('upload-text').innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Anexando...`;
+        document.getElementById('upload-text').innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Otimizando...`;
         
-        const previewUrlData = await comprimir(file);
-        window.fotosMiniaturasTemporarias.push(previewUrlData);
+        const previewBase64 = await comprimirBase64(file);
+        window.fotosMiniaturasTemporarias.push(previewBase64);
         
         renderizarGradeDeFotos();
         document.getElementById('upload-text').innerText = "Toque para adicionar foto";
@@ -478,7 +478,7 @@
         });
     }
 
-    // ENVIO CORRIGIDO: IGNORANDO O STORAGE E ENVIANDO DIRETO PARA O BANCO DE DADOS
+    // ENVIO 100% CORRIGIDO: SOMENTE PARA O DATABASE (IGNORA O STORAGE)
     window.salvarFormulario = async () => {
         const hub = document.getElementById('hub_local').value;
         const cat = document.getElementById('categoria').value;
@@ -488,7 +488,7 @@
         const btn = document.getElementById('btn-enviar');
 
         if(!hub || !cat || !dat || !hor || !det) {
-            alert("⚠️ Por favor, preencha todos os campos textuais do formulário.");
+            alert("⚠️ Por favor, preencha todos os campos do formulário antes de enviar.");
             return;
         }
 
@@ -496,20 +496,17 @@
         btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> <span>Enviando para Nuvem...</span>`;
 
         try {
-            // PULA A PARTE DO STORAGE (QUE ESTAVA BLOQUEADO NO FIREBASE)
-            const urlsDasFotos = window.fotosMiniaturasTemporarias;
-
-            // Salva tudo diretamente no Realtime Database
             const partesData = dat.split('-');
             const dataFormatada = `${partesData[2]}/${partesData[1]}/${partesData[0]} às ${hor}`;
             const novaOcorrenciaRef = push(ref(db, 'ocorrencias_lmg48'));
             
+            // MANDA TUDO, INCLUSIVE AS FOTOS (COMO TEXTO), DIRETO PRO DATABASE
             await set(novaOcorrenciaRef, {
                 local: hub,
                 categoria: cat,
                 data: dataFormatada,
                 detalheCompleto: det,
-                fotos_urls: urlsDasFotos, // Array de strings Base64
+                fotos_urls: window.fotosMiniaturasTemporarias, 
                 status: "Pendente",
                 autor: window.nomeUsuarioAtual,
                 timestamp: serverTimestamp()
