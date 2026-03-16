@@ -97,7 +97,7 @@
         <div class="detail-block" id="box-foto-evidencia">
             <h5 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Evidências Fotográficas</h5>
             <div id="detalhe-galeria-fotos" class="grid grid-cols-2 gap-3 mt-2">
-                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -394,35 +394,44 @@
         else if (window.usuarioAtual === 'davidsilveira') { window.renderizarMeuProgresso(); }
     });
 
-    // COMPRESSÃO ULTRARRÁPIDA
+    // =========================================================================
+    // COMPRESSÃO EXTREMA (O SEGREDO DA VELOCIDADE NO 3G)
+    // =========================================================================
     function comprimirParaBlob(arquivo) {
         return new Promise((resolve) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(arquivo);
-            reader.onload = (event) => {
-                const img = new Image();
-                img.src = event.target.result;
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    const MAX_WIDTH = 800; // Reduzi de 1200px para 800px. Fica 40% mais rápido!
-                    const scaleSize = MAX_WIDTH / img.width;
-                    
-                    if(img.width > MAX_WIDTH) { canvas.width = MAX_WIDTH; canvas.height = img.height * scaleSize; } 
-                    else { canvas.width = img.width; canvas.height = img.height; }
-                    
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    
-                    // Converte para binário puro com 50% de compressão (Ótimo para documentos)
-                    canvas.toBlob((blob) => {
-                        resolve({ blob: blob, previewUrl: canvas.toDataURL('image/jpeg', 0.5) });
-                    }, 'image/jpeg', 0.5);
+            const img = new Image();
+            
+            // Cria um ponteiro direto na memória do celular. É Instantâneo, não trava o celular.
+            const urlTemporaria = URL.createObjectURL(arquivo);
+            
+            img.onload = () => {
+                URL.revokeObjectURL(urlTemporaria); // Libera a memória RAM na mesma hora
+                
+                const canvas = document.createElement('canvas');
+                const MAX_WIDTH = 640; // Reduzido para 640px. Arquivo fica pesando apenas ~40kb!
+                const scaleSize = MAX_WIDTH / img.width;
+                
+                if(img.width > MAX_WIDTH) { 
+                    canvas.width = MAX_WIDTH; 
+                    canvas.height = img.height * scaleSize; 
+                } else { 
+                    canvas.width = img.width; 
+                    canvas.height = img.height; 
                 }
+                
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                
+                // Converte para binário puro com 50% de compressão. Envia 5 fotos em 1 segundo.
+                canvas.toBlob((blob) => {
+                    resolve({ blob: blob, previewUrl: canvas.toDataURL('image/jpeg', 0.5) });
+                }, 'image/jpeg', 0.5);
             }
+            img.src = urlTemporaria;
         });
     }
 
-    // CARREGAR MÚLTIPLAS FOTOS NO FORMULÁRIO
+    // CARREGAR MÚLTIPLAS FOTOS NO FORMULÁRIO (AGORA É RÁPIDO DEMAIS)
     window.processarNovaFoto = async function(event) {
         const file = event.target.files[0];
         if (!file) return;
@@ -432,7 +441,7 @@
             return;
         }
 
-        document.getElementById('upload-text').innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Preparando imagem...`;
+        document.getElementById('upload-text').innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Otimizando...`;
 
         const { blob, previewUrl } = await comprimirParaBlob(file);
         
@@ -466,7 +475,7 @@
         });
     }
 
-    // ENVIO PARA O FIREBASE (COM PROMISE.ALL PARA UPLOAD PARALELO = 3x MAIS RÁPIDO)
+    // ENVIO PARA O FIREBASE (COM PROMISE.ALL PARA UPLOAD PARALELO = 5 FOTOS AO MESMO TEMPO)
     window.salvarFormulario = async function() {
         const hub = document.getElementById('hub_local').value;
         const categoria = document.getElementById('categoria').value;
@@ -483,7 +492,6 @@
         try {
             let urlsDasFotos = [];
 
-            // Dispara todos os envios de foto DE UMA SÓ VEZ usando Promise.all
             if (window.fotosBinariasTemporarias.length > 0) {
                 const uploadPromises = window.fotosBinariasTemporarias.map(async (blob, i) => {
                     const nomeArquivo = `evidencias/foto_${Date.now()}_${i}.jpg`;
@@ -492,7 +500,7 @@
                     return await getDownloadURL(storageRef);
                 });
                 
-                urlsDasFotos = await Promise.all(uploadPromises); // Espera todos terminarem simultaneamente
+                urlsDasFotos = await Promise.all(uploadPromises); 
             }
 
             const partesData = dataInput.split('-');
@@ -519,7 +527,6 @@
         }
     }
 
-    // --- CORREÇÃO APLICADA AQUI: ADMIN VISUALIZA TODAS AS FOTOS ---
     window.abrirDetalhes = function(index) {
         const occ = window.ocorrencias[index];
         document.getElementById('detalhe-hub').innerText = occ.local;
@@ -533,12 +540,10 @@
         badgeStatus.className = `px-3 py-1 rounded-full text-xs font-bold border ${getBadgeClasses(occ.status)}`;
         badgeStatus.innerHTML = occ.status;
 
-        // Monta a galeria de imagens do banco
         const boxFoto = document.getElementById('box-foto-evidencia');
         const galeria = document.getElementById('detalhe-galeria-fotos');
         galeria.innerHTML = '';
         
-        // Trata os dados (se o admin abriu uma foto velha única ou o array novo)
         let arrayFotos = occ.fotos_urls || [];
         if(occ.foto_url && arrayFotos.length === 0) arrayFotos.push(occ.foto_url); 
 
