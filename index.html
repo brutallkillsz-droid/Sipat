@@ -114,7 +114,7 @@
         </div>
     </div>
     <div class="flex-1 flex justify-center items-center p-6 bg-gray-50 overflow-y-auto">
-        <div class="w-full max-w-md bg-white p-8 rounded-3xl shadow-xl border border-gray-100 flex flex-col items-center my-auto overflow-y-auto min-h-full py-4">
+        <div class="w-full max-w-md bg-white p-8 rounded-3xl shadow-xl border border-gray-100 flex flex-col items-center my-auto py-4">
             
             <div class="md:hidden flex flex-col items-center mb-6 w-full">
                 <video autoplay loop muted playsinline class="w-56 sm:w-64 mx-auto h-auto rounded-3xl shadow-lg border-2 border-shopee bg-white object-contain">
@@ -163,7 +163,7 @@
     <main class="flex-1 overflow-y-auto p-4 md:p-8">
         <div class="max-w-6xl mx-auto w-full h-full relative">
 
-            <div id="aba-menu-inspetor" class="hidden h-full flex flex-col justify-center max-w-2xl mx-auto pt-4 overflow-y-auto gap-4">
+            <div id="aba-menu-inspetor" class="hidden h-full flex flex-col justify-center max-w-2xl mx-auto pt-4 gap-4">
                 <div class="grid grid-cols-2 gap-4 md:gap-6">
                     <button onclick="window.mudarAba('registro')" class="card-interaction col-span-2 bg-white border-2 border-shopee rounded-3xl p-8 shadow-sm flex flex-col items-center justify-center space-y-4 group">
                         <i class="fa-solid fa-triangle-exclamation text-7xl text-shopee transition-colors"></i>
@@ -188,7 +188,7 @@
                 </div>
             </div>
 
-            <div id="aba-registro" class="hidden max-w-3xl mx-auto pb-10 overflow-y-auto">
+            <div id="aba-registro" class="hidden max-w-3xl mx-auto pb-10">
                 <div class="flex items-center gap-4 mb-6 sticky top-0 bg-gray-50 z-10 py-2">
                     <button onclick="window.voltarMenuInspetor()" class="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-gray-500 hover:text-shopee hover:bg-shopee-light transition-all"><i class="fa-solid fa-arrow-left"></i></button>
                     <div>
@@ -273,10 +273,10 @@
                     <div class="p-6 border-b border-gray-50 bg-gray-50/50">
                         <h3 class="font-bold text-gray-800 flex items-center gap-2"><i class="fa-solid fa-clock-rotate-left text-shopee"></i> Histórico Pessoal</h3>
                     </div>
-                    <div class="overflow-x-auto overflow-y-auto flex-grow table-scroll p-4">
-                        <table class="w-full text-left whitespace-nowrap min-w-[700px]">
+                    <div class="w-full overflow-x-auto">
+                        <table class="w-full text-left whitespace-nowrap">
                             <thead>
-                                <tr class="bg-white border-b border-gray-100 sticky top-0 z-10 py-2">
+                                <tr class="bg-white border-b border-gray-100">
                                     <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Unidade</th>
                                     <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Classificação</th>
                                     <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Data / Hora</th>
@@ -325,6 +325,7 @@
                         <h3 class="font-bold text-gray-800 mb-4 w-full flex items-center gap-2 sticky top-0 bg-white z-10 py-1"><i class="fa-solid fa-chart-pie text-shopee"></i> Distribuição</h3>
                         <div class="relative w-full h-full max-h-[250px] flex justify-center items-center">
                             <canvas id="graficoStatus"></canvas>
+                            <div id="grafico-vazio" class="hidden absolute text-gray-400 font-bold text-sm">Sem dados para exibir</div>
                         </div>
                     </div>
 
@@ -333,10 +334,10 @@
                             <h3 class="font-bold text-gray-800 flex items-center gap-2"><i class="fa-solid fa-cloud text-shopee"></i> Banco de Dados RTDB</h3>
                             <span class="text-xs font-bold bg-green-100 text-green-700 px-3 py-1 rounded-full"><i class="fa-solid fa-circle-nodes"></i> Online</span>
                         </div>
-                        <div class="overflow-x-auto overflow-y-auto flex-grow table-scroll p-4">
-                            <table class="w-full text-left whitespace-nowrap min-w-[800px]">
+                        <div class="w-full overflow-x-auto">
+                            <table class="w-full text-left whitespace-nowrap">
                                 <thead>
-                                    <tr class="bg-white border-b border-gray-100 sticky top-0 z-10 py-2">
+                                    <tr class="bg-white border-b border-gray-100">
                                         <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Unidade</th>
                                         <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Inspetor</th>
                                         <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Data / Hora</th>
@@ -385,13 +386,14 @@
         window.ocorrencias = data ? Object.keys(data).map(key => ({ id: key, ...data[key] })).reverse() : [];
         
         if(window.usuarioAtual === 'admin') window.atualizarDashboardUI();
-        if(window.usuarioAtual === 'davidsilveira') window.renderizarMeuProgresso();
+        else if(window.usuarioAtual === 'davidsilveira') window.renderizarMeuProgresso();
     });
 
     window.fazerLogin = () => {
         const u = document.getElementById('username').value.trim();
         const p = document.getElementById('password').value.trim();
         
+        // APENAS OS DOIS LOGINS PERMITIDOS
         if(u === "admin" && p === "spxadminl#") {
             localStorage.setItem('sipat_user', 'admin');
             localStorage.setItem('sipat_nome', 'Gestor ADM');
@@ -406,6 +408,7 @@
         }
     };
 
+    // FUNÇÃO QUE CARREGA A SESSÃO NA TELA
     window.carregarSessao = (user, nome) => {
         window.usuarioAtual = user; 
         window.nomeUsuarioAtual = nome; 
@@ -413,11 +416,7 @@
         document.getElementById('user-display-name').innerText = nome;
         document.getElementById('user-display-avatar').innerText = user === 'admin' ? 'AD' : 'DS';
         
-        // Remove do login
-        document.getElementById('login-screen').classList.remove('flex');
-        document.getElementById('login-screen').classList.add('hidden');
-        
-        // Mostra o app
+        document.getElementById('login-screen').style.display = 'none';
         document.getElementById('app-layout').classList.remove('hidden');
         document.getElementById('app-layout').classList.add('flex');
 
@@ -435,20 +434,22 @@
         const nomeSalvo = localStorage.getItem('sipat_nome');
         if(userSalvo && nomeSalvo) { window.carregarSessao(userSalvo, nomeSalvo); }
     };
-    
-    // Chama ao recarregar a aba
     window.verificarSessao();
 
-    // FUNÇÃO SAIR CORRIGIDA
+    // DESLOGAR CORRIGIDO (LIMPA MEMÓRIA E FORÇA A ABA A RECARREGAR DO ZERO)
     window.sair = () => {
         localStorage.removeItem('sipat_user');
         localStorage.removeItem('sipat_nome');
-        location.reload(); 
+        window.location.href = window.location.pathname; 
     };
 
     window.mudarAba = (aba) => {
-        ['dashboard', 'registro', 'menu-inspetor', 'progresso'].forEach(i => document.getElementById('aba-'+i).classList.add('hidden'));
-        document.getElementById('aba-'+aba).classList.remove('hidden');
+        ['dashboard', 'registro', 'menu-inspetor', 'progresso'].forEach(i => {
+            const el = document.getElementById('aba-'+i);
+            if(el) el.classList.add('hidden');
+        });
+        const target = document.getElementById('aba-'+aba);
+        if(target) target.classList.remove('hidden');
     };
 
     window.voltarMenuInspetor = () => {
@@ -462,7 +463,7 @@
             img.onload = () => {
                 URL.revokeObjectURL(url);
                 const canvas = document.createElement('canvas');
-                const MAX = 640; 
+                const MAX = 480; 
                 let w = img.width, h = img.height;
                 if(w > MAX) { h *= MAX/w; w = MAX; }
                 canvas.width = w; canvas.height = h;
@@ -547,7 +548,7 @@
 
             await set(novaOcorrenciaRef, payload);
 
-            // Limpa o form sem congelar
+            // Limpa o form silenciosamente
             document.getElementById('hub_local').value = ""; document.getElementById('categoria').value = "";
             document.getElementById('data_ocorrencia').value = ""; document.getElementById('hora_ocorrencia').value = "";
             document.getElementById('detalhes').value = ""; 
@@ -556,7 +557,7 @@
 
             alert("✅ Relatório transmitido com sucesso!");
             
-            // Joga para a tela de Progresso automaticamente
+            // Vai para a tela de Meu Progresso para ver o envio na hora, sem F5 forçado
             window.mudarAba('progresso');
 
         } catch (error) {
@@ -649,7 +650,6 @@
     document.addEventListener('click', (e) => { if (document.getElementById('statusDropdown').classList.contains('active')) window.fecharDropdownStatus(); });
     document.addEventListener('keydown', (e) => { if (e.key === "Escape") { window.fecharDetalhes(); window.fecharDropdownStatus(); } });
 
-    // CIRURGIA 1: CONSTRÓI A TABELA INTEIRA NA MEMÓRIA ANTES DE DESENHAR (Fim do Congelamento)
     window.atualizarDashboardUI = () => {
         const tbody = document.getElementById('tabela-dados');
         if(!tbody) return;
@@ -673,13 +673,13 @@
             htmlTabela += `
                 <tr class="hover:bg-gray-50/50 transition-colors group border-b border-gray-50">
                     <td class="px-6 py-4"><strong class="text-gray-800">${item.local}</strong></td>
-                    <td class="px-6 py-4"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center font-bold text-xs uppercase">${iniciais}</div><span class="text-sm font-medium text-gray-700 uppercase">${item.autor}</span></div></td>
-                    <td class="px-6 py-4 text-sm text-gray-600">${item.data}</td>
-                    <td class="px-6 py-4"><button onclick="window.abrirDropdownStatus(event, ${index})" class="px-3 py-1.5 rounded-full text-xs font-bold border cursor-pointer hover:shadow-md transition-all flex items-center gap-2 ${badgeClass}">${item.status} <i class="fa-solid fa-caret-down opacity-50"></i></button></td>
-                    <td class="px-6 py-4 text-center">
-                        <div class="flex items-center justify-center gap-3">
-                            <button onclick="window.abrirDetalhes(${index})" class="w-9 h-9 rounded-lg border border-gray-200 text-gray-400 hover:text-shopee hover:border-shopee hover:bg-shopee-light transition-all flex items-center justify-center" title="Ver Detalhes"><i class="fa-solid fa-arrow-right"></i></button>
-                            <button onclick="window.excluirRelatorio(${index})" class="w-9 h-9 rounded-lg border border-gray-200 text-gray-400 hover:text-red-500 hover:border-red-500 hover:bg-red-50 transition-all flex items-center justify-center" title="Excluir Definitivamente"><i class="fa-solid fa-trash-can"></i></button>
+                    <td class="px-6 py-4"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center font-bold text-xs uppercase shrink-0">${iniciais}</div><span class="text-sm font-medium text-gray-700 uppercase">${item.autor}</span></div></td>
+                    <td class="px-6 py-4 text-sm text-gray-600 whitespace-nowrap">${item.data}</td>
+                    <td class="px-6 py-4"><button onclick="window.abrirDropdownStatus(event, ${index})" class="px-3 py-1.5 rounded-full text-xs font-bold border cursor-pointer hover:shadow-md transition-all flex items-center gap-2 whitespace-nowrap ${badgeClass}">${item.status} <i class="fa-solid fa-caret-down opacity-50 shrink-0"></i></button></td>
+                    <td class="px-6 py-4">
+                        <div class="flex items-center gap-3">
+                            <button onclick="window.abrirDetalhes(${index})" class="w-9 h-9 rounded-lg border border-gray-200 text-gray-400 hover:text-shopee hover:border-shopee hover:bg-shopee-light transition-all flex items-center justify-center shrink-0" title="Ver Detalhes"><i class="fa-solid fa-arrow-right"></i></button>
+                            <button onclick="window.excluirRelatorio(${index})" class="w-9 h-9 rounded-lg border border-gray-200 text-gray-400 hover:text-red-500 hover:border-red-500 hover:bg-red-50 transition-all flex items-center justify-center shrink-0" title="Excluir Definitivamente"><i class="fa-solid fa-trash-can"></i></button>
                         </div>
                     </td>
                 </tr>
@@ -692,13 +692,23 @@
     };
 
     window.desenharGrafico = (p, r, c) => {
-        const ctx = document.getElementById('graficoStatus').getContext('2d');
+        const canvas = document.getElementById('graficoStatus');
+        const emptyState = document.getElementById('grafico-vazio');
+        if(!canvas) return;
+
+        const ctx = canvas.getContext('2d');
         if (graficoChartJS) { graficoChartJS.destroy(); }
+        
+        // CIRURGIA DO APAGÃO: Oculta o canvas com CSS ao invés de destruir ele com JS
         if (p === 0 && r === 0 && c === 0) {
-             const parent = ctx.canvas.parentElement;
-             parent.innerHTML = '<div class="text-center text-gray-400 font-medium text-sm mt-10">Sem dados</div>';
+             canvas.style.display = 'none';
+             if(emptyState) emptyState.classList.remove('hidden');
              return;
         }
+        
+        canvas.style.display = 'block';
+        if(emptyState) emptyState.classList.add('hidden');
+
         graficoChartJS = new Chart(ctx, {
             type: 'doughnut',
             data: { labels: ['Pendentes', 'Sanadas', 'Canceladas'], datasets: [{ data: [p, r, c], backgroundColor: ['#F59E0B', '#10B981', '#EF4444'], borderWidth: 0, hoverOffset: 4 }] },
@@ -706,11 +716,10 @@
         });
     };
 
-    // CIRURGIA 2: CONSTRÓI A TABELA DE PROGRESSO NA MEMÓRIA TAMBÉM (Mais fluidez)
     window.renderizarMeuProgresso = () => {
         const tbody = document.getElementById('tabela-meu-progresso');
         if(!tbody) return;
-        
+
         const minhasOcorrencias = window.ocorrencias.filter(o => o.autor === window.nomeUsuarioAtual);
         if(minhasOcorrencias.length === 0) {
             tbody.innerHTML = `<tr><td colspan="4" class="text-center py-10 text-gray-400 font-medium whitespace-nowrap">Você ainda não relatou nenhuma anomalia.</td></tr>`;
@@ -724,8 +733,8 @@
                 <tr class="hover:bg-gray-50/50 transition-colors border-b border-gray-50">
                     <td class="px-6 py-4"><strong class="text-gray-800">${item.local}</strong></td>
                     <td class="px-6 py-4 text-sm text-gray-600">${item.categoria}</td>
-                    <td class="px-6 py-4 text-sm text-gray-600">${item.data}</td>
-                    <td class="px-6 py-4"><span class="px-3 py-1.5 rounded-full text-xs font-bold border ${badgeClass}">${item.status}</span></td>
+                    <td class="px-6 py-4 text-sm text-gray-600 whitespace-nowrap">${item.data}</td>
+                    <td class="px-6 py-4"><span class="px-3 py-1.5 rounded-full text-xs font-bold border whitespace-nowrap ${badgeClass}">${item.status}</span></td>
                 </tr>
             `;
         });
