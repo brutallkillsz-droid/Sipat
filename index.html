@@ -155,7 +155,7 @@
                     <h1 class="font-black text-xl text-gray-800 leading-none truncate hover:text-shopee">Sair</h1>
                     <p class="text-[10px] font-bold text-gray-400 tracking-widest uppercase truncate" id="user-display-name">Nome</p>
                 </div>
-                <div id="user-display-avatar" class="w-10 h-10 rounded-full bg-shopee-light text-shopee border-2 border-white shadow-md flex items-center justify-center font-bold cursor-pointer uppercase shrink-0">DS</div>
+                <div id="user-display-avatar" class="w-10 h-10 rounded-full bg-shopee-light text-shopee border-2 border-white shadow-md flex items-center justify-center font-bold uppercase shrink-0">DS</div>
             </div>
         </div>
     </header>
@@ -384,8 +384,8 @@
         const data = snapshot.val();
         window.ocorrencias = data ? Object.keys(data).map(key => ({ id: key, ...data[key] })).reverse() : [];
         
-        if(window.usuarioAtual === 'admin') atualizarDashboardUI();
-        if(window.usuarioAtual !== 'admin' && window.usuarioAtual !== '') window.renderizarMeuProgresso();
+        if(window.usuarioAtual === 'admin') window.atualizarDashboardUI();
+        if(window.usuarioAtual === 'davidsilveira') window.renderizarMeuProgresso();
     });
 
     window.fazerLogin = () => {
@@ -395,56 +395,55 @@
         if(u === "admin" && p === "spxadminl#") {
             localStorage.setItem('sipat_user', 'admin');
             localStorage.setItem('sipat_nome', 'Gestor ADM');
-            carregarSessao('admin', 'Gestor ADM');
+            window.carregarSessao('admin', 'Gestor ADM');
         } else if(u === "davidsilveira" && p === "1234") {
             localStorage.setItem('sipat_user', 'davidsilveira');
             localStorage.setItem('sipat_nome', 'David Silveira');
-            carregarSessao('davidsilveira', 'David Silveira');
+            window.carregarSessao('davidsilveira', 'David Silveira');
         } else {
             alert("⚠️ Acesso Negado: Usuário não cadastrado ou senha incorreta.");
             return;
         }
     };
 
-    // FUNÇÃO QUE CARREGA A SESSÃO NA TELA
-    function carregarSessao(user, nome) {
+    window.carregarSessao = (user, nome) => {
         window.usuarioAtual = user; 
         window.nomeUsuarioAtual = nome; 
         
         document.getElementById('user-display-name').innerText = nome;
         document.getElementById('user-display-avatar').innerText = user === 'admin' ? 'AD' : 'DS';
         
+        // Remove do login
+        document.getElementById('login-screen').classList.remove('flex');
         document.getElementById('login-screen').classList.add('hidden');
+        
+        // Mostra o app
         document.getElementById('app-layout').classList.remove('hidden');
         document.getElementById('app-layout').classList.add('flex');
 
         if(user === 'admin') {
             window.mudarAba('dashboard');
-            atualizarDashboardUI();
+            window.atualizarDashboardUI();
         } else {
             window.mudarAba('menu-inspetor');
             window.renderizarMeuProgresso();
         }
-    }
+    };
 
-    // VERIFICA SE O USUÁRIO JÁ ESTAVA LOGADO (F5 DO NAVEGADOR)
     window.verificarSessao = () => {
         const userSalvo = localStorage.getItem('sipat_user');
         const nomeSalvo = localStorage.getItem('sipat_nome');
-
-        if(userSalvo && nomeSalvo) {
-            carregarSessao(userSalvo, nomeSalvo);
-        }
+        if(userSalvo && nomeSalvo) { window.carregarSessao(userSalvo, nomeSalvo); }
     };
-
-    // CHAMA A VERIFICAÇÃO ASSIM QUE A PÁGINA CARREGA
+    
+    // Chama ao recarregar a aba
     window.verificarSessao();
 
-    // DESLOGAR CORRIGIDO (LIMPA MEMÓRIA E RECARREGA PÁGINA)
+    // FUNÇÃO SAIR CORRIGIDA
     window.sair = () => {
         localStorage.removeItem('sipat_user');
         localStorage.removeItem('sipat_nome');
-        location.reload();
+        location.reload(); 
     };
 
     window.mudarAba = (aba) => {
@@ -453,7 +452,7 @@
     };
 
     window.voltarMenuInspetor = () => {
-        if(window.usuarioAtual !== 'admin') window.mudarAba('menu-inspetor');
+        if(window.usuarioAtual === 'davidsilveira') window.mudarAba('menu-inspetor');
     };
 
     async function comprimirBase64(file) {
@@ -463,8 +462,7 @@
             img.onload = () => {
                 URL.revokeObjectURL(url);
                 const canvas = document.createElement('canvas');
-                // Deixei o limite menor (480px) para o banco de dados processar na velocidade da luz
-                const MAX = 480; 
+                const MAX = 640; 
                 let w = img.width, h = img.height;
                 if(w > MAX) { h *= MAX/w; w = MAX; }
                 canvas.width = w; canvas.height = h;
@@ -485,22 +483,23 @@
         const previewBase64 = await comprimirBase64(file);
         window.fotosMiniaturasTemporarias.push(previewBase64);
         
-        renderizarGradeDeFotos();
+        window.renderizarGradeDeFotos();
         document.getElementById('upload-text').innerText = "Toque para adicionar foto";
         e.target.value = '';
     };
 
     window.removerFoto = (index) => {
         window.fotosMiniaturasTemporarias.splice(index, 1);
-        renderizarGradeDeFotos();
+        window.renderizarGradeDeFotos();
     };
 
-    function renderizarGradeDeFotos() {
+    window.renderizarGradeDeFotos = () => {
         const container = document.getElementById('preview-fotos-container');
         document.getElementById('contador-fotos').innerText = `${window.fotosMiniaturasTemporarias.length}/${MAX_FOTOS}`;
-        container.innerHTML = '';
+        
+        let htmlFotos = '';
         window.fotosMiniaturasTemporarias.forEach((url, index) => {
-            container.innerHTML += `
+            htmlFotos += `
                 <div class="relative w-full h-20 rounded-xl overflow-hidden border border-gray-200 shadow-sm group">
                     <img src="${url}" class="w-full h-full object-cover">
                     <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
@@ -509,7 +508,8 @@
                 </div>
             `;
         });
-    }
+        container.innerHTML = htmlFotos;
+    };
 
     window.salvarFormulario = async () => {
         const hub = document.getElementById('hub_local').value;
@@ -545,19 +545,18 @@
                 timestamp: serverTimestamp()
             };
 
-            // Envia o dado direto para o banco
             await set(novaOcorrenciaRef, payload);
 
-            // Limpa o formulário silenciosamente sem travar a tela
+            // Limpa o form sem congelar
             document.getElementById('hub_local').value = ""; document.getElementById('categoria').value = "";
             document.getElementById('data_ocorrencia').value = ""; document.getElementById('hora_ocorrencia').value = "";
             document.getElementById('detalhes').value = ""; 
             window.fotosMiniaturasTemporarias = [];
-            renderizarGradeDeFotos();
+            window.renderizarGradeDeFotos();
 
             alert("✅ Relatório transmitido com sucesso!");
             
-            // REDIRECIONA PARA A TELA "MEU PROGRESSO" EM VEZ DE DAR F5
+            // Joga para a tela de Progresso automaticamente
             window.mudarAba('progresso');
 
         } catch (error) {
@@ -592,20 +591,22 @@
 
         const galeria = document.getElementById('detalhe-galeria-fotos');
         const boxFoto = document.getElementById('box-foto-evidencia');
-        galeria.innerHTML = '';
         
         let arrayFotos = occ.fotos_urls || [];
+        let htmlFotos = '';
 
         if(arrayFotos.length > 0) {
             arrayFotos.forEach(url => {
-                galeria.innerHTML += `
+                htmlFotos += `
                     <a href="${url}" target="_blank" class="block rounded-xl overflow-hidden border border-gray-200 shadow-sm hover:border-shopee transition-colors h-24 shrink-0">
                         <img src="${url}" class="w-full h-full object-cover">
                     </a>
                 `;
             });
+            galeria.innerHTML = htmlFotos;
             boxFoto.style.display = 'block';
         } else {
+            galeria.innerHTML = '';
             boxFoto.style.display = 'none'; 
         }
 
@@ -648,28 +649,28 @@
     document.addEventListener('click', (e) => { if (document.getElementById('statusDropdown').classList.contains('active')) window.fecharDropdownStatus(); });
     document.addEventListener('keydown', (e) => { if (e.key === "Escape") { window.fecharDetalhes(); window.fecharDropdownStatus(); } });
 
-    function atualizarDashboardUI() {
+    // CIRURGIA 1: CONSTRÓI A TABELA INTEIRA NA MEMÓRIA ANTES DE DESENHAR (Fim do Congelamento)
+    window.atualizarDashboardUI = () => {
         const tbody = document.getElementById('tabela-dados');
         if(!tbody) return;
-        tbody.innerHTML = ''; 
 
         let p = 0, r = 0, c = 0;
-
         document.getElementById('kpi-total').innerText = window.ocorrencias.length;
 
         if(window.ocorrencias.length === 0) {
             tbody.innerHTML = `<tr><td colspan="5" class="text-center py-10 text-gray-400 font-medium whitespace-nowrap">Nenhuma anomalia no banco de dados.</td></tr>`;
             document.getElementById('kpi-pendentes').innerText = 0; document.getElementById('kpi-resolvidos').innerText = 0;
-            desenharGrafico(0, 0, 0); 
+            window.desenharGrafico(0, 0, 0); 
             return;
         }
 
+        let htmlTabela = '';
         window.ocorrencias.forEach((item, index) => {
             if(item.status === 'Pendente') p++; else if(item.status === 'Resolvido') r++; else c++;
             const iniciais = item.autor.substring(0,2).toUpperCase();
             const badgeClass = getBadgeClasses(item.status);
 
-            tbody.innerHTML += `
+            htmlTabela += `
                 <tr class="hover:bg-gray-50/50 transition-colors group border-b border-gray-50">
                     <td class="px-6 py-4"><strong class="text-gray-800">${item.local}</strong></td>
                     <td class="px-6 py-4"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center font-bold text-xs uppercase">${iniciais}</div><span class="text-sm font-medium text-gray-700 uppercase">${item.autor}</span></div></td>
@@ -685,11 +686,12 @@
             `;
         });
 
+        tbody.innerHTML = htmlTabela;
         document.getElementById('kpi-pendentes').innerText = p; document.getElementById('kpi-resolvidos').innerText = r;
-        desenharGrafico(p, r, c);
-    }
+        window.desenharGrafico(p, r, c);
+    };
 
-    function desenharGrafico(p, r, c) {
+    window.desenharGrafico = (p, r, c) => {
         const ctx = document.getElementById('graficoStatus').getContext('2d');
         if (graficoChartJS) { graficoChartJS.destroy(); }
         if (p === 0 && r === 0 && c === 0) {
@@ -702,22 +704,23 @@
             data: { labels: ['Pendentes', 'Sanadas', 'Canceladas'], datasets: [{ data: [p, r, c], backgroundColor: ['#F59E0B', '#10B981', '#EF4444'], borderWidth: 0, hoverOffset: 4 }] },
             options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 10, font: { family: "'Inter', sans-serif", size: 12 } } }, tooltip: { cornerRadius: 8, padding: 12, boxPadding: 8, titleFont: { family: "'Inter', sans-serif", size: 13 }, bodyFont: { family: "'Inter', sans-serif", size: 13 } } } }
         });
-    }
+    };
 
+    // CIRURGIA 2: CONSTRÓI A TABELA DE PROGRESSO NA MEMÓRIA TAMBÉM (Mais fluidez)
     window.renderizarMeuProgresso = () => {
         const tbody = document.getElementById('tabela-meu-progresso');
         if(!tbody) return;
-        tbody.innerHTML = ''; 
-
+        
         const minhasOcorrencias = window.ocorrencias.filter(o => o.autor === window.nomeUsuarioAtual);
         if(minhasOcorrencias.length === 0) {
             tbody.innerHTML = `<tr><td colspan="4" class="text-center py-10 text-gray-400 font-medium whitespace-nowrap">Você ainda não relatou nenhuma anomalia.</td></tr>`;
             return;
         }
 
+        let htmlProgresso = '';
         minhasOcorrencias.forEach((item) => {
             const badgeClass = getBadgeClasses(item.status);
-            tbody.innerHTML += `
+            htmlProgresso += `
                 <tr class="hover:bg-gray-50/50 transition-colors border-b border-gray-50">
                     <td class="px-6 py-4"><strong class="text-gray-800">${item.local}</strong></td>
                     <td class="px-6 py-4 text-sm text-gray-600">${item.categoria}</td>
@@ -726,6 +729,8 @@
                 </tr>
             `;
         });
+        
+        tbody.innerHTML = htmlProgresso;
     };
 </script>
 
