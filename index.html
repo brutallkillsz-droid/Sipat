@@ -330,7 +330,7 @@
 
                     <div class="lg:col-span-2 bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
                         <div class="p-6 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
-                            <h3 class="font-bold text-gray-800 flex items-center gap-2"><i class="fa-solid fa-cloud text-shopee"></i> Dados em Tempo Real</h3>
+                            <h3 class="font-bold text-gray-800 flex items-center gap-2"><i class="fa-solid fa-cloud text-shopee"></i> Banco de Dados RTDB</h3>
                             <span class="text-xs font-bold bg-green-100 text-green-700 px-3 py-1 rounded-full"><i class="fa-solid fa-circle-nodes"></i> Online</span>
                         </div>
                         <div class="overflow-x-auto hide-scrollbar flex-1">
@@ -357,12 +357,11 @@
 </div>
 
 <script type="module">
+    // USANDO AS EXATAS BIBLIOTECAS PARA O REALTIME DATABASE QUE VOCÊ ENVIOU
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-    // Módulo corrigido para o Realtime Database (usando sua URL)
-    import { getDatabase, ref, push, set, onValue, update, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+    import { getDatabase, ref as dbRef, push, set, onValue, update, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
     import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-storage.js";
 
-    // AS MESMAS CHAVES QUE VOCÊ INFORMOU
     const firebaseConfig = {
         apiKey: "AIzaSyCrTjdAsHZ6JK1WNjZFeC5vHI0ICif4rxQ",
         authDomain: "sipat-lmg48.firebaseapp.com",
@@ -386,10 +385,11 @@
     let graficoChartJS = null;
     const MAX_FOTOS = 5;
 
-    // Escuta Realtime (RTDB)
-    onValue(ref(db, 'ocorrencias'), (snapshot) => {
+    // Conexão e Escuta do Realtime Database na pasta "ocorrencias_lmg48"
+    onValue(dbRef(db, 'ocorrencias_lmg48'), (snapshot) => {
         const data = snapshot.val();
         window.ocorrencias = data ? Object.keys(data).map(key => ({ id: key, ...data[key] })).reverse() : [];
+        
         if(window.usuarioAtual === 'admin') atualizarDashboardUI();
         if(window.usuarioAtual === 'davidsilveira') window.renderizarMeuProgresso();
     });
@@ -397,20 +397,22 @@
     window.fazerLogin = () => {
         const u = document.getElementById('username').value.trim();
         const p = document.getElementById('password').value.trim();
+        
         if(u === "admin" && p === "spxadminl#") {
             window.usuarioAtual = 'admin'; window.nomeUsuarioAtual = 'Gestor ADM';
-            document.getElementById('user-display-name').innerText = 'Gestor ADM';
+            document.getElementById('user-display-name').innerText = window.nomeUsuarioAtual;
             document.getElementById('user-display-avatar').innerText = 'AD';
             window.mudarAba('dashboard');
         } else if(u === "davidsilveira" && p === "1234") {
             window.usuarioAtual = 'davidsilveira'; window.nomeUsuarioAtual = 'David Silveira';
-            document.getElementById('user-display-name').innerText = 'David Silveira';
+            document.getElementById('user-display-name').innerText = window.nomeUsuarioAtual;
             document.getElementById('user-display-avatar').innerText = 'DS';
             window.mudarAba('menu-inspetor');
         } else {
-            alert("Credenciais Incorretas!");
+            alert("⚠️ Credenciais Incorretas!");
             return;
         }
+        
         document.getElementById('login-screen').classList.add('hidden');
         document.getElementById('app-layout').classList.remove('hidden');
         document.getElementById('app-layout').classList.add('flex');
@@ -446,15 +448,15 @@
     window.processarNovaFoto = async (e) => {
         const file = e.target.files[0];
         if(!file) return;
-        if(window.fotosBinariasTemporarias.length >= MAX_FOTOS) { alert(`Mínimo atingido: ${MAX_FOTOS} fotos.`); return; }
+        if(window.fotosBinariasTemporarias.length >= MAX_FOTOS) { alert(`Você atingiu o limite de ${MAX_FOTOS} fotos.`); return; }
         
         document.getElementById('upload-text').innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Otimizando...`;
-        const {blob, preview} = await comprimir(file);
         
+        const {blob, preview} = await comprimir(file);
         window.fotosBinariasTemporarias.push(blob);
         window.fotosMiniaturasTemporarias.push(preview);
-        renderizarGradeDeFotos();
         
+        renderizarGradeDeFotos();
         document.getElementById('upload-text').innerText = "Toque para adicionar foto";
         e.target.value = '';
     };
@@ -481,7 +483,7 @@
         });
     }
 
-    // AQUI ESTÁ A VALIDAÇÃO RÍGIDA RESTAURADA
+    // O CÓDIGO MAIS IMPORTANTE: ENVIO CORRIGIDO COM TRATAMENTO DE ERROS CLARO
     window.salvarFormulario = async () => {
         const hub = document.getElementById('hub_local').value;
         const cat = document.getElementById('categoria').value;
@@ -491,7 +493,7 @@
         const btn = document.getElementById('btn-enviar');
 
         if(!hub || !cat || !dat || !hor || !det) {
-            alert("⚠️ Por favor, preencha TODOS os campos técnicos obrigatórios.");
+            alert("⚠️ Por favor, preencha todos os campos do formulário antes de enviar.");
             return;
         }
 
@@ -499,18 +501,24 @@
         btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> <span>Enviando para Nuvem...</span>`;
 
         try {
-            // Upload Storage
-            const uploadPromises = window.fotosBinariasTemporarias.map(async (blob, i) => {
-                const storageRef = sRef(storage, `evidencias/foto_${Date.now()}_${i}.jpg`);
-                await uploadBytes(storageRef, blob);
-                return getDownloadURL(storageRef);
-            });
-            const urlsDasFotos = await Promise.all(uploadPromises);
+            let urlsDasFotos = [];
 
-            // Gravação Realtime Database
+            // Passo 1: Enviar fotos para o Storage
+            if (window.fotosBinariasTemporarias.length > 0) {
+                const uploadPromises = window.fotosBinariasTemporarias.map(async (blob, i) => {
+                    const storageRef = sRef(storage, `evidencias/foto_${Date.now()}_${i}.jpg`);
+                    await uploadBytes(storageRef, blob);
+                    return await getDownloadURL(storageRef);
+                });
+                urlsDasFotos = await Promise.all(uploadPromises);
+            }
+
+            // Passo 2: Salvar os textos no Realtime Database
             const partesData = dat.split('-');
             const dataFormatada = `${partesData[2]}/${partesData[1]}/${partesData[0]} às ${hor}`;
-            const novaOcorrenciaRef = push(ref(db, 'ocorrencias'));
+            
+            // Aponta para a pasta correta: ocorrencias_lmg48
+            const novaOcorrenciaRef = push(dbRef(db, 'ocorrencias_lmg48'));
             
             await set(novaOcorrenciaRef, {
                 local: hub,
@@ -523,7 +531,7 @@
                 timestamp: serverTimestamp()
             });
 
-            // Limpa form
+            // Limpa form após sucesso
             document.getElementById('hub_local').value = ""; document.getElementById('categoria').value = "";
             document.getElementById('data_ocorrencia').value = ""; document.getElementById('hora_ocorrencia').value = "";
             document.getElementById('detalhes').value = ""; 
@@ -532,10 +540,13 @@
 
             alert("✅ Relatório transmitido com sucesso!");
             window.voltarMenuInspetor();
+
         } catch (error) {
-            console.error(error);
-            alert("❌ Erro ao enviar! Verifique se publicou as Regras do Realtime Database.");
+            // SE ALGO DER ERRADO, ELE VAI TE AVISAR O PORQUÊ
+            console.error("ERRO AO SALVAR:", error);
+            alert(`❌ Falha no envio! O Google retornou este erro: ${error.message}`);
         } finally {
+            // Destrava o botão independentemente se deu certo ou errado
             btn.disabled = false;
             btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> <span>Transmitir Relatório</span>`;
         }
@@ -592,7 +603,7 @@
     window.atualizarStatus = async (novoStatus) => {
         if(window.indiceEmEdicao !== null) { 
             const id = window.ocorrencias[window.indiceEmEdicao].id;
-            await update(ref(db, `ocorrencias/${id}`), { status: novoStatus });
+            await update(dbRef(db, `ocorrencias_lmg48/${id}`), { status: novoStatus });
             window.fecharDropdownStatus(); 
         }
     };
