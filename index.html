@@ -149,12 +149,13 @@
             <div class="text-center bg-shopee text-white px-6 py-1.5 rounded-full text-xs font-bold tracking-wide shadow-sm absolute left-1/2 transform -translate-x-1/2 hidden md:block uppercase truncate max-w-[40%]">
                 Segurança é Prioridade LMG-48
             </div>
-            <div class="flex items-center gap-4 shrink-0 ml-auto">
+            
+            <div class="flex items-center gap-4 shrink-0 ml-auto cursor-pointer hover:opacity-75 transition-opacity" onclick="window.sair()" title="Sair do Sistema">
                 <div class="text-right hidden sm:block truncate max-w-[150px]">
-                    <h1 class="font-black text-xl text-gray-800 leading-none truncate">LMG-48</h1>
+                    <h1 class="font-black text-xl text-gray-800 leading-none truncate">Sair</h1>
                     <p class="text-[10px] font-bold text-gray-400 tracking-widest uppercase truncate" id="user-display-name">Nome</p>
                 </div>
-                <div id="user-display-avatar" class="w-10 h-10 rounded-full bg-shopee-light text-shopee border-2 border-white shadow-md flex items-center justify-center font-bold cursor-pointer uppercase shrink-0" onclick="window.sair()" title="Sair do Sistema">DS</div>
+                <div id="user-display-avatar" class="w-10 h-10 rounded-full bg-shopee-light text-shopee border-2 border-white shadow-md flex items-center justify-center font-bold cursor-pointer uppercase shrink-0">DS</div>
             </div>
         </div>
     </header>
@@ -440,6 +441,7 @@
     // CHAMA A VERIFICAÇÃO ASSIM QUE A PÁGINA CARREGA
     window.verificarSessao();
 
+    // DESLOGAR CORRIGIDO (LIMPA MEMÓRIA E RECARREGA PÁGINA)
     window.sair = () => {
         localStorage.removeItem('sipat_user');
         localStorage.removeItem('sipat_nome');
@@ -552,19 +554,14 @@
                 timeoutPromise
             ]);
 
-            document.getElementById('hub_local').value = ""; document.getElementById('categoria').value = "";
-            document.getElementById('data_ocorrencia').value = ""; document.getElementById('hora_ocorrencia').value = "";
-            document.getElementById('detalhes').value = ""; 
-            window.fotosMiniaturasTemporarias = [];
-            renderizarGradeDeFotos();
-
             alert("✅ Relatório transmitido com sucesso!");
-            window.voltarMenuInspetor();
+            
+            // REFRESH TOTAL CORRIGIDO: Limpa o form, traz dados novos e mantém o usuário logado perfeitamente
+            location.reload();
 
         } catch (error) {
             console.error(error);
             alert(`❌ Erro: ${error.message}`);
-        } finally {
             btn.disabled = false;
             btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up shrink-0"></i> <span class="truncate">Transmitir Relatório</span>`;
         }
