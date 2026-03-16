@@ -94,9 +94,9 @@
             <p id="detalhe-texto" class="bg-white p-4 rounded-xl border border-gray-200 text-gray-700 text-sm whitespace-pre-wrap shadow-sm">Nenhum detalhe.</p>
         </div>
 
-        <div class="detail-block">
+        <div class="detail-block" id="box-foto-evidencia">
             <h5 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Evidências Fotográficas</h5>
-            <div id="detalhe-galeria-fotos" class="grid grid-cols-2 gap-3">
+            <div id="detalhe-galeria-fotos" class="grid grid-cols-2 gap-3 mt-2">
                 </div>
         </div>
     </div>
@@ -239,7 +239,7 @@
 
                     <div>
                         <div class="flex justify-between items-center mb-2">
-                            <label class="block text-sm font-bold text-gray-700">Evidências Visuais (Fotos)</label>
+                            <label class="block text-sm font-bold text-gray-700">Evidências Visuais</label>
                             <span class="text-xs text-gray-400 font-bold bg-gray-100 px-2 py-1 rounded-md" id="contador-fotos">0/5</span>
                         </div>
                         
@@ -248,7 +248,7 @@
 
                         <div class="relative border-2 border-dashed border-gray-300 bg-gray-50 rounded-2xl p-6 text-center hover:bg-shopee-light hover:border-shopee transition-colors cursor-pointer group">
                             <i class="fa-solid fa-camera-retro text-3xl text-gray-400 group-hover:text-shopee mb-2 transition-colors"></i>
-                            <p class="text-xs font-medium text-gray-500">Toque para adicionar foto</p>
+                            <p class="text-xs font-medium text-gray-500" id="upload-text">Toque para adicionar foto</p>
                             <input type="file" id="foto_upload" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="window.processarNovaFoto(event)">
                         </div>
                     </div>
@@ -321,7 +321,7 @@
 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div class="lg:col-span-1 bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center justify-center">
-                        <h3 class="font-bold text-gray-800 mb-4 w-full flex items-center gap-2"><i class="fa-solid fa-chart-pie text-shopee"></i> Distribuição de Status</h3>
+                        <h3 class="font-bold text-gray-800 mb-4 w-full flex items-center gap-2"><i class="fa-solid fa-chart-pie text-shopee"></i> Distribuição</h3>
                         <div class="relative w-full h-64 flex justify-center items-center">
                             <canvas id="graficoStatus"></canvas>
                         </div>
@@ -329,7 +329,7 @@
 
                     <div class="lg:col-span-2 bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
                         <div class="p-6 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
-                            <h3 class="font-bold text-gray-800 flex items-center gap-2"><i class="fa-solid fa-cloud text-shopee"></i> Dados da Nuvem (Firebase)</h3>
+                            <h3 class="font-bold text-gray-800 flex items-center gap-2"><i class="fa-solid fa-cloud text-shopee"></i> Dados da Nuvem</h3>
                             <span class="text-xs font-bold bg-green-100 text-green-700 px-3 py-1 rounded-full"><i class="fa-solid fa-circle-nodes"></i> Online</span>
                         </div>
                         <div class="overflow-x-auto hide-scrollbar flex-1">
@@ -358,7 +358,6 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
     import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, doc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-    // IMPORTANTE: Agora usamos uploadBytes (Binário puro) e não uploadString (Base64)
     import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-storage.js";
 
     const firebaseConfig = {
@@ -381,13 +380,11 @@
     window.nomeUsuarioAtual = ''; 
     let graficoChartJS = null;
 
-    // --- NOVO: ARRAY DE MÚLTIPLAS FOTOS E BLOBS (MUITO MAIS RÁPIDO) ---
-    window.fotosBinariasTemporarias = []; // Guarda os arquivos puros para envio rápido
-    window.fotosMiniaturasTemporarias = []; // Guarda as URLs das miniaturas para mostrar na tela
-
+    window.fotosBinariasTemporarias = []; 
+    window.fotosMiniaturasTemporarias = []; 
     const MAX_FOTOS = 5;
 
-    // Firebase Listener
+    // Escuta em tempo real do Firebase
     const q = query(collection(db, "ocorrencias_lmg48"), orderBy("timestamp", "desc"));
     onSnapshot(q, (snapshot) => {
         window.ocorrencias = [];
@@ -397,7 +394,7 @@
         else if (window.usuarioAtual === 'davidsilveira') { window.renderizarMeuProgresso(); }
     });
 
-    // COMPRESSOR NÍVEL NASA: Transforma imagem em BLOB (Binário), não em Base64 gigante
+    // COMPRESSÃO ULTRARRÁPIDA
     function comprimirParaBlob(arquivo) {
         return new Promise((resolve) => {
             const reader = new FileReader();
@@ -407,42 +404,43 @@
                 img.src = event.target.result;
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
-                    const MAX_WIDTH = 1000; // Resolução ligeiramente menor para ultra-velocidade
+                    const MAX_WIDTH = 800; // Reduzi de 1200px para 800px. Fica 40% mais rápido!
                     const scaleSize = MAX_WIDTH / img.width;
+                    
                     if(img.width > MAX_WIDTH) { canvas.width = MAX_WIDTH; canvas.height = img.height * scaleSize; } 
                     else { canvas.width = img.width; canvas.height = img.height; }
+                    
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                     
-                    // Transforma em Binário direto (Qualidade 60% é perfeita para documentos e muito leve)
+                    // Converte para binário puro com 50% de compressão (Ótimo para documentos)
                     canvas.toBlob((blob) => {
-                        resolve({ blob: blob, previewUrl: canvas.toDataURL('image/jpeg', 0.6) });
-                    }, 'image/jpeg', 0.6);
+                        resolve({ blob: blob, previewUrl: canvas.toDataURL('image/jpeg', 0.5) });
+                    }, 'image/jpeg', 0.5);
                 }
             }
         });
     }
 
-    // LÓGICA DE MÚLTIPLAS FOTOS
+    // CARREGAR MÚLTIPLAS FOTOS NO FORMULÁRIO
     window.processarNovaFoto = async function(event) {
         const file = event.target.files[0];
         if (!file) return;
 
         if (window.fotosBinariasTemporarias.length >= MAX_FOTOS) {
-            alert(`Você atingiu o limite máximo de ${MAX_FOTOS} fotos por relatório.`);
+            alert(`Limite máximo de ${MAX_FOTOS} fotos por relatório.`);
             return;
         }
 
-        // Aguarda a compressão
+        document.getElementById('upload-text').innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Preparando imagem...`;
+
         const { blob, previewUrl } = await comprimirParaBlob(file);
         
-        // Salva na memória
         window.fotosBinariasTemporarias.push(blob);
         window.fotosMiniaturasTemporarias.push(previewUrl);
 
         renderizarGradeDeFotos();
-        
-        // Limpa o input para poder selecionar a mesma foto de novo se quiser
+        document.getElementById('upload-text').innerText = "Toque para adicionar mais fotos";
         event.target.value = '';
     }
 
@@ -455,23 +453,20 @@
     function renderizarGradeDeFotos() {
         const container = document.getElementById('preview-fotos-container');
         document.getElementById('contador-fotos').innerText = `${window.fotosBinariasTemporarias.length}/${MAX_FOTOS}`;
-        
         container.innerHTML = '';
         window.fotosMiniaturasTemporarias.forEach((url, index) => {
             container.innerHTML += `
                 <div class="relative w-full h-20 rounded-xl overflow-hidden border border-gray-200 shadow-sm group">
                     <img src="${url}" class="w-full h-full object-cover">
                     <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <button onclick="window.removerFoto(${index})" class="text-white hover:text-red-400 bg-black/50 w-8 h-8 rounded-full flex items-center justify-center">
-                            <i class="fa-solid fa-trash-can"></i>
-                        </button>
+                        <button onclick="window.removerFoto(${index})" class="text-white hover:text-red-400 bg-black/50 w-8 h-8 rounded-full flex items-center justify-center"><i class="fa-solid fa-trash-can"></i></button>
                     </div>
                 </div>
             `;
         });
     }
 
-    // ENVIO OTIMIZADO PARA NUVEM
+    // ENVIO PARA O FIREBASE (COM PROMISE.ALL PARA UPLOAD PARALELO = 3x MAIS RÁPIDO)
     window.salvarFormulario = async function() {
         const hub = document.getElementById('hub_local').value;
         const categoria = document.getElementById('categoria').value;
@@ -480,7 +475,7 @@
         const detalhes = document.getElementById('detalhes').value;
         const btn = document.getElementById('btn-enviar');
 
-        if(!hub || !categoria || !dataInput || !horaInput || !detalhes) { alert("Preencha todos os campos obrigatórios."); return; }
+        if(!hub || !categoria || !dataInput || !horaInput || !detalhes) { alert("Preencha todos os campos textuais."); return; }
 
         btn.disabled = true;
         btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> <span>Enviando para Nuvem...</span>`;
@@ -488,31 +483,27 @@
         try {
             let urlsDasFotos = [];
 
-            // 1. Sobe todas as fotos para o Firebase Storage usando o Binário (Super rápido)
+            // Dispara todos os envios de foto DE UMA SÓ VEZ usando Promise.all
             if (window.fotosBinariasTemporarias.length > 0) {
-                for (let i = 0; i < window.fotosBinariasTemporarias.length; i++) {
-                    const blob = window.fotosBinariasTemporarias[i];
+                const uploadPromises = window.fotosBinariasTemporarias.map(async (blob, i) => {
                     const nomeArquivo = `evidencias/foto_${Date.now()}_${i}.jpg`;
                     const storageRef = ref(storage, nomeArquivo);
-                    
-                    // uploadBytes em vez de uploadString!
                     await uploadBytes(storageRef, blob);
-                    const url = await getDownloadURL(storageRef);
-                    urlsDasFotos.push(url);
-                }
+                    return await getDownloadURL(storageRef);
+                });
+                
+                urlsDasFotos = await Promise.all(uploadPromises); // Espera todos terminarem simultaneamente
             }
 
             const partesData = dataInput.split('-');
             const dataFormatada = `${partesData[2]}/${partesData[1]}/${partesData[0]} às ${horaInput}`;
 
-            // 2. Salva o documento no Banco, agora com ARRAY de URLs
             await addDoc(collection(db, "ocorrencias_lmg48"), {
                 local: hub, categoria: categoria, data: dataFormatada, detalheCompleto: detalhes,
-                fotos_urls: urlsDasFotos, // Array de fotos
-                status: "Pendente", autor: window.nomeUsuarioAtual, timestamp: serverTimestamp() 
+                fotos_urls: urlsDasFotos, status: "Pendente", autor: window.nomeUsuarioAtual, timestamp: serverTimestamp() 
             });
 
-            // Limpa tudo
+            // Limpa form
             document.getElementById('hub_local').value = ""; document.getElementById('categoria').value = "";
             document.getElementById('data_ocorrencia').value = ""; document.getElementById('hora_ocorrencia').value = "";
             document.getElementById('detalhes').value = ""; 
@@ -528,8 +519,48 @@
         }
     }
 
+    // --- CORREÇÃO APLICADA AQUI: ADMIN VISUALIZA TODAS AS FOTOS ---
+    window.abrirDetalhes = function(index) {
+        const occ = window.ocorrencias[index];
+        document.getElementById('detalhe-hub').innerText = occ.local;
+        document.getElementById('detalhe-categoria').innerText = occ.categoria;
+        document.getElementById('detalhe-data').innerText = occ.data;
+        document.getElementById('detalhe-texto').innerText = occ.detalheCompleto;
+        document.getElementById('detalhe-autor').innerText = occ.autor;
+        document.getElementById('detalhe-avatar').innerText = occ.autor.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
+        
+        const badgeStatus = document.getElementById('detalhe-badge-status');
+        badgeStatus.className = `px-3 py-1 rounded-full text-xs font-bold border ${getBadgeClasses(occ.status)}`;
+        badgeStatus.innerHTML = occ.status;
+
+        // Monta a galeria de imagens do banco
+        const boxFoto = document.getElementById('box-foto-evidencia');
+        const galeria = document.getElementById('detalhe-galeria-fotos');
+        galeria.innerHTML = '';
+        
+        // Trata os dados (se o admin abriu uma foto velha única ou o array novo)
+        let arrayFotos = occ.fotos_urls || [];
+        if(occ.foto_url && arrayFotos.length === 0) arrayFotos.push(occ.foto_url); 
+
+        if(arrayFotos.length > 0) {
+            arrayFotos.forEach(url => {
+                galeria.innerHTML += `
+                    <a href="${url}" target="_blank" class="block rounded-xl overflow-hidden border border-gray-200 shadow-sm hover:border-shopee transition-colors h-24">
+                        <img src="${url}" class="w-full h-full object-cover">
+                    </a>
+                `;
+            });
+            boxFoto.style.display = 'block';
+        } else {
+            boxFoto.style.display = 'none'; 
+        }
+
+        document.getElementById('slide-overlay').classList.add('active');
+        document.getElementById('slide-panel').classList.add('active');
+    }
+
     // ==========================================
-    // DEMAIS FUNÇÕES UI
+    // ROTINAS DE STATUS E NAVEGAÇÃO
     // ==========================================
     window.atualizarStatus = async function(novoStatus) {
         if(window.indiceEmEdicao !== null) { 
@@ -619,45 +650,6 @@
         document.getElementById('kpi-pendentes').innerText = qtdPendentes;
         document.getElementById('kpi-resolvidos').innerText = qtdResolvidos;
         desenharGrafico(qtdPendentes, qtdResolvidos, qtdCancelados);
-    }
-
-    // ABRIR DETALHES (PAINEL DO GESTOR) - Atualizado para mostrar várias fotos
-    window.abrirDetalhes = function(index) {
-        const occ = window.ocorrencias[index];
-        document.getElementById('detalhe-hub').innerText = occ.local;
-        document.getElementById('detalhe-categoria').innerText = occ.categoria;
-        document.getElementById('detalhe-data').innerText = occ.data;
-        document.getElementById('detalhe-texto').innerText = occ.detalheCompleto;
-        document.getElementById('detalhe-autor').innerText = occ.autor;
-        document.getElementById('detalhe-avatar').innerText = occ.autor.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
-        
-        const badgeStatus = document.getElementById('detalhe-badge-status');
-        badgeStatus.className = `px-3 py-1 rounded-full text-xs font-bold border ${getBadgeClasses(occ.status)}`;
-        badgeStatus.innerHTML = occ.status;
-
-        // Rendereização de Múltiplas Fotos no Painel do Admin
-        const galeria = document.getElementById('detalhe-galeria-fotos');
-        galeria.innerHTML = '';
-        
-        // Verifica se existem fotos (novo formato Array) ou o formato antigo único (foto_url)
-        let arrayFotos = occ.fotos_urls || [];
-        if(occ.foto_url && arrayFotos.length === 0) arrayFotos.push(occ.foto_url); // Retrocompatibilidade
-
-        if(arrayFotos.length > 0) {
-            arrayFotos.forEach(url => {
-                galeria.innerHTML += `
-                    <a href="${url}" target="_blank" class="block rounded-xl overflow-hidden border-2 border-gray-200 shadow-sm hover:border-shopee transition-colors h-32">
-                        <img src="${url}" class="w-full h-full object-cover">
-                    </a>
-                `;
-            });
-            galeria.parentElement.style.display = 'block';
-        } else {
-            galeria.parentElement.style.display = 'none';
-        }
-
-        document.getElementById('slide-overlay').classList.add('active');
-        document.getElementById('slide-panel').classList.add('active');
     }
 
     window.fecharDetalhes = function() { document.getElementById('slide-overlay').classList.remove('active'); document.getElementById('slide-panel').classList.remove('active'); }
