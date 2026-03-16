@@ -179,7 +179,7 @@
                         <i class="fa-solid fa-ranking-star text-4xl text-shopee transition-colors"></i>
                         <span class="font-bold text-sm text-gray-700 text-center leading-tight transition-colors">Ranking de Equipes</span>
                     </button>
-                    <button class="card-interaction bg-white rounded-3xl p-6 shadow-sm flex flex-col items-center justify-center space-y-3 border-b-4 border-shopee group">
+                    <button onclick="window.mudarAba('progresso')" class="card-interaction bg-white rounded-3xl p-6 shadow-sm flex flex-col items-center justify-center space-y-3 border-b-4 border-shopee group">
                         <i class="fa-solid fa-chart-simple text-4xl text-shopee transition-colors"></i>
                         <span class="font-bold text-sm text-gray-700 text-center leading-tight transition-colors">Meu Progresso</span>
                     </button>
@@ -252,6 +252,36 @@
                 </div>
             </div>
 
+            <div id="aba-progresso" class="hidden max-w-4xl mx-auto pb-10">
+                <div class="flex items-center gap-4 mb-6">
+                    <button onclick="window.voltarMenuInspetor()" class="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-gray-500 hover:text-shopee hover:bg-shopee-light transition-all"><i class="fa-solid fa-arrow-left"></i></button>
+                    <div>
+                        <h2 class="text-2xl font-black text-gray-800 tracking-tight">Meu Progresso</h2>
+                        <p class="text-sm text-gray-500 font-medium">Acompanhe o status dos relatórios enviados por você.</p>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
+                    <div class="p-6 border-b border-gray-50 bg-gray-50/50">
+                        <h3 class="font-bold text-gray-800 flex items-center gap-2"><i class="fa-solid fa-clock-rotate-left text-shopee"></i> Histórico Pessoal</h3>
+                    </div>
+                    <div class="overflow-x-auto hide-scrollbar flex-1">
+                        <table class="w-full text-left whitespace-nowrap">
+                            <thead>
+                                <tr class="bg-white border-b border-gray-100">
+                                    <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Unidade</th>
+                                    <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Classificação</th>
+                                    <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Data / Hora</th>
+                                    <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Status Atual</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabela-meu-progresso" class="divide-y divide-gray-50">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
             <div id="aba-dashboard" class="hidden space-y-6 pb-10">
                 <h2 class="text-2xl font-black text-gray-800 tracking-tight mb-2">Visão Geral Gerencial</h2>
                 
@@ -307,7 +337,7 @@
                                     </tr>
                                 </thead>
                                 <tbody id="tabela-dados" class="divide-y divide-gray-50">
-                                    </tbody>
+                                </tbody>
                             </table>
                         </div>
                     </div>
@@ -319,12 +349,10 @@
 </div>
 
 <script type="module">
-    // 1. Importações Modulares do Firebase V9
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
     import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, doc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
     import { getStorage, ref, uploadString, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-storage.js";
 
-    // 2. SUAS CHAVES DO FIREBASE
     const firebaseConfig = {
         apiKey: "AIzaSyCrTjdAsHZ6JK1WNjZFeC5vHI0ICif4rxQ",
         authDomain: "sipat-lmg48.firebaseapp.com",
@@ -335,39 +363,33 @@
         measurementId: "G-175HXY00MN"
     };
 
-    // 3. Inicialização dos Motores
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const storage = getStorage(app);
 
-    // Variáveis Globais de Controle
     window.ocorrencias = [];
     window.indiceEmEdicao = null; 
     window.fotoBase64Temp = null;
     window.usuarioAtual = ''; 
+    window.nomeUsuarioAtual = ''; // Guarda o nome certinho para filtrar o histórico
     let graficoChartJS = null;
 
-    // ==========================================
-    // ESCUTA EM TEMPO REAL DO BANCO DE DADOS (Firestore)
-    // ==========================================
+    // Escuta do Firebase
     const q = query(collection(db, "ocorrencias_lmg48"), orderBy("timestamp", "desc"));
     onSnapshot(q, (snapshot) => {
         window.ocorrencias = [];
         snapshot.forEach((doc) => {
-            // Mapeia os dados do Firebase para o nosso array local
             window.ocorrencias.push({ id: doc.id, ...doc.data() });
         });
         
-        // Se estivermos na tela de Admin, redesenhamos a tabela e o gráfico
+        // Atualiza a tela certa dependendo de quem está logado
         if(window.usuarioAtual === 'admin') {
             atualizarDashboardUI();
+        } else if (window.usuarioAtual === 'davidsilveira') {
+            renderizarMeuProgresso();
         }
     });
 
-    // ==========================================
-    // COMPRESSOR DE IMAGENS (HTML5 CANVAS)
-    // Reduz fotos de 5MB para ~200kb mantendo a qualidade visual
-    // ==========================================
     function comprimirImagem(arquivo) {
         return new Promise((resolve) => {
             const reader = new FileReader();
@@ -377,22 +399,12 @@
                 img.src = event.target.result;
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
-                    const MAX_WIDTH = 1200; // Boa resolução para visualização em monitor
+                    const MAX_WIDTH = 1200; 
                     const scaleSize = MAX_WIDTH / img.width;
-                    
-                    // Só comprime se a imagem for maior que 1200px
-                    if(img.width > MAX_WIDTH) {
-                        canvas.width = MAX_WIDTH;
-                        canvas.height = img.height * scaleSize;
-                    } else {
-                        canvas.width = img.width;
-                        canvas.height = img.height;
-                    }
-                    
+                    if(img.width > MAX_WIDTH) { canvas.width = MAX_WIDTH; canvas.height = img.height * scaleSize; } 
+                    else { canvas.width = img.width; canvas.height = img.height; }
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    
-                    // Converte para JPEG com 70% de qualidade
                     resolve(canvas.toDataURL('image/jpeg', 0.7));
                 }
             }
@@ -402,18 +414,12 @@
     window.processarFoto = async function(event) {
         const file = event.target.files[0];
         if (file) {
-            document.getElementById('upload-text').innerHTML = `<span class="text-yellow-500 font-bold"><i class="fa-solid fa-spinner fa-spin"></i> Otimizando imagem...</span>`;
-            
-            // Chama a função de compressão que criamos
+            document.getElementById('upload-text').innerHTML = `<span class="text-yellow-500 font-bold"><i class="fa-solid fa-spinner fa-spin"></i> Otimizando...</span>`;
             window.fotoBase64Temp = await comprimirImagem(file);
-            
-            document.getElementById('upload-text').innerHTML = `<span class="text-shopee font-bold"><i class="fa-solid fa-check"></i> Foto anexada (Otimizada)</span>`;
+            document.getElementById('upload-text').innerHTML = `<span class="text-shopee font-bold"><i class="fa-solid fa-check"></i> Foto anexada</span>`;
         }
     }
 
-    // ==========================================
-    // ENVIAR DADOS PARA O FIREBASE
-    // ==========================================
     window.salvarFormulario = async function() {
         const hub = document.getElementById('hub_local').value;
         const categoria = document.getElementById('categoria').value;
@@ -422,86 +428,51 @@
         const detalhes = document.getElementById('detalhes').value;
         const btn = document.getElementById('btn-enviar');
 
-        if(!hub || !categoria || !dataInput || !horaInput || !detalhes) {
-            alert("Preencha todos os campos obrigatórios."); return;
-        }
+        if(!hub || !categoria || !dataInput || !horaInput || !detalhes) { alert("Preencha todos os campos obrigatórios."); return; }
 
-        // Estado de Carregamento no Botão
         btn.disabled = true;
         btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> <span>Enviando para Nuvem...</span>`;
 
         try {
             let urlFotoSalva = null;
-
-            // 1. Se tiver foto, salva no Firebase Storage primeiro
             if (window.fotoBase64Temp) {
                 const nomeArquivo = `evidencias/foto_${Date.now()}.jpg`;
                 const storageRef = ref(storage, nomeArquivo);
-                // Sobe a foto base64 comprimida
                 await uploadString(storageRef, window.fotoBase64Temp, 'data_url');
-                // Pega a URL pública (Link seguro) da foto gerada pelo Google
                 urlFotoSalva = await getDownloadURL(storageRef);
             }
 
-            // 2. Formata a data para leitura fácil
             const partesData = dataInput.split('-');
             const dataFormatada = `${partesData[2]}/${partesData[1]}/${partesData[0]} às ${horaInput}`;
-            const nomeInspetor = document.getElementById('user-display-name').innerText;
 
-            // 3. Salva os textos no Firestore Database
             await addDoc(collection(db, "ocorrencias_lmg48"), {
-                local: hub,
-                categoria: categoria,
-                data: dataFormatada,
-                detalheCompleto: detalhes,
-                foto_url: urlFotoSalva, // O Firebase guarda apenas o link da foto, e não a foto inteira!
-                status: "Pendente",
-                autor: nomeInspetor,
-                timestamp: serverTimestamp() // Cria uma marcação de tempo oficial do servidor
+                local: hub, categoria: categoria, data: dataFormatada, detalheCompleto: detalhes,
+                foto_url: urlFotoSalva, status: "Pendente", autor: window.nomeUsuarioAtual, timestamp: serverTimestamp() 
             });
 
-            // Limpeza
             document.getElementById('hub_local').value = ""; document.getElementById('categoria').value = "";
             document.getElementById('data_ocorrencia').value = ""; document.getElementById('hora_ocorrencia').value = "";
             document.getElementById('detalhes').value = ""; document.getElementById('foto_upload').value = "";
             document.getElementById('upload-text').innerText = "Toque para abrir a câmera ou galeria";
             window.fotoBase64Temp = null;
 
-            alert("Relatório transmitido com sucesso para a Nuvem da Regional!");
+            alert("Relatório transmitido com sucesso!");
             window.voltarMenuInspetor();
-
         } catch (error) {
-            console.error("Erro ao enviar dados: ", error);
-            alert("Ocorreu um erro ao enviar. Verifique a conexão com a internet.");
+            console.error(error); alert("Erro ao enviar. Verifique a internet.");
         } finally {
-            // Restaura o botão
-            btn.disabled = false;
-            btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> <span>Transmitir Relatório</span>`;
+            btn.disabled = false; btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> <span>Transmitir Relatório</span>`;
         }
     }
 
-    // ==========================================
-    // ATUALIZAR STATUS DIRETO NA NUVEM
-    // ==========================================
     window.atualizarStatus = async function(novoStatus) {
         if(window.indiceEmEdicao !== null) { 
-            // Identifica qual o ID do documento real no Firebase
             const docId = window.ocorrencias[window.indiceEmEdicao].id;
-            
-            // Aponta para o documento exato e atualiza o status na nuvem
             const docRef = doc(db, "ocorrencias_lmg48", docId);
             await updateDoc(docRef, { status: novoStatus });
-            
             window.fecharDropdownStatus(); 
-            // Não precisa chamar atualizarDashboardUI() manualmente, 
-            // o onSnapshot percebe a mudança e atualiza a tela sozinho!
         }
     }
-
-
-    // =========================================================================
-    // RESTANTE DAS FUNÇÕES (UI, Lógica Visual, Chart.js, RBAC)
-    // =========================================================================
 
     function getBadgeClasses(status) {
         if(status === 'Pendente') return 'bg-yellow-50 text-yellow-600 border-yellow-200';
@@ -514,26 +485,48 @@
         const ctx = document.getElementById('graficoStatus').getContext('2d');
         if (graficoChartJS) { graficoChartJS.destroy(); }
         if (pendentes === 0 && resolvidos === 0 && cancelados === 0) return;
-
         graficoChartJS = new Chart(ctx, {
             type: 'doughnut',
-            data: {
-                labels: ['Pendentes', 'Sanadas', 'Canceladas'],
-                datasets: [{
-                    data: [pendentes, resolvidos, cancelados],
-                    backgroundColor: ['#F59E0B', '#10B981', '#EF4444'],
-                    borderWidth: 0, hoverOffset: 4
-                }]
-            },
-            options: {
-                responsive: true, maintainAspectRatio: false, cutout: '75%',
-                plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20, font: { family: "'Inter', sans-serif", size: 12 } } } }
-            }
+            data: { labels: ['Pendentes', 'Sanadas', 'Canceladas'], datasets: [{ data: [pendentes, resolvidos, cancelados], backgroundColor: ['#F59E0B', '#10B981', '#EF4444'], borderWidth: 0, hoverOffset: 4 }] },
+            options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20, font: { family: "'Inter', sans-serif", size: 12 } } } } }
+        });
+    }
+
+    // --- NOVA FUNÇÃO: RENDERIZAR "MEU PROGRESSO" ---
+    window.renderizarMeuProgresso = function() {
+        const tbody = document.getElementById('tabela-meu-progresso');
+        if(!tbody) return;
+        tbody.innerHTML = ''; 
+
+        // Filtra apenas as ocorrências do usuário logado
+        const minhasOcorrencias = window.ocorrencias.filter(o => o.autor === window.nomeUsuarioAtual);
+
+        if(minhasOcorrencias.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="4" class="text-center py-10 text-gray-400 font-medium">Você ainda não relatou nenhuma anomalia.</td></tr>`;
+            return;
+        }
+
+        minhasOcorrencias.forEach((item) => {
+            const badgeClass = getBadgeClasses(item.status);
+            const tr = `
+                <tr class="hover:bg-gray-50/50 transition-colors">
+                    <td class="px-6 py-4"><strong class="text-gray-800">${item.local}</strong></td>
+                    <td class="px-6 py-4 text-sm text-gray-600">${item.categoria}</td>
+                    <td class="px-6 py-4 text-sm text-gray-600">${item.data}</td>
+                    <td class="px-6 py-4">
+                        <span class="px-3 py-1.5 rounded-full text-xs font-bold border ${badgeClass}">
+                            ${item.status}
+                        </span>
+                    </td>
+                </tr>
+            `;
+            tbody.innerHTML += tr;
         });
     }
 
     function atualizarDashboardUI() {
         const tbody = document.getElementById('tabela-dados');
+        if(!tbody) return;
         tbody.innerHTML = ''; 
 
         let qtdPendentes = 0; let qtdResolvidos = 0; let qtdCancelados = 0;
@@ -556,23 +549,10 @@
             const tr = `
                 <tr class="hover:bg-gray-50/50 transition-colors group">
                     <td class="px-6 py-4"><strong class="text-gray-800">${item.local}</strong></td>
-                    <td class="px-6 py-4">
-                        <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center font-bold text-xs">${iniciais}</div>
-                            <span class="text-sm font-medium text-gray-700">${item.autor}</span>
-                        </div>
-                    </td>
+                    <td class="px-6 py-4"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center font-bold text-xs">${iniciais}</div><span class="text-sm font-medium text-gray-700">${item.autor}</span></div></td>
                     <td class="px-6 py-4 text-sm text-gray-600">${item.data}</td>
-                    <td class="px-6 py-4">
-                        <button onclick="window.abrirDropdownStatus(event, ${index})" class="px-3 py-1.5 rounded-full text-xs font-bold border cursor-pointer hover:shadow-md transition-all flex items-center gap-2 ${badgeClass}">
-                            ${item.status} <i class="fa-solid fa-caret-down opacity-50"></i>
-                        </button>
-                    </td>
-                    <td class="px-6 py-4 text-center">
-                        <button onclick="window.abrirDetalhes(${index})" class="w-8 h-8 rounded-lg border border-gray-200 text-gray-400 hover:text-shopee hover:border-shopee hover:bg-shopee-light transition-all flex items-center justify-center mx-auto">
-                            <i class="fa-solid fa-arrow-right"></i>
-                        </button>
-                    </td>
+                    <td class="px-6 py-4"><button onclick="window.abrirDropdownStatus(event, ${index})" class="px-3 py-1.5 rounded-full text-xs font-bold border cursor-pointer hover:shadow-md transition-all flex items-center gap-2 ${badgeClass}">${item.status} <i class="fa-solid fa-caret-down opacity-50"></i></button></td>
+                    <td class="px-6 py-4 text-center"><button onclick="window.abrirDetalhes(${index})" class="w-8 h-8 rounded-lg border border-gray-200 text-gray-400 hover:text-shopee hover:border-shopee hover:bg-shopee-light transition-all flex items-center justify-center mx-auto"><i class="fa-solid fa-arrow-right"></i></button></td>
                 </tr>
             `;
             tbody.innerHTML += tr;
@@ -584,7 +564,6 @@
         desenharGrafico(qtdPendentes, qtdResolvidos, qtdCancelados);
     }
 
-    // --- INTERAÇÕES DE JANELA E MENUS ---
     window.abrirDropdownStatus = function(event, index) {
         event.stopPropagation(); window.indiceEmEdicao = index;
         const dropdown = document.getElementById('statusDropdown');
@@ -619,15 +598,9 @@
 
         const boxFoto = document.getElementById('box-foto-evidencia');
         const linkFoto = document.getElementById('detalhe-link-foto');
-        
-        // Renderiza a URL da imagem guardada no Storage do Firebase
         if(occ.foto_url) {
-            document.getElementById('detalhe-foto').src = occ.foto_url; 
-            linkFoto.href = occ.foto_url;
-            boxFoto.style.display = 'block';
-        } else {
-            boxFoto.style.display = 'none'; 
-        }
+            document.getElementById('detalhe-foto').src = occ.foto_url; linkFoto.href = occ.foto_url; boxFoto.style.display = 'block';
+        } else { boxFoto.style.display = 'none'; }
 
         document.getElementById('slide-overlay').classList.add('active');
         document.getElementById('slide-panel').classList.add('active');
@@ -635,22 +608,32 @@
 
     window.fecharDetalhes = function() { document.getElementById('slide-overlay').classList.remove('active'); document.getElementById('slide-panel').classList.remove('active'); }
 
-    // --- CONTROLES DE ACESSO ---
     window.fazerLogin = function() {
         const user = document.getElementById('username').value; const pass = document.getElementById('password').value;
         if (user === "admin" && pass === "spxadminl#") {
             window.usuarioAtual = 'admin';
-            document.getElementById('user-display-name').innerText = 'Gestor ADM'; document.getElementById('user-display-avatar').innerText = 'AD';
+            window.nomeUsuarioAtual = 'Gestor ADM'; // Guarda no Global
+            document.getElementById('user-display-name').innerText = window.nomeUsuarioAtual; 
+            document.getElementById('user-display-avatar').innerText = 'AD';
+            
             document.getElementById('login-screen').classList.add('hidden');
             document.getElementById('app-layout').classList.remove('hidden'); document.getElementById('app-layout').classList.add('flex');
+            
             window.mudarAba('dashboard');
-            atualizarDashboardUI(); // Renderiza os dados do Firebase baixados
+            atualizarDashboardUI(); 
+            
         } else if (user === "davidsilveira" && pass === "1234") {
             window.usuarioAtual = 'davidsilveira';
-            document.getElementById('user-display-name').innerText = 'David Silveira'; document.getElementById('user-display-avatar').innerText = 'DS';
+            window.nomeUsuarioAtual = 'David Silveira'; // Guarda no Global
+            document.getElementById('user-display-name').innerText = window.nomeUsuarioAtual; 
+            document.getElementById('user-display-avatar').innerText = 'DS';
+            
             document.getElementById('login-screen').classList.add('hidden');
             document.getElementById('app-layout').classList.remove('hidden'); document.getElementById('app-layout').classList.add('flex');
+            
             window.mudarAba('menu-inspetor');
+            renderizarMeuProgresso(); // Já carrega os dados dele por baixo dos panos
+            
         } else { alert("Credenciais incorretas."); }
     }
 
@@ -658,6 +641,8 @@
         document.getElementById('aba-dashboard').classList.add('hidden');
         document.getElementById('aba-registro').classList.add('hidden');
         document.getElementById('aba-menu-inspetor').classList.add('hidden');
+        document.getElementById('aba-progresso').classList.add('hidden'); // Oculta a nova aba também
+        
         document.getElementById('aba-' + aba).classList.remove('hidden');
     }
 
@@ -668,6 +653,7 @@
         document.getElementById('login-screen').classList.remove('hidden');
         document.getElementById('username').value = ""; document.getElementById('password').value = "";
         window.usuarioAtual = '';
+        window.nomeUsuarioAtual = '';
     }
 </script>
 
