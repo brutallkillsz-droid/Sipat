@@ -4,39 +4,49 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portal SIPAT - Shopee LMG-48</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <script>
-        tailwind.config = { theme: { extend: { colors: { shopee: { DEFAULT: '#EE4D2D', dark: '#d64428', light: '#fff0ed' } } } } }
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        shopee: { DEFAULT: '#EE4D2D', dark: '#d64428', light: '#fff0ed' }
+                    }
+                }
+            }
+        }
     </script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
         body { font-family: 'Inter', sans-serif; overflow: hidden; background: #f8fafc; }
-        .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15); }
+        .glass-card { background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15); }
         .card-interaction { transition: all 0.3s ease; cursor: pointer; }
         .card-interaction:hover { transform: translateY(-5px); border-color: #EE4D2D; box-shadow: 0 15px 30px rgba(238,77,45,0.15); }
         .slide-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 998; opacity: 0; pointer-events: none; transition: 0.4s; }
         .slide-overlay.active { opacity: 1; pointer-events: all; }
-        .slide-panel { position: fixed; top: 0; right: 0; width: 100%; max-width: 460px; height: 100vh; background: #fff; z-index: 999; transform: translateX(100%); transition: 0.5s cubic-bezier(0.16, 1, 0.3, 1); display: flex; flex-direction: column; border-left: 1px solid #f1f5f9; }
+        .slide-panel { position: fixed; top: 0; right: 0; width: 100%; max-width: 460px; height: 100vh; background: #fff; z-index: 999; transform: translateX(100%); transition: 0.5s cubic-bezier(0.16, 1, 0.3, 1); display: flex; flex-direction: column; }
         .slide-panel.active { transform: translateX(0); }
         .status-dropdown { position: fixed; background: #fff; border-radius: 16px; padding: 8px; box-shadow: 0 15px 35px rgba(0,0,0,0.15); z-index: 9999; opacity: 0; transform: scale(0.9); pointer-events: none; transition: 0.2s; min-width: 170px; border: 1px solid #f1f5f9; }
         .status-dropdown.active { opacity: 1; transform: scale(1); pointer-events: all; }
-        .hide-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
 <body class="text-slate-800 flex flex-col h-screen">
 
 <div id="statusDropdown" class="status-dropdown">
-    <button class="w-full text-left px-4 py-3 rounded-xl hover:bg-slate-50 text-yellow-600 font-semibold text-sm transition-all" onclick="window.atualizarStatus('Pendente')"><i class="fa-solid fa-clock mr-2"></i> Pendente</button>
-    <button class="w-full text-left px-4 py-3 rounded-xl hover:bg-slate-50 text-green-600 font-semibold text-sm transition-all" onclick="window.atualizarStatus('Resolvido')"><i class="fa-solid fa-check-double mr-2"></i> Resolvido</button>
-    <button class="w-full text-left px-4 py-3 rounded-xl hover:bg-slate-50 text-red-600 font-semibold text-sm transition-all" onclick="window.atualizarStatus('Cancelado')"><i class="fa-solid fa-ban mr-2"></i> Cancelado</button>
+    <button class="w-full text-left px-4 py-3 rounded-xl hover:bg-slate-50 text-yellow-600 font-bold text-sm" onclick="window.atualizarStatus('Pendente')">Pendente</button>
+    <button class="w-full text-left px-4 py-3 rounded-xl hover:bg-slate-50 text-green-600 font-bold text-sm" onclick="window.atualizarStatus('Resolvido')">Resolvido</button>
+    <button class="w-full text-left px-4 py-3 rounded-xl hover:bg-slate-50 text-red-600 font-bold text-sm" onclick="window.atualizarStatus('Cancelado')">Cancelado</button>
 </div>
 
 <div id="slide-overlay" class="slide-overlay" onclick="window.fecharDetalhes()"></div>
 <div id="slide-panel">
     <div class="p-6 border-b flex justify-between items-center bg-white sticky top-0 z-10">
-        <h2 class="font-black text-shopee uppercase tracking-tighter">Detalhes da Inspeção</h2>
+        <h2 class="font-black text-shopee uppercase">Inspeção Detalhada</h2>
         <button onclick="window.fecharDetalhes()" class="w-10 h-10 rounded-full hover:bg-slate-100 flex items-center justify-center transition-colors"><i class="fa-solid fa-xmark text-xl text-slate-400"></i></button>
     </div>
     <div class="p-6 overflow-y-auto flex-1 space-y-6 bg-slate-50/50">
@@ -49,16 +59,12 @@
             </div>
         </div>
         <div class="bg-white p-5 rounded-[1.5rem] border border-slate-100 shadow-sm">
-            <h5 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Informações</h5>
-            <p class="text-sm font-semibold text-slate-600" id="detalhe-hub"></p>
-            <p class="text-xs text-slate-400 mt-1" id="detalhe-categoria"></p>
-            <p class="text-[10px] text-slate-400 mt-4 pt-4 border-t border-slate-50 font-bold" id="detalhe-data"></p>
-        </div>
-        <div class="bg-white p-5 rounded-[1.5rem] border border-slate-100 shadow-sm">
-            <h5 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Descrição</h5>
+            <h5 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Relatório</h5>
+            <p class="text-sm font-bold text-shopee" id="detalhe-hub"></p>
+            <p class="text-xs text-slate-400 mb-4" id="detalhe-categoria"></p>
             <p id="detalhe-texto" class="text-sm text-slate-600 leading-relaxed"></p>
         </div>
-        <div id="detalhe-galeria-fotos" class="grid grid-cols-2 gap-3 px-1 pb-10"></div>
+        <div id="detalhe-galeria-fotos" class="grid grid-cols-2 gap-3 pb-10"></div>
     </div>
 </div>
 
@@ -67,26 +73,24 @@
         <div class="absolute inset-0 bg-gradient-to-br from-shopee via-shopee to-shopee-dark"></div>
         <div class="relative z-10 text-center px-12">
             <h1 class="text-white text-6xl font-black tracking-tighter leading-none mb-4">LMG-48</h1>
-            <p class="text-shopee-light text-xl font-medium opacity-90">SEGURANÇA E AUDITORIA</p>
+            <p class="text-shopee-light text-xl font-medium opacity-90 uppercase tracking-widest">Segurança Shopee</p>
         </div>
     </div>
-    <div class="flex-1 flex justify-center items-center p-8 bg-slate-50 relative">
+    <div class="flex-1 flex justify-center items-center p-8 bg-slate-50">
         <div class="w-full max-w-[420px]">
-            <div class="relative z-20 flex justify-center -mb-20 drop-shadow-2xl">
-                <div class="w-44 h-44 rounded-[3rem] overflow-hidden border-8 border-white bg-white shadow-xl">
+            <div class="relative z-20 flex justify-center -mb-20">
+                <div class="w-44 h-44 rounded-[3.5rem] overflow-hidden border-8 border-white bg-white shadow-2xl">
                     <video autoplay loop muted playsinline class="w-full h-full object-cover">
                         <source src="https://i.imgur.com/iKdPvMx.mp4" type="video/mp4">
                     </video>
                 </div>
             </div>
-            <div class="glass-card pt-24 pb-12 px-10 rounded-[3.5rem] relative z-10">
-                <div class="text-center mb-10">
-                    <h2 class="text-2xl font-black text-slate-800 tracking-tighter uppercase">Acesso Portal</h2>
-                </div>
-                <div class="space-y-5">
-                    <input type="text" id="username" class="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 outline-none focus:ring-2 focus:ring-shopee/20 font-semibold" placeholder="ID Usuário">
-                    <input type="password" id="password" class="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 outline-none focus:ring-2 focus:ring-shopee/20 font-semibold" placeholder="Senha">
-                    <button onclick="window.fazerLogin()" class="w-full bg-shopee text-white font-black py-5 rounded-2xl shadow-xl shadow-shopee/30 transition-all uppercase tracking-widest text-sm mt-4 active:scale-95">Autenticar</button>
+            <div class="glass-card pt-28 pb-12 px-10 rounded-[3.5rem] relative z-10">
+                <h2 class="text-2xl font-black text-center text-slate-800 uppercase tracking-tighter mb-8">Acesso ao Portal</h2>
+                <div class="space-y-4">
+                    <input type="text" id="username" class="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 outline-none focus:ring-2 focus:ring-shopee/20 font-bold" placeholder="Usuário">
+                    <input type="password" id="password" class="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 outline-none focus:ring-2 focus:ring-shopee/20 font-bold" placeholder="Senha">
+                    <button onclick="window.fazerLogin()" class="w-full bg-shopee text-white font-black py-5 rounded-2xl shadow-xl shadow-shopee/30 transition-all uppercase tracking-widest text-sm active:scale-95">Entrar no Sistema</button>
                 </div>
             </div>
         </div>
@@ -94,11 +98,13 @@
 </div>
 
 <div id="app-layout" class="hidden flex-col h-full w-full bg-slate-50">
-    <header class="bg-white/80 backdrop-blur-md border-b border-slate-100 sticky top-0 z-40 p-4 shadow-sm">
-        <div class="max-w-6xl mx-auto flex justify-between items-center text-shopee">
+    <header class="bg-white/80 backdrop-blur-md border-b sticky top-0 z-40 p-4">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
             <div class="flex items-center">
-                <video autoplay loop muted playsinline class="h-10 w-10 rounded-lg mr-2 shadow-sm"><source src="https://i.imgur.com/iKdPvMx.mp4" type="video/mp4"></video>
-                <span class="font-black text-xl tracking-tighter">SIPAT LMG-48</span>
+                <div class="h-10 w-10 rounded-lg overflow-hidden border mr-3 shadow-sm">
+                    <video autoplay loop muted playsinline class="w-full h-full object-cover"><source src="https://i.imgur.com/iKdPvMx.mp4" type="video/mp4"></video>
+                </div>
+                <span class="font-black text-xl text-shopee tracking-tighter">SIPAT LMG-48</span>
             </div>
             <div id="user-display-avatar" class="w-10 h-10 rounded-full bg-shopee text-white flex items-center justify-center font-bold cursor-pointer" onclick="window.sair()">?</div>
         </div>
@@ -108,30 +114,30 @@
         <div class="max-w-6xl mx-auto h-full">
 
             <div id="aba-menu-inspetor" class="hidden grid grid-cols-1 md:grid-cols-2 gap-5 max-w-2xl mx-auto mt-6">
-                <button onclick="window.mudarAba('registro')" class="card-interaction col-span-1 md:col-span-2 bg-white border border-slate-100 rounded-[2.5rem] p-12 flex flex-col items-center gap-6 shadow-sm">
+                <button onclick="window.mudarAba('registro')" class="card-interaction col-span-1 md:col-span-2 bg-white border border-slate-100 rounded-[3rem] p-12 flex flex-col items-center gap-6 shadow-sm">
                     <i class="fa-solid fa-triangle-exclamation text-7xl text-shopee"></i>
                     <span class="font-black text-3xl uppercase tracking-tighter text-slate-800">Relatar Risco</span>
                 </button>
-                <button onclick="window.mudarAba('progresso')" class="card-interaction bg-white rounded-[2rem] p-8 border border-slate-100 flex flex-col items-center gap-3">
-                    <i class="fa-solid fa-chart-line text-3xl text-slate-300"></i>
-                    <span class="font-black text-xs uppercase tracking-widest text-slate-500">Meu Progresso</span>
+                <button onclick="window.mudarAba('progresso')" class="card-interaction bg-white rounded-[2rem] p-8 border border-slate-100 flex flex-col items-center gap-2">
+                    <i class="fa-solid fa-chart-bar text-3xl text-slate-300"></i>
+                    <span class="font-black text-[10px] uppercase text-slate-400">Meu Progresso</span>
                 </button>
-                <button onclick="window.sair()" class="card-interaction bg-white rounded-[2rem] p-8 border border-slate-100 flex flex-col items-center gap-3">
+                <button onclick="window.sair()" class="card-interaction bg-white rounded-[2rem] p-8 border border-slate-100 flex flex-col items-center gap-2">
                     <i class="fa-solid fa-power-off text-3xl text-slate-200"></i>
-                    <span class="font-black text-xs uppercase tracking-widest text-slate-300">Sair</span>
+                    <span class="font-black text-[10px] uppercase text-slate-300">Sair</span>
                 </button>
             </div>
 
             <div id="aba-registro" class="hidden max-w-2xl mx-auto">
-                <button onclick="window.voltarMenu()" class="mb-6 font-black text-shopee uppercase text-xs tracking-widest flex items-center gap-2"><i class="fa-solid fa-arrow-left"></i> Voltar</button>
-                <div class="bg-white p-10 rounded-[3rem] shadow-xl space-y-8 border border-slate-50">
+                <button onclick="window.voltarMenu()" class="mb-6 font-black text-shopee uppercase text-xs flex items-center gap-2"><i class="fa-solid fa-arrow-left"></i> Voltar</button>
+                <div class="bg-white p-10 rounded-[3rem] shadow-xl border border-slate-50 space-y-8">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <select id="hub_local" class="w-full bg-slate-50 p-5 rounded-2xl outline-none font-bold text-slate-700">
-                            <option value="" disabled selected>Hub...</option>
+                        <select id="hub_local" class="w-full bg-slate-50 p-5 rounded-2xl outline-none font-bold text-slate-700 focus:ring-2 focus:ring-shopee/20">
+                            <option value="" disabled selected>Selecionar Base...</option>
                             <option>Hub Uberaba</option><option>Hub Uberlândia</option><option>Hub Divinópolis</option>
                         </select>
-                        <select id="categoria" class="w-full bg-slate-50 p-5 rounded-2xl outline-none font-bold text-slate-700">
-                            <option value="" disabled selected>Risco...</option>
+                        <select id="categoria" class="w-full bg-slate-50 p-5 rounded-2xl outline-none font-bold text-slate-700 focus:ring-2 focus:ring-shopee/20">
+                            <option value="" disabled selected>Tipo de Risco...</option>
                             <option>EPIs</option><option>Volumosos</option><option>Organização</option>
                         </select>
                     </div>
@@ -139,37 +145,37 @@
                         <input type="date" id="data_ocorrencia" class="w-full bg-slate-50 p-5 rounded-2xl outline-none font-bold text-slate-600">
                         <input type="time" id="hora_ocorrencia" class="w-full bg-slate-50 p-5 rounded-2xl outline-none font-bold text-slate-600">
                     </div>
-                    <textarea id="detalhes" rows="3" class="w-full bg-slate-50 p-5 rounded-2xl outline-none font-medium text-slate-600" placeholder="Relatório técnico..."></textarea>
+                    <textarea id="detalhes" rows="3" class="w-full bg-slate-50 p-5 rounded-2xl outline-none font-medium text-slate-600" placeholder="Descrição técnica..."></textarea>
                     
                     <div class="border-2 border-dashed border-slate-100 rounded-3xl p-10 text-center relative hover:bg-shopee-light transition-all group">
-                        <i class="fa-solid fa-camera text-4xl text-slate-200 mb-3 group-hover:text-shopee"></i>
-                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest" id="upload-text">Anexar Fotos (Max 5)</p>
+                        <i class="fa-solid fa-camera text-4xl text-slate-200 mb-2 group-hover:text-shopee"></i>
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest" id="upload-text">Tirar Fotos (Max 5)</p>
                         <input type="file" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="window.processarNovaFoto(event)">
                     </div>
                     <div id="preview-fotos-container" class="grid grid-cols-5 gap-3"></div>
-                    <button id="btn-enviar" onclick="window.salvarFormulario()" class="w-full bg-shopee text-white font-black py-6 rounded-[2rem] shadow-2xl uppercase tracking-widest active:scale-95 transition-all">Transmitir Agora</button>
+                    <button id="btn-enviar" onclick="window.salvarFormulario()" class="w-full bg-shopee text-white font-black py-6 rounded-[2rem] shadow-2xl shadow-shopee/30 uppercase tracking-widest transition-all">Transmitir Relatório</button>
                 </div>
             </div>
 
             <div id="aba-dashboard" class="hidden space-y-8 pb-20">
                 <div class="grid grid-cols-3 gap-6">
-                    <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-50"><h4 class="text-[10px] font-black text-slate-400 uppercase mb-1">Total</h4><h2 id="kpi-total" class="text-4xl font-black">0</h2></div>
-                    <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-50"><h4 class="text-[10px] font-black text-slate-400 uppercase mb-1">Pendentes</h4><h2 id="kpi-pendentes" class="text-4xl font-black text-yellow-500">0</h2></div>
-                    <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-50"><h4 class="text-[10px] font-black text-slate-400 uppercase mb-1">Sanadas</h4><h2 id="kpi-resolvidos" class="text-4xl font-black text-green-500">0</h2></div>
+                    <div class="bg-white p-8 rounded-[2.5rem] border shadow-sm"><h4 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total</h4><h2 id="kpi-total" class="text-4xl font-black">0</h2></div>
+                    <div class="bg-white p-8 rounded-[2.5rem] border shadow-sm"><h4 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Pendente</h4><h2 id="kpi-pendentes" class="text-4xl font-black text-yellow-500">0</h2></div>
+                    <div class="bg-white p-8 rounded-[2.5rem] border shadow-sm"><h4 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Sanado</h4><h2 id="kpi-resolvidos" class="text-4xl font-black text-green-500">0</h2></div>
                 </div>
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    <div class="bg-white p-10 rounded-[3rem] shadow-sm border border-slate-50 flex flex-col items-center">
+                    <div class="lg:col-span-1 bg-white p-10 rounded-[3rem] border border-slate-50 flex flex-col items-center">
                         <div class="w-full aspect-square"><canvas id="graficoStatus"></canvas></div>
                     </div>
-                    <div class="lg:col-span-2 bg-white rounded-[3rem] shadow-sm border border-slate-50 overflow-hidden flex flex-col text-sm">
-                        <table class="w-full text-left"><thead class="bg-slate-50/50 border-b border-slate-100 font-black text-slate-400 uppercase text-[10px] tracking-widest"><th class="p-6">Unidade</th><th class="p-6">Inspetor</th><th class="p-6">Status</th><th class="p-6">Ação</th></thead><tbody id="tabela-dados" class="divide-y divide-slate-50"></tbody></table>
+                    <div class="lg:col-span-2 bg-white rounded-[3rem] border border-slate-50 shadow-sm overflow-hidden">
+                        <table class="w-full text-left text-sm"><thead class="bg-slate-50/50 border-b font-black text-slate-400 uppercase text-[10px] tracking-widest"><th class="p-6">Unidade</th><th class="p-6">Status</th><th class="p-6">Ação</th></thead><tbody id="tabela-dados" class="divide-y divide-slate-50"></tbody></table>
                     </div>
                 </div>
             </div>
 
             <div id="aba-progresso" class="hidden max-w-3xl mx-auto">
-                <button onclick="window.voltarMenu()" class="mb-6 text-shopee font-black uppercase text-[10px] tracking-widest"><i class="fa-solid fa-chevron-left"></i> Voltar</button>
-                <div class="bg-white rounded-[3rem] border border-slate-100 shadow-xl overflow-hidden">
+                <button onclick="window.voltarMenu()" class="mb-6 text-shopee font-black uppercase text-[10px] tracking-widest flex items-center gap-2"><i class="fa-solid fa-arrow-left"></i> Voltar</button>
+                <div class="bg-white rounded-[3rem] border shadow-xl overflow-hidden">
                     <table class="w-full text-left"><thead class="bg-slate-50/50 border-b font-black text-slate-400 uppercase text-[10px] tracking-widest"><th class="p-6">Local</th><th class="p-6">Status</th></thead><tbody id="tabela-meu-progresso" class="divide-y"></tbody></table>
                 </div>
             </div>
@@ -180,7 +186,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-    import { getDatabase, ref as dbRef, push, set, onValue, update, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+    import { getDatabase, ref, push, set, onValue, update, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
     import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-storage.js";
 
     const firebaseConfig = {
@@ -200,14 +206,14 @@
     window.ocorrencias = [];
     window.usuarioAtual = '';
     window.nomeUsuarioAtual = '';
-    window.indiceEmEdicao = null;
     window.fotosBinariasTemporarias = [];
+    window.indiceEmEdicao = null;
     let graficoChartJS = null;
 
-    // Escuta tempo real do REALTIME DATABASE
-    onValue(dbRef(db, 'ocorrencias'), (snapshot) => {
-        const data = snapshot.val();
-        window.ocorrencias = data ? Object.keys(data).map(key => ({ id: key, ...data[key] })).reverse() : [];
+    // Escuta Realtime (RTDB)
+    onValue(ref(db, 'ocorrencias'), (snap) => {
+        const data = snap.val();
+        window.ocorrencias = data ? Object.keys(data).map(k => ({ id: k, ...data[k] })).reverse() : [];
         if(window.usuarioAtual === 'admin') atualizarDashboardUI();
         if(window.usuarioAtual === 'davidsilveira') renderizarMeuProgresso();
     });
@@ -216,10 +222,10 @@
         const u = document.getElementById('username').value.trim();
         const p = document.getElementById('password').value.trim();
         if(u === "admin" && p === "spxadminl#") {
-            window.usuarioAtual = 'admin'; window.nomeUsuarioAtual = 'ADM'; entrarApp('dashboard');
+            window.usuarioAtual = 'admin'; window.nomeUsuarioAtual = 'Gestor ADM'; entrarApp('dashboard');
         } else if(u === "davidsilveira" && p === "1234") {
             window.usuarioAtual = 'davidsilveira'; window.nomeUsuarioAtual = 'David Silveira'; entrarApp('aba-menu-inspetor');
-        } else { alert("Acesso inválido!"); }
+        } else { alert("Acesso negado!"); }
     };
 
     function entrarApp(aba) {
@@ -230,8 +236,12 @@
     }
 
     window.mudarAba = (a) => {
-        ['dashboard', 'registro', 'aba-menu-inspetor', 'progresso'].forEach(i => document.getElementById(i === 'aba-menu-inspetor' ? i : 'aba-'+i)?.classList.add('hidden'));
-        document.getElementById(a === 'aba-menu-inspetor' ? a : 'aba-'+a)?.classList.remove('hidden');
+        ['dashboard', 'registro', 'aba-menu-inspetor', 'progresso'].forEach(i => {
+            const el = document.getElementById(i === 'aba-menu-inspetor' ? i : 'aba-'+i);
+            if(el) el.classList.add('hidden');
+        });
+        const target = document.getElementById(a === 'aba-menu-inspetor' ? a : 'aba-'+a);
+        if(target) target.classList.remove('hidden');
     };
 
     window.processarNovaFoto = async (e) => {
@@ -250,45 +260,58 @@
             canvas.getContext('2d').drawImage(img, 0,0,w,h);
             canvas.toBlob(blob => {
                 window.fotosBinariasTemporarias.push(blob);
-                document.getElementById('preview-fotos-container').innerHTML += `<div class="h-16 rounded-xl border-2 border-white shadow-sm overflow-hidden"><img src="${canvas.toDataURL('image/jpeg',0.5)}" class="w-full h-full object-cover"></div>`;
-                document.getElementById('upload-text').innerText = "FOTOS: "+window.fotosBinariasTemporarias.length+"/5";
+                document.getElementById('preview-fotos-container').innerHTML += `<div class="h-16 rounded-xl border-2 border-white shadow-md overflow-hidden"><img src="${canvas.toDataURL('image/jpeg',0.5)}" class="w-full h-full object-cover"></div>`;
+                document.getElementById('upload-text').innerText = `Capturado (${window.fotosBinariasTemporarias.length}/5)`;
             }, 'image/jpeg', 0.5);
         };
         img.src = url;
     };
 
     window.salvarFormulario = async () => {
+        const hub = document.getElementById('hub_local').value;
         const btn = document.getElementById('btn-enviar');
-        btn.disabled = true; btn.innerText = "ENVIANDO...";
+        if(!hub) { alert("Selecione o Hub!"); return; }
+        
+        btn.disabled = true; btn.innerText = "TRANSMITINDO...";
+
         try {
+            // Upload Storage
             const uploadPromises = window.fotosBinariasTemporarias.map(async (blob, i) => {
                 const storageRef = sRef(storage, `lmg48/${Date.now()}_${i}.jpg`);
                 await uploadBytes(storageRef, blob);
                 return getDownloadURL(storageRef);
             });
             const urls = await Promise.all(uploadPromises);
+
+            // Gravação Realtime Database (RTDB)
+            const novaRef = push(ref(db, 'ocorrencias'));
             const dataBr = document.getElementById('data_ocorrencia').value.split('-').reverse().join('/');
-            const novaOcorrenciaRef = push(dbRef(db, 'ocorrencias'));
-            await set(novaOcorrenciaRef, {
-                local: document.getElementById('hub_local').value,
+            
+            await set(novaRef, {
+                local: hub,
                 categoria: document.getElementById('categoria').value,
                 data: `${dataBr} às ${document.getElementById('hora_ocorrencia').value}`,
                 detalheCompleto: document.getElementById('detalhes').value,
                 fotos_urls: urls, status: "Pendente", autor: window.nomeUsuarioAtual, timestamp: serverTimestamp()
             });
-            alert("Relatório Enviado!"); location.reload();
-        } catch(e) { alert("Falha no envio!"); btn.disabled = false; }
+
+            alert("Relatório Enviado com Sucesso!");
+            location.reload();
+        } catch(e) {
+            console.error(e);
+            alert("Erro na Transmissão! Verifique as regras do Database.");
+            btn.disabled = false; btn.innerText = "TENTAR NOVAMENTE";
+        }
     };
 
     window.abrirDetalhes = (idx) => {
         const o = window.ocorrencias[idx];
         document.getElementById('detalhe-hub').innerText = o.local;
         document.getElementById('detalhe-categoria').innerText = o.categoria;
-        document.getElementById('detalhe-data').innerText = o.data;
         document.getElementById('detalhe-texto').innerText = o.detalheCompleto;
         document.getElementById('detalhe-autor').innerText = o.autor;
-        document.getElementById('detalhe-status-box').innerHTML = `<span class="px-4 py-1.5 rounded-full text-[10px] font-black border uppercase ${o.status==='Resolvido'?'bg-green-50 text-green-600 border-green-200':'bg-yellow-50 text-yellow-600 border-yellow-200'}">${o.status}</span>`;
-        document.getElementById('detalhe-galeria-fotos').innerHTML = (o.fotos_urls || []).map(u => `<a href="${u}" target="_blank"><img src="${u}" class="h-28 w-full object-cover rounded-2xl border-2 border-white shadow-sm hover:border-shopee transition-all"></a>`).join('');
+        document.getElementById('detalhe-status-box').innerHTML = `<span class="px-4 py-2 rounded-full text-[10px] font-black border uppercase ${o.status==='Resolvido'?'bg-green-50 text-green-600 border-green-100':'bg-yellow-50 text-yellow-600 border-yellow-100'}">${o.status}</span>`;
+        document.getElementById('detalhe-galeria-fotos').innerHTML = (o.fotos_urls || []).map(u => `<a href="${u}" target="_blank"><img src="${u}" class="h-28 w-full object-cover rounded-2xl border-2 border-white shadow-sm"></a>`).join('');
         document.getElementById('slide-overlay').classList.add('active');
         document.getElementById('slide-panel').classList.add('active');
     };
@@ -296,7 +319,7 @@
     window.atualizarStatus = async (s) => {
         if(window.indiceEmEdicao !== null) {
             const id = window.ocorrencias[window.indiceEmEdicao].id;
-            await update(dbRef(db, `ocorrencias/${id}`), { status: s });
+            await update(ref(db, `ocorrencias/${id}`), { status: s });
             window.fecharDropdownStatus();
         }
     };
@@ -314,7 +337,7 @@
         let p=0, r=0, c=0;
         tb.innerHTML = window.ocorrencias.map((o, i) => {
             if(o.status==='Pendente') p++; else if(o.status==='Resolvido') r++; else c++;
-            return `<tr class="hover:bg-slate-50 transition-colors"><td class="p-6 font-black text-xs uppercase">${o.local}</td><td class="p-6 text-[10px] font-bold text-slate-400 uppercase">${o.autor}</td><td class="p-6"><button onclick="window.abrirDropdownStatus(event, ${i})" class="px-3 py-1.5 rounded-full text-[10px] font-black border uppercase ${o.status==='Resolvido'?'bg-green-50 text-green-600':'bg-yellow-50 text-yellow-600'}">${o.status}</button></td><td class="p-6 text-center"><button onclick="window.abrirDetalhes(${i})" class="text-shopee"><i class="fa-solid fa-circle-arrow-right text-xl"></i></button></td></tr>`;
+            return `<tr class="hover:bg-slate-50 transition-colors"><td class="p-6 font-black text-xs uppercase">${o.local}</td><td class="p-6"><button onclick="window.abrirDropdownStatus(event, ${i})" class="px-3 py-1.5 rounded-full text-[10px] font-black border uppercase shadow-sm ${o.status==='Resolvido'?'bg-green-50 text-green-600 border-green-100':'bg-yellow-50 text-yellow-600 border-yellow-100'}">${o.status}</button></td><td class="p-6 text-center"><button onclick="window.abrirDetalhes(${i})" class="text-shopee"><i class="fa-solid fa-circle-arrow-right text-xl"></i></button></td></tr>`;
         }).join('');
         document.getElementById('kpi-total').innerText = window.ocorrencias.length;
         document.getElementById('kpi-pendentes').innerText = p; document.getElementById('kpi-resolvidos').innerText = r;
@@ -329,7 +352,7 @@
 
     function renderizarMeuProgresso() {
         const tb = document.getElementById('tabela-meu-progresso');
-        tb.innerHTML = window.ocorrencias.filter(o => o.autor === window.nomeUsuarioAtual).map(o => `<tr><td class="p-6 font-bold text-xs uppercase">${o.local}</td><td class="p-6"><span class="px-3 py-1.5 rounded-full text-[10px] font-black border uppercase ${o.status==='Resolvido'?'text-green-600':'text-yellow-600'}">${o.status}</span></td></tr>`).join('');
+        tb.innerHTML = window.ocorrencias.filter(o => o.autor === window.nomeUsuarioAtual).map(o => `<tr><td class="p-6 font-bold text-xs uppercase">${o.local}</td><td class="p-6"><span class="px-3 py-1 rounded-full text-[10px] font-black border uppercase ${o.status==='Resolvido'?'text-green-600':'text-yellow-600'}">${o.status}</span></td></tr>`).join('');
     }
 </script>
 </body>
