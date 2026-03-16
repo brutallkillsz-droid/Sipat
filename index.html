@@ -332,7 +332,7 @@
                             <h3 class="font-bold text-gray-800 flex items-center gap-2"><i class="fa-solid fa-cloud text-shopee"></i> Banco de Dados RTDB</h3>
                             <span class="text-xs font-bold bg-green-100 text-green-700 px-3 py-1 rounded-full"><i class="fa-solid fa-circle-nodes"></i> Online</span>
                         </div>
-                        <div class="overflow-x-auto overflow-y-auto flex-grow p-4">
+                        <div class="overflow-x-auto overflow-y-auto flex-grow table-scroll p-4">
                             <table class="w-full text-left whitespace-nowrap min-w-[800px]">
                                 <thead>
                                     <tr class="bg-white border-b border-gray-100 sticky top-0 z-10 py-2">
@@ -391,31 +391,59 @@
         const u = document.getElementById('username').value.trim();
         const p = document.getElementById('password').value.trim();
         
-        // BLOQUEIO DE LOGIN: Apenas admin e davidsilveira
+        // APENAS OS DOIS LOGINS PERMITIDOS
         if(u === "admin" && p === "spxadminl#") {
-            window.usuarioAtual = 'admin'; window.nomeUsuarioAtual = 'Gestor ADM';
-            document.getElementById('user-display-name').innerText = window.nomeUsuarioAtual;
-            document.getElementById('user-display-avatar').innerText = 'AD';
-            
-            window.mudarAba('dashboard');
-            atualizarDashboardUI(); 
-
+            localStorage.setItem('sipat_user', 'admin');
+            localStorage.setItem('sipat_nome', 'Gestor ADM');
+            carregarSessao('admin', 'Gestor ADM');
         } else if(u === "davidsilveira" && p === "1234") {
-            window.usuarioAtual = 'davidsilveira'; window.nomeUsuarioAtual = 'David Silveira'; 
-            document.getElementById('user-display-name').innerText = window.nomeUsuarioAtual;
-            document.getElementById('user-display-avatar').innerText = 'DS';
-            
-            window.mudarAba('menu-inspetor');
-            window.renderizarMeuProgresso(); 
-
+            localStorage.setItem('sipat_user', 'davidsilveira');
+            localStorage.setItem('sipat_nome', 'David Silveira');
+            carregarSessao('davidsilveira', 'David Silveira');
         } else {
             alert("⚠️ Acesso Negado: Usuário não cadastrado ou senha incorreta.");
             return;
         }
+    };
+
+    // FUNÇÃO QUE CARREGA A SESSÃO NA TELA
+    function carregarSessao(user, nome) {
+        window.usuarioAtual = user; 
+        window.nomeUsuarioAtual = nome; 
+        
+        document.getElementById('user-display-name').innerText = nome;
+        document.getElementById('user-display-avatar').innerText = user === 'admin' ? 'AD' : 'DS';
         
         document.getElementById('login-screen').classList.add('hidden');
         document.getElementById('app-layout').classList.remove('hidden');
         document.getElementById('app-layout').classList.add('flex');
+
+        if(user === 'admin') {
+            window.mudarAba('dashboard');
+            atualizarDashboardUI();
+        } else {
+            window.mudarAba('menu-inspetor');
+            window.renderizarMeuProgresso();
+        }
+    }
+
+    // VERIFICA SE O USUÁRIO JÁ ESTAVA LOGADO (F5 DO NAVEGADOR)
+    window.verificarSessao = () => {
+        const userSalvo = localStorage.getItem('sipat_user');
+        const nomeSalvo = localStorage.getItem('sipat_nome');
+
+        if(userSalvo && nomeSalvo) {
+            carregarSessao(userSalvo, nomeSalvo);
+        }
+    };
+
+    // CHAMA A VERIFICAÇÃO ASSIM QUE A PÁGINA CARREGA
+    window.verificarSessao();
+
+    window.sair = () => {
+        localStorage.removeItem('sipat_user');
+        localStorage.removeItem('sipat_nome');
+        location.reload();
     };
 
     window.mudarAba = (aba) => {
@@ -620,7 +648,6 @@
 
     document.addEventListener('click', (e) => { if (document.getElementById('statusDropdown').classList.contains('active')) window.fecharDropdownStatus(); });
     document.addEventListener('keydown', (e) => { if (e.key === "Escape") { window.fecharDetalhes(); window.fecharDropdownStatus(); } });
-    window.sair = () => location.reload();
 
     function atualizarDashboardUI() {
         const tbody = document.getElementById('tabela-dados');
@@ -643,7 +670,6 @@
             const iniciais = item.autor.substring(0,2).toUpperCase();
             const badgeClass = getBadgeClasses(item.status);
 
-            // TABELA COM ESPAÇO LIVRE PARA ROLAR HORIZONTALMENTE SEM CORTAR BOTÕES
             tbody.innerHTML += `
                 <tr class="hover:bg-gray-50/50 transition-colors group border-b border-gray-50">
                     <td class="px-6 py-4"><strong class="text-gray-800">${item.local}</strong></td>
