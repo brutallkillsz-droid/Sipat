@@ -13,168 +13,342 @@
             theme: {
                 extend: {
                     colors: {
-                        shopee: { DEFAULT: '#EE4D2D', dark: '#d64428', light: '#fff0ed' }
+                        shopee: { DEFAULT: '#EE4D2D', dark: '#d64428', light: '#fff0ed' },
+                        darkbg: '#1f2937', surface: '#ffffff', surfaceHover: '#f3f4f6'
                     }
                 }
             }
         }
     </script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        body { font-family: 'Inter', sans-serif; overflow: hidden; background: #f8fafc; }
-        .glass-card { background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15); }
-        .card-interaction { transition: all 0.3s ease; cursor: pointer; }
-        .card-interaction:hover { transform: translateY(-5px); border-color: #EE4D2D; box-shadow: 0 15px 30px rgba(238,77,45,0.15); }
-        .slide-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 998; opacity: 0; pointer-events: none; transition: 0.4s; }
+        body { font-family: 'Inter', sans-serif; overflow: hidden; }
+        
+        .card-interaction { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .card-interaction:hover, .card-interaction:focus {
+            background-color: var(--shopee-orange, #EE4D2D); transform: translateY(-5px); outline: none;
+            box-shadow: 0 10px 15px -3px rgba(238, 77, 45, 0.4);
+        }
+        .card-interaction:hover i, .card-interaction:focus i,
+        .card-interaction:hover span, .card-interaction:focus span { color: white !important; }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        input[type="date"]::-webkit-calendar-picker-indicator,
+        input[type="time"]::-webkit-calendar-picker-indicator { cursor: pointer; opacity: 0.6; }
+
+        .slide-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(3px); z-index: 998; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
         .slide-overlay.active { opacity: 1; pointer-events: all; }
-        .slide-panel { position: fixed; top: 0; right: 0; width: 100%; max-width: 460px; height: 100vh; background: #fff; z-index: 999; transform: translateX(100%); transition: 0.5s cubic-bezier(0.16, 1, 0.3, 1); display: flex; flex-direction: column; }
+        .slide-panel { position: fixed; top: 0; right: 0; width: 100%; max-width: 450px; height: 100vh; background: #fff; box-shadow: -10px 0 30px rgba(0,0,0,0.2); z-index: 999; transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); display: flex; flex-direction: column; }
         .slide-panel.active { transform: translateX(0); }
-        .status-dropdown { position: fixed; background: #fff; border-radius: 16px; padding: 8px; box-shadow: 0 15px 35px rgba(0,0,0,0.15); z-index: 9999; opacity: 0; transform: scale(0.9); pointer-events: none; transition: 0.2s; min-width: 170px; border: 1px solid #f1f5f9; }
+        
+        .status-dropdown { position: fixed; background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 8px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.2); z-index: 9999; opacity: 0; transform: scale(0.95); pointer-events: none; transition: all 0.15s ease; display: flex; flex-direction: column; gap: 4px; min-width: 150px; }
         .status-dropdown.active { opacity: 1; transform: scale(1); pointer-events: all; }
+
         .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body class="text-slate-800 flex flex-col h-screen">
+<body class="bg-gray-50 text-gray-800 flex flex-col h-screen">
 
 <div id="statusDropdown" class="status-dropdown">
-    <button class="w-full text-left px-4 py-3 rounded-xl hover:bg-slate-50 text-yellow-600 font-bold" onclick="window.atualizarStatus('Pendente')">Pendente</button>
-    <button class="w-full text-left px-4 py-3 rounded-xl hover:bg-slate-50 text-green-600 font-bold" onclick="window.atualizarStatus('Resolvido')">Resolvido</button>
-    <button class="w-full text-left px-4 py-3 rounded-xl hover:bg-slate-50 text-red-600 font-bold" onclick="window.atualizarStatus('Cancelado')">Cancelado</button>
+    <button class="w-full text-left px-3 py-2 rounded-md hover:bg-yellow-50 text-yellow-600 font-semibold text-sm transition-colors flex items-center gap-2" onclick="window.atualizarStatus('Pendente')"><i class="fa-solid fa-clock"></i> Pendente</button>
+    <button class="w-full text-left px-3 py-2 rounded-md hover:bg-green-50 text-green-600 font-semibold text-sm transition-colors flex items-center gap-2" onclick="window.atualizarStatus('Resolvido')"><i class="fa-solid fa-check-double"></i> Resolvido</button>
+    <button class="w-full text-left px-3 py-2 rounded-md hover:bg-red-50 text-red-600 font-semibold text-sm transition-colors flex items-center gap-2" onclick="window.atualizarStatus('Cancelado')"><i class="fa-solid fa-ban"></i> Cancelado</button>
 </div>
 
 <div id="slide-overlay" class="slide-overlay" onclick="window.fecharDetalhes()"></div>
-<div id="slide-panel">
-    <div class="p-6 border-b flex justify-between items-center bg-white sticky top-0 z-10">
-        <h2 class="font-black text-shopee uppercase">Inspeção Detalhada</h2>
-        <button onclick="window.fecharDetalhes()"><i class="fa-solid fa-xmark text-xl text-slate-400"></i></button>
+<div id="slide-panel" class="slide-panel">
+    <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-white">
+        <h2 class="font-bold text-lg text-gray-800 flex items-center gap-2"><i class="fa-solid fa-clipboard-list text-shopee"></i> Ficha da Ocorrência</h2>
+        <button class="text-gray-400 hover:text-shopee transition-colors p-2" onclick="window.fecharDetalhes()" title="Fechar (ESC)"><i class="fa-solid fa-xmark text-xl"></i></button>
     </div>
-    <div class="p-6 overflow-y-auto flex-1 space-y-6 bg-slate-50/50">
-        <div id="detalhe-status-box"></div>
-        <div class="bg-white p-5 rounded-[1.5rem] border shadow-sm">
-            <h5 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Responsável</h5>
-            <div class="flex items-center gap-3">
-                <div id="detalhe-avatar" class="w-10 h-10 rounded-full bg-shopee text-white flex items-center justify-center font-bold">?</div>
-                <span id="detalhe-autor" class="font-bold"></span>
+    <div class="p-6 overflow-y-auto flex-1 bg-gray-50 space-y-6">
+        <div><span id="detalhe-badge-status" class="px-3 py-1 rounded-full text-xs font-bold border">Status</span></div>
+        
+        <div class="detail-block">
+            <h5 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Inspetor Responsável</h5>
+            <div class="bg-white p-4 rounded-xl border border-gray-200 flex items-center gap-3 shadow-sm">
+                <div id="detalhe-avatar" class="w-10 h-10 rounded-full bg-shopee-light text-shopee flex items-center justify-center font-bold">DS</div>
+                <strong id="detalhe-autor" class="text-gray-800">Nome</strong>
             </div>
         </div>
-        <div class="bg-white p-5 rounded-[1.5rem] border shadow-sm">
-            <h5 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Relatório</h5>
-            <p class="text-sm font-bold text-shopee" id="detalhe-hub"></p>
-            <p class="text-xs text-slate-400 mb-4" id="detalhe-categoria"></p>
-            <p id="detalhe-texto" class="text-sm text-slate-600 leading-relaxed"></p>
-        </div>
-        <div id="detalhe-galeria-fotos" class="grid grid-cols-2 gap-3 pb-10"></div>
-    </div>
-</div>
 
-<div id="login-screen" class="fixed inset-0 z-50 flex flex-col md:flex-row bg-slate-50 w-full h-full overflow-hidden">
-    <div class="hidden md:flex flex-1 bg-shopee flex-col justify-center items-center relative">
-        <div class="absolute inset-0 bg-gradient-to-br from-shopee via-shopee to-shopee-dark"></div>
-        <div class="relative z-10 text-center px-12">
-            <h1 class="text-white text-6xl font-black tracking-tighter mb-4">LMG-48</h1>
-            <p class="text-shopee-light text-xl font-medium opacity-90">SISTEMA DE SEGURANÇA</p>
+        <div class="detail-block">
+            <h5 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Unidade e Risco</h5>
+            <p class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm"><strong class="text-shopee block" id="detalhe-hub">Hub</strong><span id="detalhe-categoria" class="text-gray-600 text-sm">Categoria</span></p>
         </div>
-    </div>
-    <div class="flex-1 flex justify-center items-center p-8 bg-slate-50">
-        <div class="w-full max-w-[420px]">
-            <div class="relative z-20 flex justify-center -mb-20">
-                <div class="w-44 h-44 rounded-[3.5rem] overflow-hidden border-8 border-white bg-white shadow-2xl">
-                    <video autoplay loop muted playsinline class="w-full h-full object-cover">
-                        <source src="https://i.imgur.com/iKdPvMx.mp4" type="video/mp4">
-                    </video>
+        
+        <div class="detail-block">
+            <h5 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Data e Hora</h5>
+            <p class="bg-white p-4 rounded-xl border border-gray-200 text-gray-600 text-sm shadow-sm flex items-center gap-2"><i class="fa-regular fa-calendar"></i> <span id="detalhe-data">00/00/0000</span></p>
+        </div>
+
+        <div class="detail-block">
+            <h5 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Detalhamento</h5>
+            <p id="detalhe-texto" class="bg-white p-4 rounded-xl border border-gray-200 text-gray-700 text-sm whitespace-pre-wrap shadow-sm">Nenhum detalhe.</p>
+        </div>
+
+        <div class="detail-block" id="box-foto-evidencia">
+            <h5 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Evidências Fotográficas</h5>
+            <div id="detalhe-galeria-fotos" class="grid grid-cols-2 gap-3 mt-2">
                 </div>
-            </div>
-            <div class="glass-card pt-28 pb-12 px-10 rounded-[3.5rem] relative z-10">
-                <h2 class="text-2xl font-black text-center text-slate-800 uppercase tracking-tighter mb-8">Acesso</h2>
-                <div class="space-y-4">
-                    <input type="text" id="username" class="w-full bg-slate-50 border rounded-2xl px-6 py-4 outline-none focus:ring-2 focus:ring-shopee/20 font-bold" placeholder="ID Usuário">
-                    <input type="password" id="password" class="w-full bg-slate-50 border rounded-2xl px-6 py-4 outline-none focus:ring-2 focus:ring-shopee/20 font-bold" placeholder="Senha">
-                    <button onclick="window.fazerLogin()" class="w-full bg-shopee text-white font-black py-5 rounded-2xl shadow-xl transition-all uppercase tracking-widest text-sm active:scale-95">Entrar</button>
-                </div>
-            </div>
         </div>
     </div>
 </div>
 
-<div id="app-layout" class="hidden flex-col h-full w-full bg-slate-50">
-    <header class="bg-white/80 backdrop-blur-md border-b sticky top-0 z-40 p-4">
-        <div class="max-w-6xl mx-auto flex justify-between items-center">
-            <div class="flex items-center">
-                <video autoplay loop muted playsinline class="h-10 w-10 rounded-lg mr-2 shadow-sm"><source src="https://i.imgur.com/iKdPvMx.mp4" type="video/mp4"></video>
-                <span class="font-black text-xl text-shopee tracking-tighter">SIPAT</span>
+<div id="login-screen" class="flex w-full h-full absolute inset-0 z-50 bg-white">
+    <div class="hidden md:flex flex-1 bg-shopee flex-col justify-center items-center p-12 text-center relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-br from-shopee to-shopee-dark opacity-90"></div>
+        <div class="relative z-10 text-white w-full flex flex-col items-center">
+            <video autoplay loop muted playsinline class="w-64 h-auto rounded-3xl shadow-2xl mb-8 border-4 border-white/20">
+                <source src="https://i.imgur.com/iKdPvMx.mp4" type="video/mp4">
+            </video>
+            <h1 class="text-4xl font-black tracking-tight mb-2">Portal SIPAT LMG-48</h1>
+            <p class="text-shopee-light text-lg font-medium">Prevenção e Segurança é Prioridade</p>
+        </div>
+    </div>
+    <div class="flex-1 flex justify-center items-center p-6 bg-gray-50">
+        <div class="w-full max-w-md bg-white p-8 rounded-3xl shadow-xl border border-gray-100 flex flex-col items-center">
+            <div class="md:hidden flex flex-col items-center mb-8">
+                <video autoplay loop muted playsinline class="w-32 h-auto rounded-2xl shadow-lg border-2 border-shopee mb-4">
+                    <source src="https://i.imgur.com/iKdPvMx.mp4" type="video/mp4">
+                </video>
+                <h2 class="text-2xl font-black text-gray-800">SIPAT Portal</h2>
             </div>
-            <div id="user-display-avatar" class="w-10 h-10 rounded-full bg-shopee text-white flex items-center justify-center font-bold cursor-pointer" onclick="window.sair()">?</div>
+            <h2 class="text-2xl font-bold text-gray-800 mb-2 hidden md:block">Bem-vindo</h2>
+            <p class="text-gray-500 mb-8 font-medium text-center">Acesse com suas credenciais de operação.</p>
+            
+            <div class="space-y-5 w-full">
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">ID do Colaborador</label>
+                    <input type="text" id="username" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee focus:border-transparent transition-all" placeholder="Ex: davidsilveira">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Senha Segura</label>
+                    <input type="password" id="password" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee focus:border-transparent transition-all" placeholder="••••••••">
+                </div>
+                <button onclick="window.fazerLogin()" class="w-full bg-shopee hover:bg-shopee-dark text-white font-bold rounded-xl py-4 mt-4 shadow-lg shadow-shopee/30 transition-all active:scale-95 uppercase tracking-wide">Entrar no Sistema</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="app-layout" class="hidden flex-col h-full w-full bg-gray-50">
+    <header class="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-40">
+        <div class="max-w-6xl mx-auto flex justify-between items-center py-2 px-4">
+            <div class="flex items-center space-x-3">
+                <video autoplay loop muted playsinline class="h-10 w-auto rounded-lg"><source src="https://i.imgur.com/iKdPvMx.mp4" type="video/mp4"></video>
+                <span class="font-black text-xl text-shopee hidden sm:block">Shopee</span>
+            </div>
+            <div class="text-center bg-shopee text-white px-6 py-1.5 rounded-full text-xs font-bold tracking-wide shadow-sm absolute left-1/2 transform -translate-x-1/2 hidden md:block uppercase">
+                Segurança é Prioridade LMG-48
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="text-right hidden sm:block">
+                    <h1 class="font-black text-xl text-gray-800 leading-none">LMG-48</h1>
+                    <p class="text-[10px] font-bold text-gray-400 tracking-widest uppercase" id="user-display-name">Nome</p>
+                </div>
+                <div id="user-display-avatar" class="w-10 h-10 rounded-full bg-shopee-light text-shopee border-2 border-white shadow-md flex items-center justify-center font-bold cursor-pointer" onclick="window.sair()" title="Sair do Sistema">DS</div>
+            </div>
         </div>
     </header>
 
     <main class="flex-1 overflow-y-auto p-4 md:p-8">
-        <div class="max-w-6xl mx-auto">
-            <div id="aba-menu-inspetor" class="hidden grid grid-cols-1 md:grid-cols-2 gap-5 max-w-2xl mx-auto mt-6">
-                <button onclick="window.mudarAba('registro')" class="card-interaction col-span-1 md:col-span-2 bg-white border rounded-[3rem] p-12 flex flex-col items-center gap-6 shadow-sm">
-                    <i class="fa-solid fa-triangle-exclamation text-7xl text-shopee"></i>
-                    <span class="font-black text-3xl uppercase tracking-tighter">Relatar Risco</span>
-                </button>
-                <button onclick="window.mudarAba('progresso')" class="card-interaction bg-white rounded-[2rem] p-8 border flex flex-col items-center gap-2 shadow-sm">
-                    <i class="fa-solid fa-chart-line text-3xl text-slate-300"></i>
-                    <span class="font-black text-[10px] uppercase text-slate-400">Meu Progresso</span>
-                </button>
-                <button onclick="window.sair()" class="card-interaction bg-white rounded-[2rem] p-8 border flex flex-col items-center gap-2 shadow-sm">
-                    <i class="fa-solid fa-power-off text-3xl text-slate-200"></i>
-                    <span class="font-black text-[10px] uppercase text-slate-300">Sair</span>
-                </button>
+        <div class="max-w-6xl mx-auto w-full h-full relative">
+
+            <div id="aba-menu-inspetor" class="hidden h-full flex flex-col justify-center max-w-2xl mx-auto pt-4">
+                <div class="grid grid-cols-2 gap-4 md:gap-6">
+                    <button onclick="window.mudarAba('registro')" class="card-interaction col-span-2 bg-white border-2 border-shopee rounded-3xl p-8 shadow-sm flex flex-col items-center justify-center space-y-4 group">
+                        <i class="fa-solid fa-triangle-exclamation text-7xl text-shopee transition-colors"></i>
+                        <span class="font-black text-2xl text-gray-800 uppercase group-hover:text-white transition-colors tracking-tight">Relatar Risco Agora</span>
+                    </button>
+                    <button class="card-interaction bg-white rounded-3xl p-6 shadow-sm flex flex-col items-center justify-center space-y-3 border-b-4 border-shopee group">
+                        <i class="fa-solid fa-file-shield text-4xl text-shopee transition-colors"></i>
+                        <span class="font-bold text-sm text-gray-700 text-center leading-tight transition-colors">Procedimentos</span>
+                    </button>
+                    <button class="card-interaction bg-white rounded-3xl p-6 shadow-sm flex flex-col items-center justify-center space-y-3 border-b-4 border-shopee group">
+                        <i class="fa-solid fa-graduation-cap text-4xl text-shopee transition-colors"></i>
+                        <span class="font-bold text-sm text-gray-700 text-center leading-tight transition-colors">Treinamento</span>
+                    </button>
+                    <button class="card-interaction bg-white rounded-3xl p-6 shadow-sm flex flex-col items-center justify-center space-y-3 border-b-4 border-shopee group">
+                        <i class="fa-solid fa-ranking-star text-4xl text-shopee transition-colors"></i>
+                        <span class="font-bold text-sm text-gray-700 text-center leading-tight transition-colors">Ranking</span>
+                    </button>
+                    <button onclick="window.mudarAba('progresso')" class="card-interaction bg-white rounded-3xl p-6 shadow-sm flex flex-col items-center justify-center space-y-3 border-b-4 border-shopee group">
+                        <i class="fa-solid fa-chart-simple text-4xl text-shopee transition-colors"></i>
+                        <span class="font-bold text-sm text-gray-700 text-center leading-tight transition-colors">Meu Progresso</span>
+                    </button>
+                </div>
             </div>
 
-            <div id="aba-registro" class="hidden max-w-2xl mx-auto">
-                <button onclick="window.voltarMenu()" class="mb-6 font-black text-shopee uppercase text-xs flex items-center gap-2"><i class="fa-solid fa-arrow-left"></i> Voltar</button>
-                <div class="bg-white p-10 rounded-[3rem] shadow-xl border space-y-8">
+            <div id="aba-registro" class="hidden max-w-3xl mx-auto pb-10">
+                <div class="flex items-center gap-4 mb-6">
+                    <button onclick="window.voltarMenuInspetor()" class="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-gray-500 hover:text-shopee hover:bg-shopee-light transition-all"><i class="fa-solid fa-arrow-left"></i></button>
+                    <div>
+                        <h2 class="text-2xl font-black text-gray-800 tracking-tight">Reportar Anomalia</h2>
+                        <p class="text-sm text-gray-500 font-medium">Preencha os dados técnicos da ocorrência.</p>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 space-y-6">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <select id="hub_local" class="w-full bg-slate-50 p-5 rounded-2xl outline-none font-bold text-slate-700">
-                            <option value="" disabled selected>Hub...</option>
-                            <option>Hub Uberaba</option><option>Hub Uberlândia</option><option>Hub Divinópolis</option>
-                        </select>
-                        <select id="categoria" class="w-full bg-slate-50 p-5 rounded-2xl outline-none font-bold text-slate-700">
-                            <option value="" disabled selected>Risco...</option>
-                            <option>EPIs</option><option>Volumosos</option><option>Organização</option>
-                        </select>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Unidade Logística</label>
+                            <select id="hub_local" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee focus:border-transparent appearance-none font-medium text-gray-700">
+                                <option value="" disabled selected>Selecionar Base...</option>
+                                <option>Hub Uberaba</option>
+                                <option>Hub Uberlândia</option>
+                                <option>Hub Divinópolis</option>
+                                <option>Hub Lagoa da Prata</option>
+                                <option>Hub Patos de Minas</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Vetor de Risco</label>
+                            <select id="categoria" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee focus:border-transparent appearance-none font-medium text-gray-700">
+                                <option value="" disabled selected>Selecionar Padrão...</option>
+                                <option>Organização e Limpeza</option>
+                                <option>Movimentação de Volumosos</option>
+                                <option>Uso de EPIs</option>
+                                <option>Infraestrutura e Docas</option>
+                                <option>Equipamentos (Empilhadeira)</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="grid grid-cols-2 gap-6">
-                        <input type="date" id="data_ocorrencia" class="w-full bg-slate-50 p-5 rounded-2xl outline-none font-bold">
-                        <input type="time" id="hora_ocorrencia" class="w-full bg-slate-50 p-5 rounded-2xl outline-none font-bold">
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Data Constatada</label>
+                            <input type="date" id="data_ocorrencia" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee focus:border-transparent text-gray-700 font-medium">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Horário Exato</label>
+                            <input type="time" id="hora_ocorrencia" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee focus:border-transparent text-gray-700 font-medium">
+                        </div>
                     </div>
-                    <textarea id="detalhes" rows="3" class="w-full bg-slate-50 p-5 rounded-2xl outline-none" placeholder="Descrição..."></textarea>
-                    
-                    <div class="border-2 border-dashed border-slate-100 rounded-3xl p-10 text-center relative hover:bg-shopee-light transition-all group">
-                        <i class="fa-solid fa-camera text-4xl text-slate-200 mb-2 group-hover:text-shopee"></i>
-                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest" id="upload-text">Anexar Fotos (Max 5)</p>
-                        <input type="file" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="window.processarNovaFoto(event)">
+
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Laudo / Detalhamento</label>
+                        <textarea id="detalhes" rows="3" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee focus:border-transparent text-gray-700 font-medium resize-none" placeholder="Descreva tecnicamente o cenário encontrado..."></textarea>
                     </div>
-                    <div id="preview-fotos-container" class="grid grid-cols-5 gap-3"></div>
-                    <button id="btn-enviar" onclick="window.salvarFormulario()" class="w-full bg-shopee text-white font-black py-6 rounded-[2rem] shadow-2xl uppercase tracking-widest">Transmitir Agora</button>
+
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="block text-sm font-bold text-gray-700">Evidências Visuais (Fotos)</label>
+                            <span class="text-xs text-gray-400 font-bold bg-gray-100 px-2 py-1 rounded-md" id="contador-fotos">0/5</span>
+                        </div>
+                        
+                        <div id="preview-fotos-container" class="grid grid-cols-3 sm:grid-cols-5 gap-3 mb-3 empty:hidden">
+                            </div>
+
+                        <div class="relative border-2 border-dashed border-gray-300 bg-gray-50 rounded-2xl p-6 text-center hover:bg-shopee-light hover:border-shopee transition-colors cursor-pointer group">
+                            <i class="fa-solid fa-camera-retro text-3xl text-gray-400 group-hover:text-shopee mb-2 transition-colors"></i>
+                            <p class="text-xs font-medium text-gray-500" id="upload-text">Toque para adicionar foto</p>
+                            <input type="file" id="foto_upload" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="window.processarNovaFoto(event)">
+                        </div>
+                    </div>
+
+                    <button id="btn-enviar" onclick="window.salvarFormulario()" class="w-full bg-shopee hover:bg-shopee-dark text-white font-black text-lg tracking-wide rounded-2xl py-4 mt-4 shadow-lg shadow-shopee/30 transition-all active:scale-95 flex justify-center items-center gap-2">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> <span>Transmitir Relatório</span>
+                    </button>
                 </div>
             </div>
 
-            <div id="aba-dashboard" class="hidden space-y-8 pb-20">
-                <div class="grid grid-cols-3 gap-6">
-                    <div class="bg-white p-8 rounded-[2.5rem] border shadow-sm"><h4 class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total</h4><h2 id="kpi-total" class="text-4xl font-black">0</h2></div>
-                    <div class="bg-white p-8 rounded-[2.5rem] border shadow-sm"><h4 class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Aguardando</h4><h2 id="kpi-pendentes" class="text-4xl font-black text-yellow-500">0</h2></div>
-                    <div class="bg-white p-8 rounded-[2.5rem] border shadow-sm"><h4 class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Sanadas</h4><h2 id="kpi-resolvidos" class="text-4xl font-black text-green-500">0</h2></div>
-                </div>
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    <div class="lg:col-span-1 bg-white p-10 rounded-[3rem] border shadow-sm flex flex-col items-center">
-                        <div class="w-full aspect-square"><canvas id="graficoStatus"></canvas></div>
+            <div id="aba-progresso" class="hidden max-w-4xl mx-auto pb-10">
+                <div class="flex items-center gap-4 mb-6">
+                    <button onclick="window.voltarMenuInspetor()" class="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-gray-500 hover:text-shopee hover:bg-shopee-light transition-all"><i class="fa-solid fa-arrow-left"></i></button>
+                    <div>
+                        <h2 class="text-2xl font-black text-gray-800 tracking-tight">Meu Progresso</h2>
+                        <p class="text-sm text-gray-500 font-medium">Acompanhe o status dos relatórios enviados por você.</p>
                     </div>
-                    <div class="lg:col-span-2 bg-white rounded-[3rem] border overflow-hidden flex flex-col">
-                        <table class="w-full text-left text-sm"><thead class="bg-slate-50/50 border-b font-black text-slate-400 uppercase text-[10px] tracking-widest"><th class="p-6">Unidade</th><th class="p-6">Inspetor</th><th class="p-6">Status</th><th class="p-6">Ação</th></thead><tbody id="tabela-dados" class="divide-y"></tbody></table>
+                </div>
+
+                <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
+                    <div class="p-6 border-b border-gray-50 bg-gray-50/50">
+                        <h3 class="font-bold text-gray-800 flex items-center gap-2"><i class="fa-solid fa-clock-rotate-left text-shopee"></i> Histórico Pessoal</h3>
+                    </div>
+                    <div class="overflow-x-auto hide-scrollbar flex-1">
+                        <table class="w-full text-left whitespace-nowrap">
+                            <thead>
+                                <tr class="bg-white border-b border-gray-100">
+                                    <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Unidade</th>
+                                    <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Classificação</th>
+                                    <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Data / Hora</th>
+                                    <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Status Atual</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabela-meu-progresso" class="divide-y divide-gray-50">
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
 
-            <div id="aba-progresso" class="hidden max-w-3xl mx-auto">
-                <button onclick="window.voltarMenu()" class="mb-6 text-shopee font-black uppercase text-[10px] tracking-widest flex items-center gap-2"><i class="fa-solid fa-arrow-left"></i> Voltar</button>
-                <div class="bg-white rounded-[3rem] border shadow-xl overflow-hidden">
-                    <table class="w-full text-left"><thead class="bg-slate-50/50 border-b font-black text-slate-400 uppercase text-[10px] tracking-widest"><th class="p-6">Local</th><th class="p-6">Status</th></thead><tbody id="tabela-meu-progresso" class="divide-y"></tbody></table>
+            <div id="aba-dashboard" class="hidden space-y-6 pb-10">
+                <h2 class="text-2xl font-black text-gray-800 tracking-tight mb-2">Visão Geral Gerencial</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center relative overflow-hidden">
+                        <div class="w-2 h-full bg-gray-800 absolute left-0 top-0"></div>
+                        <div class="pl-2">
+                            <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Ocorrências</h4>
+                            <h2 id="kpi-total" class="text-4xl font-black text-gray-800">0</h2>
+                        </div>
+                        <div class="w-14 h-14 rounded-2xl bg-gray-50 flex justify-center items-center text-gray-400 text-2xl"><i class="fa-solid fa-layer-group"></i></div>
+                    </div>
+                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center relative overflow-hidden">
+                        <div class="w-2 h-full bg-yellow-500 absolute left-0 top-0"></div>
+                        <div class="pl-2">
+                            <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Aguardando</h4>
+                            <h2 id="kpi-pendentes" class="text-4xl font-black text-gray-800">0</h2>
+                        </div>
+                        <div class="w-14 h-14 rounded-2xl bg-yellow-50 flex justify-center items-center text-yellow-500 text-2xl"><i class="fa-solid fa-clock-rotate-left"></i></div>
+                    </div>
+                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center relative overflow-hidden">
+                        <div class="w-2 h-full bg-green-500 absolute left-0 top-0"></div>
+                        <div class="pl-2">
+                            <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Sanadas</h4>
+                            <h2 id="kpi-resolvidos" class="text-4xl font-black text-gray-800">0</h2>
+                        </div>
+                        <div class="w-14 h-14 rounded-2xl bg-green-50 flex justify-center items-center text-green-500 text-2xl"><i class="fa-solid fa-shield-check"></i></div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-1 bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center justify-center">
+                        <h3 class="font-bold text-gray-800 mb-4 w-full flex items-center gap-2"><i class="fa-solid fa-chart-pie text-shopee"></i> Distribuição</h3>
+                        <div class="relative w-full h-64 flex justify-center items-center">
+                            <canvas id="graficoStatus"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-2 bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
+                        <div class="p-6 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
+                            <h3 class="font-bold text-gray-800 flex items-center gap-2"><i class="fa-solid fa-cloud text-shopee"></i> Dados em Tempo Real</h3>
+                            <span class="text-xs font-bold bg-green-100 text-green-700 px-3 py-1 rounded-full"><i class="fa-solid fa-circle-nodes"></i> Online</span>
+                        </div>
+                        <div class="overflow-x-auto hide-scrollbar flex-1">
+                            <table class="w-full text-left whitespace-nowrap">
+                                <thead>
+                                    <tr class="bg-white border-b border-gray-100">
+                                        <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Unidade</th>
+                                        <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Inspetor</th>
+                                        <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Data / Hora</th>
+                                        <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Status</th>
+                                        <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-center">Ação</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabela-dados" class="divide-y divide-gray-50">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -184,10 +358,11 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    // Módulo corrigido para o Realtime Database (usando sua URL)
     import { getDatabase, ref, push, set, onValue, update, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
     import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-storage.js";
 
-    // CONFIGURAÇÃO OFICIAL (O QUE VOCÊ ENVIOU)
+    // AS MESMAS CHAVES QUE VOCÊ INFORMOU
     const firebaseConfig = {
         apiKey: "AIzaSyCrTjdAsHZ6JK1WNjZFeC5vHI0ICif4rxQ",
         authDomain: "sipat-lmg48.firebaseapp.com",
@@ -205,152 +380,297 @@
     window.ocorrencias = [];
     window.usuarioAtual = '';
     window.nomeUsuarioAtual = '';
-    window.fotosBinariasTemporarias = [];
     window.indiceEmEdicao = null;
+    window.fotosBinariasTemporarias = [];
+    window.fotosMiniaturasTemporarias = [];
     let graficoChartJS = null;
+    const MAX_FOTOS = 5;
 
     // Escuta Realtime (RTDB)
-    onValue(ref(db, 'ocorrencias'), (snap) => {
-        const data = snap.val();
-        window.ocorrencias = data ? Object.keys(data).map(k => ({ id: k, ...data[k] })).reverse() : [];
+    onValue(ref(db, 'ocorrencias'), (snapshot) => {
+        const data = snapshot.val();
+        window.ocorrencias = data ? Object.keys(data).map(key => ({ id: key, ...data[key] })).reverse() : [];
         if(window.usuarioAtual === 'admin') atualizarDashboardUI();
-        if(window.usuarioAtual === 'davidsilveira') renderizarMeuProgresso();
+        if(window.usuarioAtual === 'davidsilveira') window.renderizarMeuProgresso();
     });
 
     window.fazerLogin = () => {
         const u = document.getElementById('username').value.trim();
         const p = document.getElementById('password').value.trim();
         if(u === "admin" && p === "spxadminl#") {
-            window.usuarioAtual = 'admin'; window.nomeUsuarioAtual = 'ADM'; entrarApp('dashboard');
+            window.usuarioAtual = 'admin'; window.nomeUsuarioAtual = 'Gestor ADM';
+            document.getElementById('user-display-name').innerText = 'Gestor ADM';
+            document.getElementById('user-display-avatar').innerText = 'AD';
+            window.mudarAba('dashboard');
         } else if(u === "davidsilveira" && p === "1234") {
-            window.usuarioAtual = 'davidsilveira'; window.nomeUsuarioAtual = 'David Silveira'; entrarApp('aba-menu-inspetor');
-        } else { alert("Acesso Negado!"); }
-    };
-
-    function entrarApp(aba) {
+            window.usuarioAtual = 'davidsilveira'; window.nomeUsuarioAtual = 'David Silveira';
+            document.getElementById('user-display-name').innerText = 'David Silveira';
+            document.getElementById('user-display-avatar').innerText = 'DS';
+            window.mudarAba('menu-inspetor');
+        } else {
+            alert("Credenciais Incorretas!");
+            return;
+        }
         document.getElementById('login-screen').classList.add('hidden');
+        document.getElementById('app-layout').classList.remove('hidden');
         document.getElementById('app-layout').classList.add('flex');
-        document.getElementById('user-display-avatar').innerText = window.nomeUsuarioAtual.substring(0,2).toUpperCase();
-        window.mudarAba(aba);
-    }
-
-    window.mudarAba = (a) => {
-        ['dashboard', 'registro', 'aba-menu-inspetor', 'progresso'].forEach(i => {
-            const el = document.getElementById(i === 'aba-menu-inspetor' ? i : 'aba-'+i);
-            if(el) el.classList.add('hidden');
-        });
-        const target = document.getElementById(a === 'aba-menu-inspetor' ? a : 'aba-'+a);
-        if(target) target.classList.remove('hidden');
     };
+
+    window.mudarAba = (aba) => {
+        ['dashboard', 'registro', 'menu-inspetor', 'progresso'].forEach(i => document.getElementById('aba-'+i).classList.add('hidden'));
+        document.getElementById('aba-'+aba).classList.remove('hidden');
+    };
+
+    window.voltarMenuInspetor = () => {
+        if(window.usuarioAtual === 'davidsilveira') window.mudarAba('menu-inspetor');
+    };
+
+    async function comprimir(file) {
+        return new Promise(resolve => {
+            const img = new Image();
+            const url = URL.createObjectURL(file);
+            img.onload = () => {
+                URL.revokeObjectURL(url);
+                const canvas = document.createElement('canvas');
+                const MAX = 640;
+                let w = img.width, h = img.height;
+                if(w > MAX) { h *= MAX/w; w = MAX; }
+                canvas.width = w; canvas.height = h;
+                canvas.getContext('2d').drawImage(img, 0,0,w,h);
+                canvas.toBlob(blob => resolve({blob, preview: canvas.toDataURL('image/jpeg', 0.5)}), 'image/jpeg', 0.5);
+            };
+            img.src = url;
+        });
+    }
 
     window.processarNovaFoto = async (e) => {
         const file = e.target.files[0];
-        if(!file || window.fotosBinariasTemporarias.length >= 5) return;
-        document.getElementById('upload-text').innerText = "CALIBRANDO...";
-        const img = new Image();
-        const url = URL.createObjectURL(file);
-        img.onload = () => {
-            URL.revokeObjectURL(url);
-            const canvas = document.createElement('canvas');
-            const MAX = 640;
-            let w = img.width, h = img.height;
-            if(w > MAX) { h *= MAX/w; w = MAX; }
-            canvas.width = w; canvas.height = h;
-            canvas.getContext('2d').drawImage(img, 0,0,w,h);
-            canvas.toBlob(blob => {
-                window.fotosBinariasTemporarias.push(blob);
-                document.getElementById('preview-fotos-container').innerHTML += `<div class="h-16 rounded-xl border-2 border-white shadow-md overflow-hidden"><img src="${canvas.toDataURL('image/jpeg',0.5)}" class="w-full h-full object-cover"></div>`;
-                document.getElementById('upload-text').innerText = `Capturado (${window.fotosBinariasTemporarias.length}/5)`;
-            }, 'image/jpeg', 0.5);
-        };
-        img.src = url;
+        if(!file) return;
+        if(window.fotosBinariasTemporarias.length >= MAX_FOTOS) { alert(`Mínimo atingido: ${MAX_FOTOS} fotos.`); return; }
+        
+        document.getElementById('upload-text').innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Otimizando...`;
+        const {blob, preview} = await comprimir(file);
+        
+        window.fotosBinariasTemporarias.push(blob);
+        window.fotosMiniaturasTemporarias.push(preview);
+        renderizarGradeDeFotos();
+        
+        document.getElementById('upload-text').innerText = "Toque para adicionar foto";
+        e.target.value = '';
     };
 
+    window.removerFoto = (index) => {
+        window.fotosBinariasTemporarias.splice(index, 1);
+        window.fotosMiniaturasTemporarias.splice(index, 1);
+        renderizarGradeDeFotos();
+    };
+
+    function renderizarGradeDeFotos() {
+        const container = document.getElementById('preview-fotos-container');
+        document.getElementById('contador-fotos').innerText = `${window.fotosBinariasTemporarias.length}/${MAX_FOTOS}`;
+        container.innerHTML = '';
+        window.fotosMiniaturasTemporarias.forEach((url, index) => {
+            container.innerHTML += `
+                <div class="relative w-full h-20 rounded-xl overflow-hidden border border-gray-200 shadow-sm group">
+                    <img src="${url}" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <button onclick="window.removerFoto(${index})" class="text-white hover:text-red-400 bg-black/50 w-8 h-8 rounded-full flex items-center justify-center"><i class="fa-solid fa-trash-can"></i></button>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    // AQUI ESTÁ A VALIDAÇÃO RÍGIDA RESTAURADA
     window.salvarFormulario = async () => {
-        const btn = document.getElementById('btn-enviar');
         const hub = document.getElementById('hub_local').value;
-        if(!hub) { alert("Selecione o Hub!"); return; }
-        
-        btn.disabled = true; btn.innerText = "TRANSMITINDO...";
+        const cat = document.getElementById('categoria').value;
+        const dat = document.getElementById('data_ocorrencia').value;
+        const hor = document.getElementById('hora_ocorrencia').value;
+        const det = document.getElementById('detalhes').value;
+        const btn = document.getElementById('btn-enviar');
+
+        if(!hub || !cat || !dat || !hor || !det) {
+            alert("⚠️ Por favor, preencha TODOS os campos técnicos obrigatórios.");
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> <span>Enviando para Nuvem...</span>`;
 
         try {
+            // Upload Storage
             const uploadPromises = window.fotosBinariasTemporarias.map(async (blob, i) => {
-                const storageRef = sRef(storage, `lmg48/${Date.now()}_${i}.jpg`);
+                const storageRef = sRef(storage, `evidencias/foto_${Date.now()}_${i}.jpg`);
                 await uploadBytes(storageRef, blob);
                 return getDownloadURL(storageRef);
             });
-            const urls = await Promise.all(uploadPromises);
+            const urlsDasFotos = await Promise.all(uploadPromises);
 
-            const novaRef = push(ref(db, 'ocorrencias'));
-            const dataBr = document.getElementById('data_ocorrencia').value.split('-').reverse().join('/');
+            // Gravação Realtime Database
+            const partesData = dat.split('-');
+            const dataFormatada = `${partesData[2]}/${partesData[1]}/${partesData[0]} às ${hor}`;
+            const novaOcorrenciaRef = push(ref(db, 'ocorrencias'));
             
-            await set(novaRef, {
+            await set(novaOcorrenciaRef, {
                 local: hub,
-                categoria: document.getElementById('categoria').value,
-                data: `${dataBr} às ${document.getElementById('hora_ocorrencia').value}`,
-                detalheCompleto: document.getElementById('detalhes').value,
-                fotos_urls: urls, status: "Pendente", autor: window.nomeUsuarioAtual, timestamp: serverTimestamp()
+                categoria: cat,
+                data: dataFormatada,
+                detalheCompleto: det,
+                fotos_urls: urlsDasFotos,
+                status: "Pendente",
+                autor: window.nomeUsuarioAtual,
+                timestamp: serverTimestamp()
             });
 
-            alert("Relatório Enviado!");
-            location.reload();
-        } catch(e) {
-            console.error(e);
-            alert("Erro! Verifique as Regras JSON do seu Realtime Database.");
-            btn.disabled = false; btn.innerText = "TENTAR NOVAMENTE";
+            // Limpa form
+            document.getElementById('hub_local').value = ""; document.getElementById('categoria').value = "";
+            document.getElementById('data_ocorrencia').value = ""; document.getElementById('hora_ocorrencia').value = "";
+            document.getElementById('detalhes').value = ""; 
+            window.fotosBinariasTemporarias = []; window.fotosMiniaturasTemporarias = [];
+            renderizarGradeDeFotos();
+
+            alert("✅ Relatório transmitido com sucesso!");
+            window.voltarMenuInspetor();
+        } catch (error) {
+            console.error(error);
+            alert("❌ Erro ao enviar! Verifique se publicou as Regras do Realtime Database.");
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> <span>Transmitir Relatório</span>`;
         }
     };
 
-    window.abrirDetalhes = (idx) => {
-        const o = window.ocorrencias[idx];
-        document.getElementById('detalhe-hub').innerText = o.local;
-        document.getElementById('detalhe-categoria').innerText = o.categoria;
-        document.getElementById('detalhe-texto').innerText = o.detalheCompleto;
-        document.getElementById('detalhe-autor').innerText = o.autor;
-        document.getElementById('detalhe-status-box').innerHTML = `<span class="px-4 py-1.5 rounded-full text-[10px] font-black border uppercase ${o.status==='Resolvido'?'bg-green-50 text-green-600 border-green-100':'bg-yellow-50 text-yellow-600 border-yellow-100'}">${o.status}</span>`;
-        document.getElementById('detalhe-galeria-fotos').innerHTML = (o.fotos_urls || []).map(u => `<a href="${u}" target="_blank"><img src="${u}" class="h-28 w-full object-cover rounded-2xl border-2 border-white shadow-sm"></a>`).join('');
+    function getBadgeClasses(status) {
+        if(status === 'Pendente') return 'bg-yellow-50 text-yellow-600 border-yellow-200';
+        if(status === 'Resolvido') return 'bg-green-50 text-green-600 border-green-200';
+        if(status === 'Cancelado') return 'bg-red-50 text-red-600 border-red-200';
+        return 'bg-gray-50 text-gray-600 border-gray-200';
+    }
+
+    window.abrirDetalhes = (index) => {
+        const occ = window.ocorrencias[index];
+        document.getElementById('detalhe-hub').innerText = occ.local;
+        document.getElementById('detalhe-categoria').innerText = occ.categoria;
+        document.getElementById('detalhe-data').innerText = occ.data;
+        document.getElementById('detalhe-texto').innerText = occ.detalheCompleto;
+        document.getElementById('detalhe-autor').innerText = occ.autor;
+        document.getElementById('detalhe-avatar').innerText = occ.autor.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
+        
+        const badgeStatus = document.getElementById('detalhe-badge-status');
+        badgeStatus.className = `px-3 py-1 rounded-full text-xs font-bold border ${getBadgeClasses(occ.status)}`;
+        badgeStatus.innerHTML = occ.status;
+
+        const galeria = document.getElementById('detalhe-galeria-fotos');
+        const boxFoto = document.getElementById('box-foto-evidencia');
+        galeria.innerHTML = '';
+        
+        let arrayFotos = occ.fotos_urls || [];
+        if(occ.foto_url && arrayFotos.length === 0) arrayFotos.push(occ.foto_url); 
+
+        if(arrayFotos.length > 0) {
+            arrayFotos.forEach(url => {
+                galeria.innerHTML += `
+                    <a href="${url}" target="_blank" class="block rounded-xl overflow-hidden border border-gray-200 shadow-sm hover:border-shopee transition-colors h-24">
+                        <img src="${url}" class="w-full h-full object-cover">
+                    </a>
+                `;
+            });
+            boxFoto.style.display = 'block';
+        } else {
+            boxFoto.style.display = 'none'; 
+        }
+
         document.getElementById('slide-overlay').classList.add('active');
         document.getElementById('slide-panel').classList.add('active');
     };
 
-    window.atualizarStatus = async (s) => {
-        if(window.indiceEmEdicao !== null) {
+    window.fecharDetalhes = () => { document.getElementById('slide-overlay').classList.remove('active'); document.getElementById('slide-panel').classList.remove('active'); };
+    window.abrirDropdownStatus = (e, i) => { e.stopPropagation(); window.indiceEmEdicao = i; const d = document.getElementById('statusDropdown'); d.style.left = e.clientX+'px'; d.style.top = e.clientY+'px'; d.classList.add('active'); };
+    window.fecharDropdownStatus = () => { document.getElementById('statusDropdown').classList.remove('active'); window.indiceEmEdicao = null; };
+    
+    window.atualizarStatus = async (novoStatus) => {
+        if(window.indiceEmEdicao !== null) { 
             const id = window.ocorrencias[window.indiceEmEdicao].id;
-            await update(ref(db, `ocorrencias/${id}`), { status: s });
-            window.fecharDropdownStatus();
+            await update(ref(db, `ocorrencias/${id}`), { status: novoStatus });
+            window.fecharDropdownStatus(); 
         }
     };
 
-    window.fecharDetalhes = () => { document.getElementById('slide-overlay').classList.remove('active'); document.getElementById('slide-panel').classList.remove('active'); };
-    window.abrirDropdownStatus = (e, i) => { e.stopPropagation(); window.indiceEmEdicao = i; const d = document.getElementById('statusDropdown'); d.style.left = (e.clientX-100)+'px'; d.style.top = e.clientY+'px'; d.classList.add('active'); };
-    window.fecharDropdownStatus = () => document.getElementById('statusDropdown').classList.remove('active');
+    document.addEventListener('click', (e) => { if (document.getElementById('statusDropdown').classList.contains('active')) window.fecharDropdownStatus(); });
+    document.addEventListener('keydown', (e) => { if (e.key === "Escape") { window.fecharDetalhes(); window.fecharDropdownStatus(); } });
     window.sair = () => location.reload();
-    window.voltarMenu = () => window.mudarAba('aba-menu-inspetor');
-    document.addEventListener('click', window.fecharDropdownStatus);
-    document.addEventListener('keydown', e => { if(e.key==='Escape') { window.fecharDetalhes(); window.fecharDropdownStatus(); } });
 
     function atualizarDashboardUI() {
-        const tb = document.getElementById('tabela-dados');
-        let p=0, r=0, c=0;
-        tb.innerHTML = window.ocorrencias.map((o, i) => {
-            if(o.status==='Pendente') p++; else if(o.status==='Resolvido') r++; else c++;
-            return `<tr class="hover:bg-slate-50 transition-colors"><td class="p-6 font-black text-xs uppercase">${o.local}</td><td class="p-6 text-[10px] font-bold text-slate-400 uppercase">${o.autor}</td><td class="p-6"><button onclick="window.abrirDropdownStatus(event, ${i})" class="px-3 py-1 rounded-full text-[10px] font-black border uppercase shadow-sm ${o.status==='Resolvido'?'bg-green-50 text-green-600 border-green-100':'bg-yellow-50 text-yellow-600 border-yellow-100'}">${o.status}</button></td><td class="p-6 text-center"><button onclick="window.abrirDetalhes(${i})" class="text-shopee"><i class="fa-solid fa-circle-arrow-right text-xl"></i></button></td></tr>`;
-        }).join('');
+        const tbody = document.getElementById('tabela-dados');
+        if(!tbody) return;
+        tbody.innerHTML = ''; 
+
+        let p = 0, r = 0, c = 0;
+
+        if(window.ocorrencias.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" class="text-center py-10 text-gray-400 font-medium">Nenhuma anomalia no Realtime Database.</td></tr>`;
+            document.getElementById('kpi-total').innerText = 0; document.getElementById('kpi-pendentes').innerText = 0; document.getElementById('kpi-resolvidos').innerText = 0;
+            desenharGrafico(0, 0, 0); 
+            return;
+        }
+
+        window.ocorrencias.forEach((item, index) => {
+            if(item.status === 'Pendente') p++; else if(item.status === 'Resolvido') r++; else c++;
+            const iniciais = item.autor.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
+            const badgeClass = getBadgeClasses(item.status);
+
+            tbody.innerHTML += `
+                <tr class="hover:bg-gray-50/50 transition-colors group">
+                    <td class="px-6 py-4"><strong class="text-gray-800">${item.local}</strong></td>
+                    <td class="px-6 py-4"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center font-bold text-xs">${iniciais}</div><span class="text-sm font-medium text-gray-700">${item.autor}</span></div></td>
+                    <td class="px-6 py-4 text-sm text-gray-600">${item.data}</td>
+                    <td class="px-6 py-4"><button onclick="window.abrirDropdownStatus(event, ${index})" class="px-3 py-1.5 rounded-full text-xs font-bold border cursor-pointer hover:shadow-md transition-all flex items-center gap-2 ${badgeClass}">${item.status} <i class="fa-solid fa-caret-down opacity-50"></i></button></td>
+                    <td class="px-6 py-4 text-center"><button onclick="window.abrirDetalhes(${index})" class="w-8 h-8 rounded-lg border border-gray-200 text-gray-400 hover:text-shopee hover:border-shopee hover:bg-shopee-light transition-all flex items-center justify-center mx-auto"><i class="fa-solid fa-arrow-right"></i></button></td>
+                </tr>
+            `;
+        });
+
         document.getElementById('kpi-total').innerText = window.ocorrencias.length;
         document.getElementById('kpi-pendentes').innerText = p; document.getElementById('kpi-resolvidos').innerText = r;
-        desenharGrafico(p,r,c);
+        desenharGrafico(p, r, c);
     }
 
-    function desenharGrafico(p,r,c) {
+    function desenharGrafico(p, r, c) {
         const ctx = document.getElementById('graficoStatus').getContext('2d');
-        if(graficoChartJS) graficoChartJS.destroy();
-        graficoChartJS = new Chart(ctx, { type: 'doughnut', data: { datasets: [{ data: [p,r,c], backgroundColor: ['#F59E0B', '#10B981', '#EF4444'], borderWidth: 0 }] }, options: { cutout: '85%' } });
+        if (graficoChartJS) { graficoChartJS.destroy(); }
+        if (p === 0 && r === 0 && c === 0) return;
+        graficoChartJS = new Chart(ctx, {
+            type: 'doughnut',
+            data: { labels: ['Pendentes', 'Sanadas', 'Canceladas'], datasets: [{ data: [p, r, c], backgroundColor: ['#F59E0B', '#10B981', '#EF4444'], borderWidth: 0, hoverOffset: 4 }] },
+            options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20, font: { family: "'Inter', sans-serif", size: 12 } } } } }
+        });
     }
 
-    function renderizarMeuProgresso() {
-        const tb = document.getElementById('tabela-meu-progresso');
-        tb.innerHTML = window.ocorrencias.filter(o => o.autor === window.nomeUsuarioAtual).map(o => `<tr><td class="p-6 font-bold text-xs uppercase">${o.local}</td><td class="p-6"><span class="px-3 py-1 rounded-full text-[10px] font-black border uppercase ${o.status==='Resolvido'?'text-green-600':'text-yellow-600'}">${o.status}</span></td></tr>`).join('');
-    }
+    window.renderizarMeuProgresso = () => {
+        const tbody = document.getElementById('tabela-meu-progresso');
+        if(!tbody) return;
+        tbody.innerHTML = ''; 
+
+        const minhasOcorrencias = window.ocorrencias.filter(o => o.autor === window.nomeUsuarioAtual);
+        if(minhasOcorrencias.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="4" class="text-center py-10 text-gray-400 font-medium">Você ainda não relatou nenhuma anomalia.</td></tr>`;
+            return;
+        }
+
+        minhasOcorrencias.forEach((item) => {
+            const badgeClass = getBadgeClasses(item.status);
+            tbody.innerHTML += `
+                <tr class="hover:bg-gray-50/50 transition-colors">
+                    <td class="px-6 py-4"><strong class="text-gray-800">${item.local}</strong></td>
+                    <td class="px-6 py-4 text-sm text-gray-600">${item.categoria}</td>
+                    <td class="px-6 py-4 text-sm text-gray-600">${item.data}</td>
+                    <td class="px-6 py-4"><span class="px-3 py-1.5 rounded-full text-xs font-bold border ${badgeClass}">${item.status}</span></td>
+                </tr>
+            `;
+        });
+    };
 </script>
+
 </body>
 </html>
