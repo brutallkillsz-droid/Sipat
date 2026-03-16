@@ -106,7 +106,7 @@
     <div class="hidden md:flex flex-1 bg-shopee flex-col justify-center items-center p-12 text-center relative overflow-hidden">
         <div class="absolute inset-0 bg-gradient-to-br from-shopee to-shopee-dark opacity-90"></div>
         <div class="relative z-10 text-white w-full flex flex-col items-center">
-            <video autoplay loop muted playsinline class="w-80 md:w-96 h-auto rounded-3xl shadow-2xl mb-8 border-4 border-white/20 bg-white object-contain">
+            <video autoplay loop muted playsinline class="w-80 lg:w-[26rem] h-auto rounded-3xl shadow-2xl mb-8 border-4 border-white/20 bg-white object-contain">
                 <source src="https://i.imgur.com/iKdPvMx.mp4" type="video/mp4">
             </video>
             <h1 class="text-4xl font-black tracking-tight mb-2">Portal SIPAT LMG-48</h1>
@@ -115,23 +115,23 @@
     </div>
     <div class="flex-1 flex justify-center items-center p-6 bg-gray-50">
         <div class="w-full max-w-md bg-white p-8 rounded-3xl shadow-xl border border-gray-100 flex flex-col items-center">
-            <div class="md:hidden flex flex-col items-center mb-8 w-full">
-                <video autoplay loop muted playsinline class="w-48 sm:w-56 mx-auto h-auto rounded-2xl shadow-lg border-2 border-shopee mb-5 bg-white object-contain">
+            
+            <div class="md:hidden flex flex-col items-center mb-6 w-full">
+                <video autoplay loop muted playsinline class="w-56 sm:w-64 mx-auto h-auto rounded-3xl shadow-lg border-2 border-shopee bg-white object-contain">
                     <source src="https://i.imgur.com/iKdPvMx.mp4" type="video/mp4">
                 </video>
-                <h2 class="text-2xl font-black text-gray-800">SIPAT Portal</h2>
             </div>
-            <h2 class="text-2xl font-bold text-gray-800 mb-2 hidden md:block">Bem-vindo</h2>
-            <p class="text-gray-500 mb-8 font-medium text-center">Acesse com suas credenciais de operação.</p>
+            
+            <h2 class="text-3xl font-black text-gray-800 mb-8 text-center w-full">Bem-vindo</h2>
             
             <div class="space-y-5 w-full">
                 <div>
                     <label class="block text-sm font-bold text-gray-700 mb-2">ID do Usuário</label>
-                    <input type="text" id="username" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee focus:border-transparent transition-all" placeholder="Digite seu ID">
+                    <input type="text" id="username" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee focus:border-transparent transition-all text-center font-bold" placeholder="Digite seu ID">
                 </div>
                 <div>
                     <label class="block text-sm font-bold text-gray-700 mb-2">Senha Segura</label>
-                    <input type="password" id="password" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee focus:border-transparent transition-all" placeholder="••••••••">
+                    <input type="password" id="password" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee focus:border-transparent transition-all text-center font-bold" placeholder="••••••••">
                 </div>
                 <button onclick="window.fazerLogin()" class="w-full bg-shopee hover:bg-shopee-dark text-white font-bold rounded-xl py-4 mt-4 shadow-lg shadow-shopee/30 transition-all active:scale-95 uppercase tracking-wide">Entrar no Sistema</button>
             </div>
@@ -379,7 +379,6 @@
     let graficoChartJS = null;
     const MAX_FOTOS = 5;
 
-    // ESCUTA O BANCO DE DADOS EM TEMPO REAL
     onValue(ref(db, 'ocorrencias_lmg48'), (snapshot) => {
         const data = snapshot.val();
         window.ocorrencias = data ? Object.keys(data).map(key => ({ id: key, ...data[key] })).reverse() : [];
@@ -599,7 +598,6 @@
         }
     };
 
-    // NOVA FUNÇÃO: EXCLUIR RELATÓRIO DO ADMIN
     window.excluirRelatorio = async (index) => {
         if(confirm("⚠️ AÇÃO IRREVERSÍVEL!\nTem certeza que deseja excluir permanentemente este relatório da nuvem?")) {
             const id = window.ocorrencias[index].id;
@@ -635,7 +633,6 @@
             const iniciais = item.autor.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
             const badgeClass = getBadgeClasses(item.status);
 
-            // BOTÃO DE EXCLUIR ADICIONADO NA ÚLTIMA COLUNA (AÇÃO)
             tbody.innerHTML += `
                 <tr class="hover:bg-gray-50/50 transition-colors group">
                     <td class="px-6 py-4"><strong class="text-gray-800">${item.local}</strong></td>
