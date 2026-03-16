@@ -127,7 +127,7 @@
             <div class="space-y-5 w-full">
                 <div>
                     <label class="block text-sm font-bold text-gray-700 mb-2">ID do Colaborador</label>
-                    <input type="text" id="username" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee focus:border-transparent transition-all" placeholder="Ex: davidsilveira">
+                    <input type="text" id="username" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee focus:border-transparent transition-all" placeholder="ID do Usuário">
                 </div>
                 <div>
                     <label class="block text-sm font-bold text-gray-700 mb-2">Senha Segura</label>
@@ -376,17 +376,17 @@
     window.usuarioAtual = '';
     window.nomeUsuarioAtual = '';
     window.indiceEmEdicao = null;
-    window.fotosMiniaturasTemporarias = []; // AGORA GUARDA O TEXTO DA IMAGEM DIRETO
+    window.fotosMiniaturasTemporarias = []; 
     let graficoChartJS = null;
     const MAX_FOTOS = 5;
 
-    // Escuta Realtime
+    // Conexão com o Realtime Database
     onValue(ref(db, 'ocorrencias_lmg48'), (snapshot) => {
         const data = snapshot.val();
         window.ocorrencias = data ? Object.keys(data).map(key => ({ id: key, ...data[key] })).reverse() : [];
         
         if(window.usuarioAtual === 'admin') atualizarDashboardUI();
-        if(window.usuarioAtual === 'davidsilveira') window.renderizarMeuProgresso();
+        if(window.usuarioAtual !== 'admin' && window.usuarioAtual !== '') window.renderizarMeuProgresso();
     });
 
     window.fazerLogin = () => {
@@ -398,10 +398,12 @@
             document.getElementById('user-display-name').innerText = window.nomeUsuarioAtual;
             document.getElementById('user-display-avatar').innerText = 'AD';
             window.mudarAba('dashboard');
-        } else if(u === "davidsilveira" && p === "1234") {
-            window.usuarioAtual = 'davidsilveira'; window.nomeUsuarioAtual = 'David Silveira';
+        } else if(u !== "" && p !== "") {
+            // Qualquer outro login vai cair aqui (como davidsilveira, joaosilva, etc.)
+            window.usuarioAtual = u; 
+            window.nomeUsuarioAtual = u; // Pode customizar depois
             document.getElementById('user-display-name').innerText = window.nomeUsuarioAtual;
-            document.getElementById('user-display-avatar').innerText = 'DS';
+            document.getElementById('user-display-avatar').innerText = u.substring(0,2).toUpperCase();
             window.mudarAba('menu-inspetor');
         } else {
             alert("⚠️ Credenciais Incorretas!");
@@ -419,10 +421,9 @@
     };
 
     window.voltarMenuInspetor = () => {
-        if(window.usuarioAtual === 'davidsilveira') window.mudarAba('menu-inspetor');
+        if(window.usuarioAtual !== 'admin') window.mudarAba('menu-inspetor');
     };
 
-    // FUNÇÃO DE COMPRESSÃO QUE TRANSFORMA FOTO EM TEXTO PARA NÃO USAR O STORAGE BLOQUEADO
     async function comprimirBase64(file) {
         return new Promise(resolve => {
             const img = new Image();
@@ -435,7 +436,6 @@
                 if(w > MAX) { h *= MAX/w; w = MAX; }
                 canvas.width = w; canvas.height = h;
                 canvas.getContext('2d').drawImage(img, 0,0,w,h);
-                // Devolve a imagem como um texto minúsculo direto
                 resolve(canvas.toDataURL('image/jpeg', 0.4));
             };
             img.src = url;
@@ -478,7 +478,7 @@
         });
     }
 
-    // ENVIO 100% CORRIGIDO: SOMENTE PARA O DATABASE (IGNORA O STORAGE)
+    // ENVIO 100% CORRIGIDO: SOMENTE PARA O DATABASE
     window.salvarFormulario = async () => {
         const hub = document.getElementById('hub_local').value;
         const cat = document.getElementById('categoria').value;
@@ -488,7 +488,7 @@
         const btn = document.getElementById('btn-enviar');
 
         if(!hub || !cat || !dat || !hor || !det) {
-            alert("⚠️ Por favor, preencha todos os campos do formulário antes de enviar.");
+            alert("⚠️ Por favor, preencha todos os campos textuais do formulário.");
             return;
         }
 
@@ -496,23 +496,22 @@
         btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> <span>Enviando para Nuvem...</span>`;
 
         try {
+            const urlsDasFotos = window.fotosMiniaturasTemporarias;
             const partesData = dat.split('-');
             const dataFormatada = `${partesData[2]}/${partesData[1]}/${partesData[0]} às ${hor}`;
             const novaOcorrenciaRef = push(ref(db, 'ocorrencias_lmg48'));
             
-            // MANDA TUDO, INCLUSIVE AS FOTOS (COMO TEXTO), DIRETO PRO DATABASE
             await set(novaOcorrenciaRef, {
                 local: hub,
                 categoria: cat,
                 data: dataFormatada,
                 detalheCompleto: det,
-                fotos_urls: window.fotosMiniaturasTemporarias, 
+                fotos_urls: urlsDasFotos, 
                 status: "Pendente",
                 autor: window.nomeUsuarioAtual,
                 timestamp: serverTimestamp()
             });
 
-            // Limpa form após sucesso
             document.getElementById('hub_local').value = ""; document.getElementById('categoria').value = "";
             document.getElementById('data_ocorrencia').value = ""; document.getElementById('hora_ocorrencia').value = "";
             document.getElementById('detalhes').value = ""; 
