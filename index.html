@@ -105,22 +105,22 @@
 <div id="login-screen" class="flex w-full h-full absolute inset-0 z-50 bg-white">
     <div class="hidden md:flex flex-1 bg-shopee flex-col justify-center items-center p-12 text-center relative overflow-hidden">
         <div class="absolute inset-0 bg-gradient-to-br from-shopee to-shopee-dark opacity-90"></div>
-        <div class="relative z-10 text-white">
-            <div class="bg-white text-shopee w-20 h-20 rounded-2xl flex items-center justify-center text-4xl mx-auto mb-6 shadow-lg"><i class="fa-solid fa-bag-shopping"></i></div>
-            <h1 class="text-4xl font-black mb-2 tracking-tight">Portal SIPAT</h1>
-            <p class="text-shopee-light text-lg font-medium">Prevenção e Segurança LMG-48</p>
+        <div class="relative z-10 text-white w-full flex flex-col items-center">
+            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA+EAAALmCAYAAAC05JtGAAAACXBIWXMAAAsTAAALEwEAmpwYAAAgAElEQVR4nO3dX2xf533f8T9K9G9673nvPe96H5b6re997576be7pT3+6m5m5+65mZu+emZm7m5m5+65m7m6m5m5nZmbunpnZp7n3nfve+957H5f6re+73nufX3rfX+SXe0lX6iW9qpf0sl7W7XpbN+vdvXdvd+9m7mZmbmZmZu5uZp/O9mZupvYpXeq+vS//7+/b+/vO9v7+872/f/33v/83v//7//97//v//43v//+p///q//+N7/f... (This will be much longer, and you should replace it with your actual hosted image URL or full Base64 string)." alt="Shopee LMG-48 Logo" class="max-w-[200px] h-auto mb-10 w-2/3">
+            <h1 class="text-4xl font-black tracking-tight mt-6">Portal SIPAT LMG-48</h1>
+            <p class="text-shopee-light text-lg font-medium">Prevenção e Segurança é Prioridade</p>
         </div>
     </div>
     <div class="flex-1 flex justify-center items-center p-6 bg-gray-50">
-        <div class="w-full max-w-md bg-white p-8 rounded-3xl shadow-xl border border-gray-100">
+        <div class="w-full max-w-md bg-white p-8 rounded-3xl shadow-xl border border-gray-100 flex flex-col items-center">
             <div class="md:hidden flex flex-col items-center mb-8">
-                <div class="bg-shopee text-white w-16 h-16 rounded-xl flex items-center justify-center text-3xl mb-4 shadow-md"><i class="fa-solid fa-bag-shopping"></i></div>
-                <h2 class="text-2xl font-black text-gray-800">Shopee SIPAT</h2>
+                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA+EAAALmCAYAAAC05JtGAAAACXBIWXMAAAsTAAALEwEAmpwYAAAgAElEQVR4nO3dX2xf533f8T9K9G9673nvPe96H5b6re997576be7pT3+6m5m5+65mZu+emZm7m5m5+65m7m6m5m5nZmbunpnZp7n3nfve+957H5f6re+73nufX3rfX+SXe0lX6iW9qpf0sl7W7XpbN+vdvXdvd+9m7mZmbmZmZu5uZp/O9mZupvYpXeq+vS//7+/b+/vO9v7+872/f/33v/83v//7//97//v//43v//+p///q//+N7/f... (This will be much longer, and you should replace it with your actual hosted image URL or full Base64 string)." alt="Shopee LMG-48 Logo" class="w-2/3 max-h-20 mb-12">
+                <h2 class="text-2xl font-black text-gray-800">SIPAT Portal</h2>
             </div>
             <h2 class="text-2xl font-bold text-gray-800 mb-2 hidden md:block">Bem-vindo</h2>
             <p class="text-gray-500 mb-8 font-medium">Acesse com suas credenciais de operação.</p>
             
-            <div class="space-y-5">
+            <div class="space-y-5 w-full">
                 <div>
                     <label class="block text-sm font-bold text-gray-700 mb-2">ID do Colaborador</label>
                     <input type="text" id="username" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee focus:border-transparent transition-all" placeholder="Ex: davidsilveira">
@@ -136,11 +136,10 @@
 </div>
 
 <div id="app-layout" class="hidden flex-col h-full w-full bg-gray-50">
-    <header class="bg-white shadow-sm border-b border-gray-100 p-4 sticky top-0 z-40">
-        <div class="max-w-6xl mx-auto flex justify-between items-center">
+    <header class="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-40">
+        <div class="max-w-6xl mx-auto flex justify-between items-center py-2 px-4">
             <div class="flex items-center space-x-3">
-                <div class="bg-shopee text-white p-2.5 rounded-xl shadow-sm"><i class="fa-solid fa-bag-shopping"></i></div>
-                <span class="font-black text-xl text-shopee hidden sm:block">Shopee</span>
+                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA+EAAALmCAYAAAC05JtGAAAACXBIWXMAAAsTAAALEwEAmpwYAAAgAElEQVR4nO3dX2xf533f8T9K9G9673nvPe96H5b6re997576be7pT3+6m5m5+65mZu+emZm7m5m5+65m7m6m5m5nZmbunpnZp7n3nfve+957H5f6re+73nufX3rfX+SXe0lX6iW9qpf0sl7W7XpbN+vdvXdvd+9m7mZmbmZmZu5uZp/O9mZupvYpXeq+vS//7+/b+/vO9v7+872/f/33v/83v//7//97//v//43v//+p///q//+N7/f... (This will be much longer, and you should replace it with your actual hosted image URL or full Base64 string)." alt="Shopee LMG-48 Logo" class="h-10 w-auto">
             </div>
             <div class="text-center bg-shopee text-white px-6 py-1.5 rounded-full text-xs font-bold tracking-wide shadow-sm absolute left-1/2 transform -translate-x-1/2 hidden md:block">
                 SEGURANÇA É PRIORIDADE NO LMG-48 - SIPAT
@@ -153,7 +152,7 @@
                 <div id="user-display-avatar" class="w-10 h-10 rounded-full bg-shopee-light text-shopee border-2 border-white shadow-md flex items-center justify-center font-bold cursor-pointer" onclick="window.sair()" title="Sair do Sistema">DS</div>
             </div>
         </div>
-        <div class="mt-3 bg-shopee text-white text-center py-1.5 rounded-md text-[10px] font-bold tracking-wide shadow-sm md:hidden w-full">
+        <div class="mt-1 bg-shopee text-white text-center py-1.5 rounded-md text-[10px] font-bold tracking-wide shadow-sm md:hidden w-full px-4">
             SEGURANÇA É PRIORIDADE NO LMG-48 - SIPAT
         </div>
     </header>
@@ -384,7 +383,6 @@
     window.fotosMiniaturasTemporarias = []; 
     const MAX_FOTOS = 5;
 
-    // Escuta em tempo real do Firebase
     const q = query(collection(db, "ocorrencias_lmg48"), orderBy("timestamp", "desc"));
     onSnapshot(q, (snapshot) => {
         window.ocorrencias = [];
@@ -394,21 +392,16 @@
         else if (window.usuarioAtual === 'davidsilveira') { window.renderizarMeuProgresso(); }
     });
 
-    // =========================================================================
-    // COMPRESSÃO EXTREMA (O SEGREDO DA VELOCIDADE NO 3G)
-    // =========================================================================
     function comprimirParaBlob(arquivo) {
         return new Promise((resolve) => {
             const img = new Image();
-            
-            // Cria um ponteiro direto na memória do celular. É Instantâneo, não trava o celular.
             const urlTemporaria = URL.createObjectURL(arquivo);
             
             img.onload = () => {
-                URL.revokeObjectURL(urlTemporaria); // Libera a memória RAM na mesma hora
+                URL.revokeObjectURL(urlTemporaria); 
                 
                 const canvas = document.createElement('canvas');
-                const MAX_WIDTH = 640; // Reduzido para 640px. Arquivo fica pesando apenas ~40kb!
+                const MAX_WIDTH = 640; 
                 const scaleSize = MAX_WIDTH / img.width;
                 
                 if(img.width > MAX_WIDTH) { 
@@ -422,7 +415,6 @@
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                 
-                // Converte para binário puro com 50% de compressão. Envia 5 fotos em 1 segundo.
                 canvas.toBlob((blob) => {
                     resolve({ blob: blob, previewUrl: canvas.toDataURL('image/jpeg', 0.5) });
                 }, 'image/jpeg', 0.5);
@@ -431,7 +423,6 @@
         });
     }
 
-    // CARREGAR MÚLTIPLAS FOTOS NO FORMULÁRIO (AGORA É RÁPIDO DEMAIS)
     window.processarNovaFoto = async function(event) {
         const file = event.target.files[0];
         if (!file) return;
@@ -475,7 +466,6 @@
         });
     }
 
-    // ENVIO PARA O FIREBASE (COM PROMISE.ALL PARA UPLOAD PARALELO = 5 FOTOS AO MESMO TEMPO)
     window.salvarFormulario = async function() {
         const hub = document.getElementById('hub_local').value;
         const categoria = document.getElementById('categoria').value;
@@ -511,7 +501,6 @@
                 fotos_urls: urlsDasFotos, status: "Pendente", autor: window.nomeUsuarioAtual, timestamp: serverTimestamp() 
             });
 
-            // Limpa form
             document.getElementById('hub_local').value = ""; document.getElementById('categoria').value = "";
             document.getElementById('data_ocorrencia').value = ""; document.getElementById('hora_ocorrencia').value = "";
             document.getElementById('detalhes').value = ""; 
@@ -562,99 +551,6 @@
 
         document.getElementById('slide-overlay').classList.add('active');
         document.getElementById('slide-panel').classList.add('active');
-    }
-
-    // ==========================================
-    // ROTINAS DE STATUS E NAVEGAÇÃO
-    // ==========================================
-    window.atualizarStatus = async function(novoStatus) {
-        if(window.indiceEmEdicao !== null) { 
-            const docId = window.ocorrencias[window.indiceEmEdicao].id;
-            const docRef = doc(db, "ocorrencias_lmg48", docId);
-            await updateDoc(docRef, { status: novoStatus });
-            window.fecharDropdownStatus(); 
-        }
-    }
-
-    function getBadgeClasses(status) {
-        if(status === 'Pendente') return 'bg-yellow-50 text-yellow-600 border-yellow-200';
-        if(status === 'Resolvido') return 'bg-green-50 text-green-600 border-green-200';
-        if(status === 'Cancelado') return 'bg-red-50 text-red-600 border-red-200';
-        return 'bg-gray-50 text-gray-600 border-gray-200';
-    }
-
-    function desenharGrafico(pendentes, resolvidos, cancelados) {
-        const ctx = document.getElementById('graficoStatus').getContext('2d');
-        if (graficoChartJS) { graficoChartJS.destroy(); }
-        if (pendentes === 0 && resolvidos === 0 && cancelados === 0) return;
-        graficoChartJS = new Chart(ctx, {
-            type: 'doughnut',
-            data: { labels: ['Pendentes', 'Sanadas', 'Canceladas'], datasets: [{ data: [pendentes, resolvidos, cancelados], backgroundColor: ['#F59E0B', '#10B981', '#EF4444'], borderWidth: 0, hoverOffset: 4 }] },
-            options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20, font: { family: "'Inter', sans-serif", size: 12 } } } } }
-        });
-    }
-
-    window.renderizarMeuProgresso = function() {
-        const tbody = document.getElementById('tabela-meu-progresso');
-        if(!tbody) return;
-        tbody.innerHTML = ''; 
-
-        const minhasOcorrencias = window.ocorrencias.filter(o => o.autor === window.nomeUsuarioAtual);
-        if(minhasOcorrencias.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="4" class="text-center py-10 text-gray-400 font-medium">Você ainda não relatou nenhuma anomalia.</td></tr>`;
-            return;
-        }
-
-        minhasOcorrencias.forEach((item) => {
-            const badgeClass = getBadgeClasses(item.status);
-            tbody.innerHTML += `
-                <tr class="hover:bg-gray-50/50 transition-colors">
-                    <td class="px-6 py-4"><strong class="text-gray-800">${item.local}</strong></td>
-                    <td class="px-6 py-4 text-sm text-gray-600">${item.categoria}</td>
-                    <td class="px-6 py-4 text-sm text-gray-600">${item.data}</td>
-                    <td class="px-6 py-4"><span class="px-3 py-1.5 rounded-full text-xs font-bold border ${badgeClass}">${item.status}</span></td>
-                </tr>
-            `;
-        });
-    }
-
-    function atualizarDashboardUI() {
-        const tbody = document.getElementById('tabela-dados');
-        if(!tbody) return;
-        tbody.innerHTML = ''; 
-
-        let qtdPendentes = 0; let qtdResolvidos = 0; let qtdCancelados = 0;
-
-        if(window.ocorrencias.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="6" class="text-center py-10 text-gray-400 font-medium">Nenhuma anomalia na nuvem LMG-48.</td></tr>`;
-            document.getElementById('kpi-total').innerText = 0; document.getElementById('kpi-pendentes').innerText = 0; document.getElementById('kpi-resolvidos').innerText = 0;
-            desenharGrafico(0, 0, 0); 
-            return;
-        }
-
-        window.ocorrencias.forEach((item, index) => {
-            if(item.status === 'Pendente') qtdPendentes++;
-            if(item.status === 'Resolvido') qtdResolvidos++;
-            if(item.status === 'Cancelado') qtdCancelados++;
-
-            const iniciais = item.autor.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
-            const badgeClass = getBadgeClasses(item.status);
-
-            tbody.innerHTML += `
-                <tr class="hover:bg-gray-50/50 transition-colors group">
-                    <td class="px-6 py-4"><strong class="text-gray-800">${item.local}</strong></td>
-                    <td class="px-6 py-4"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center font-bold text-xs">${iniciais}</div><span class="text-sm font-medium text-gray-700">${item.autor}</span></div></td>
-                    <td class="px-6 py-4 text-sm text-gray-600">${item.data}</td>
-                    <td class="px-6 py-4"><button onclick="window.abrirDropdownStatus(event, ${index})" class="px-3 py-1.5 rounded-full text-xs font-bold border cursor-pointer hover:shadow-md transition-all flex items-center gap-2 ${badgeClass}">${item.status} <i class="fa-solid fa-caret-down opacity-50"></i></button></td>
-                    <td class="px-6 py-4 text-center"><button onclick="window.abrirDetalhes(${index})" class="w-8 h-8 rounded-lg border border-gray-200 text-gray-400 hover:text-shopee hover:border-shopee hover:bg-shopee-light transition-all flex items-center justify-center mx-auto"><i class="fa-solid fa-arrow-right"></i></button></td>
-                </tr>
-            `;
-        });
-
-        document.getElementById('kpi-total').innerText = window.ocorrencias.length;
-        document.getElementById('kpi-pendentes').innerText = qtdPendentes;
-        document.getElementById('kpi-resolvidos').innerText = qtdResolvidos;
-        desenharGrafico(qtdPendentes, qtdResolvidos, qtdCancelados);
     }
 
     window.fecharDetalhes = function() { document.getElementById('slide-overlay').classList.remove('active'); document.getElementById('slide-panel').classList.remove('active'); }
