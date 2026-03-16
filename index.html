@@ -94,10 +94,10 @@
             <p id="detalhe-texto" class="bg-white p-4 rounded-xl border border-gray-200 text-gray-700 text-sm whitespace-pre-wrap shadow-sm">Nenhum detalhe.</p>
         </div>
 
-        <div id="box-foto-evidencia">
-            <h5 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Evidência Fotográfica</h5>
-            <img id="detalhe-foto" class="w-full rounded-xl border-2 border-gray-200 object-cover max-h-64 shadow-sm" src="" alt="Evidência">
-            <a id="detalhe-link-foto" href="#" target="_blank" class="mt-2 text-shopee text-sm font-bold block text-center hover:underline"><i class="fa-solid fa-expand"></i> Ver em tela cheia</a>
+        <div class="detail-block">
+            <h5 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Evidências Fotográficas</h5>
+            <div id="detalhe-galeria-fotos" class="grid grid-cols-2 gap-3">
+                </div>
         </div>
     </div>
 </div>
@@ -238,11 +238,18 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-2">Evidência Visual</label>
-                        <div class="relative border-2 border-dashed border-gray-300 bg-gray-50 rounded-2xl p-8 text-center hover:bg-shopee-light hover:border-shopee transition-colors cursor-pointer group">
-                            <i class="fa-solid fa-camera text-4xl text-gray-400 group-hover:text-shopee mb-3 transition-colors"></i>
-                            <p id="upload-text" class="text-sm font-medium text-gray-500">Toque para abrir a câmera ou galeria</p>
-                            <input type="file" id="foto_upload" accept="image/*" capture="environment" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="window.processarFoto(event)">
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="block text-sm font-bold text-gray-700">Evidências Visuais (Fotos)</label>
+                            <span class="text-xs text-gray-400 font-bold bg-gray-100 px-2 py-1 rounded-md" id="contador-fotos">0/5</span>
+                        </div>
+                        
+                        <div id="preview-fotos-container" class="grid grid-cols-3 sm:grid-cols-5 gap-3 mb-3 empty:hidden">
+                            </div>
+
+                        <div class="relative border-2 border-dashed border-gray-300 bg-gray-50 rounded-2xl p-6 text-center hover:bg-shopee-light hover:border-shopee transition-colors cursor-pointer group">
+                            <i class="fa-solid fa-camera-retro text-3xl text-gray-400 group-hover:text-shopee mb-2 transition-colors"></i>
+                            <p class="text-xs font-medium text-gray-500">Toque para adicionar foto</p>
+                            <input type="file" id="foto_upload" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="window.processarNovaFoto(event)">
                         </div>
                     </div>
 
@@ -276,7 +283,7 @@
                                 </tr>
                             </thead>
                             <tbody id="tabela-meu-progresso" class="divide-y divide-gray-50">
-                                </tbody>
+                            </tbody>
                         </table>
                     </div>
                 </div>
@@ -351,7 +358,8 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
     import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, doc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-    import { getStorage, ref, uploadString, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-storage.js";
+    // IMPORTANTE: Agora usamos uploadBytes (Binário puro) e não uploadString (Base64)
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-storage.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyCrTjdAsHZ6JK1WNjZFeC5vHI0ICif4rxQ",
@@ -369,28 +377,28 @@
 
     window.ocorrencias = [];
     window.indiceEmEdicao = null; 
-    window.fotoBase64Temp = null;
     window.usuarioAtual = ''; 
-    window.nomeUsuarioAtual = ''; // Guarda o nome certinho para filtrar o histórico
+    window.nomeUsuarioAtual = ''; 
     let graficoChartJS = null;
 
-    // Escuta do Firebase
+    // --- NOVO: ARRAY DE MÚLTIPLAS FOTOS E BLOBS (MUITO MAIS RÁPIDO) ---
+    window.fotosBinariasTemporarias = []; // Guarda os arquivos puros para envio rápido
+    window.fotosMiniaturasTemporarias = []; // Guarda as URLs das miniaturas para mostrar na tela
+
+    const MAX_FOTOS = 5;
+
+    // Firebase Listener
     const q = query(collection(db, "ocorrencias_lmg48"), orderBy("timestamp", "desc"));
     onSnapshot(q, (snapshot) => {
         window.ocorrencias = [];
-        snapshot.forEach((doc) => {
-            window.ocorrencias.push({ id: doc.id, ...doc.data() });
-        });
+        snapshot.forEach((doc) => { window.ocorrencias.push({ id: doc.id, ...doc.data() }); });
         
-        // Atualiza a tela certa dependendo de quem está logado
-        if(window.usuarioAtual === 'admin') {
-            atualizarDashboardUI();
-        } else if (window.usuarioAtual === 'davidsilveira') {
-            renderizarMeuProgresso();
-        }
+        if(window.usuarioAtual === 'admin') { atualizarDashboardUI(); } 
+        else if (window.usuarioAtual === 'davidsilveira') { window.renderizarMeuProgresso(); }
     });
 
-    function comprimirImagem(arquivo) {
+    // COMPRESSOR NÍVEL NASA: Transforma imagem em BLOB (Binário), não em Base64 gigante
+    function comprimirParaBlob(arquivo) {
         return new Promise((resolve) => {
             const reader = new FileReader();
             reader.readAsDataURL(arquivo);
@@ -399,27 +407,71 @@
                 img.src = event.target.result;
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
-                    const MAX_WIDTH = 1200; 
+                    const MAX_WIDTH = 1000; // Resolução ligeiramente menor para ultra-velocidade
                     const scaleSize = MAX_WIDTH / img.width;
                     if(img.width > MAX_WIDTH) { canvas.width = MAX_WIDTH; canvas.height = img.height * scaleSize; } 
                     else { canvas.width = img.width; canvas.height = img.height; }
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    resolve(canvas.toDataURL('image/jpeg', 0.7));
+                    
+                    // Transforma em Binário direto (Qualidade 60% é perfeita para documentos e muito leve)
+                    canvas.toBlob((blob) => {
+                        resolve({ blob: blob, previewUrl: canvas.toDataURL('image/jpeg', 0.6) });
+                    }, 'image/jpeg', 0.6);
                 }
             }
         });
     }
 
-    window.processarFoto = async function(event) {
+    // LÓGICA DE MÚLTIPLAS FOTOS
+    window.processarNovaFoto = async function(event) {
         const file = event.target.files[0];
-        if (file) {
-            document.getElementById('upload-text').innerHTML = `<span class="text-yellow-500 font-bold"><i class="fa-solid fa-spinner fa-spin"></i> Otimizando...</span>`;
-            window.fotoBase64Temp = await comprimirImagem(file);
-            document.getElementById('upload-text').innerHTML = `<span class="text-shopee font-bold"><i class="fa-solid fa-check"></i> Foto anexada</span>`;
+        if (!file) return;
+
+        if (window.fotosBinariasTemporarias.length >= MAX_FOTOS) {
+            alert(`Você atingiu o limite máximo de ${MAX_FOTOS} fotos por relatório.`);
+            return;
         }
+
+        // Aguarda a compressão
+        const { blob, previewUrl } = await comprimirParaBlob(file);
+        
+        // Salva na memória
+        window.fotosBinariasTemporarias.push(blob);
+        window.fotosMiniaturasTemporarias.push(previewUrl);
+
+        renderizarGradeDeFotos();
+        
+        // Limpa o input para poder selecionar a mesma foto de novo se quiser
+        event.target.value = '';
     }
 
+    window.removerFoto = function(index) {
+        window.fotosBinariasTemporarias.splice(index, 1);
+        window.fotosMiniaturasTemporarias.splice(index, 1);
+        renderizarGradeDeFotos();
+    }
+
+    function renderizarGradeDeFotos() {
+        const container = document.getElementById('preview-fotos-container');
+        document.getElementById('contador-fotos').innerText = `${window.fotosBinariasTemporarias.length}/${MAX_FOTOS}`;
+        
+        container.innerHTML = '';
+        window.fotosMiniaturasTemporarias.forEach((url, index) => {
+            container.innerHTML += `
+                <div class="relative w-full h-20 rounded-xl overflow-hidden border border-gray-200 shadow-sm group">
+                    <img src="${url}" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <button onclick="window.removerFoto(${index})" class="text-white hover:text-red-400 bg-black/50 w-8 h-8 rounded-full flex items-center justify-center">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    // ENVIO OTIMIZADO PARA NUVEM
     window.salvarFormulario = async function() {
         const hub = document.getElementById('hub_local').value;
         const categoria = document.getElementById('categoria').value;
@@ -434,27 +486,38 @@
         btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> <span>Enviando para Nuvem...</span>`;
 
         try {
-            let urlFotoSalva = null;
-            if (window.fotoBase64Temp) {
-                const nomeArquivo = `evidencias/foto_${Date.now()}.jpg`;
-                const storageRef = ref(storage, nomeArquivo);
-                await uploadString(storageRef, window.fotoBase64Temp, 'data_url');
-                urlFotoSalva = await getDownloadURL(storageRef);
+            let urlsDasFotos = [];
+
+            // 1. Sobe todas as fotos para o Firebase Storage usando o Binário (Super rápido)
+            if (window.fotosBinariasTemporarias.length > 0) {
+                for (let i = 0; i < window.fotosBinariasTemporarias.length; i++) {
+                    const blob = window.fotosBinariasTemporarias[i];
+                    const nomeArquivo = `evidencias/foto_${Date.now()}_${i}.jpg`;
+                    const storageRef = ref(storage, nomeArquivo);
+                    
+                    // uploadBytes em vez de uploadString!
+                    await uploadBytes(storageRef, blob);
+                    const url = await getDownloadURL(storageRef);
+                    urlsDasFotos.push(url);
+                }
             }
 
             const partesData = dataInput.split('-');
             const dataFormatada = `${partesData[2]}/${partesData[1]}/${partesData[0]} às ${horaInput}`;
 
+            // 2. Salva o documento no Banco, agora com ARRAY de URLs
             await addDoc(collection(db, "ocorrencias_lmg48"), {
                 local: hub, categoria: categoria, data: dataFormatada, detalheCompleto: detalhes,
-                foto_url: urlFotoSalva, status: "Pendente", autor: window.nomeUsuarioAtual, timestamp: serverTimestamp() 
+                fotos_urls: urlsDasFotos, // Array de fotos
+                status: "Pendente", autor: window.nomeUsuarioAtual, timestamp: serverTimestamp() 
             });
 
+            // Limpa tudo
             document.getElementById('hub_local').value = ""; document.getElementById('categoria').value = "";
             document.getElementById('data_ocorrencia').value = ""; document.getElementById('hora_ocorrencia').value = "";
-            document.getElementById('detalhes').value = ""; document.getElementById('foto_upload').value = "";
-            document.getElementById('upload-text').innerText = "Toque para abrir a câmera ou galeria";
-            window.fotoBase64Temp = null;
+            document.getElementById('detalhes').value = ""; 
+            window.fotosBinariasTemporarias = []; window.fotosMiniaturasTemporarias = [];
+            renderizarGradeDeFotos();
 
             alert("Relatório transmitido com sucesso!");
             window.voltarMenuInspetor();
@@ -465,6 +528,9 @@
         }
     }
 
+    // ==========================================
+    // DEMAIS FUNÇÕES UI
+    // ==========================================
     window.atualizarStatus = async function(novoStatus) {
         if(window.indiceEmEdicao !== null) { 
             const docId = window.ocorrencias[window.indiceEmEdicao].id;
@@ -492,15 +558,12 @@
         });
     }
 
-    // --- NOVA FUNÇÃO: RENDERIZAR "MEU PROGRESSO" ---
     window.renderizarMeuProgresso = function() {
         const tbody = document.getElementById('tabela-meu-progresso');
         if(!tbody) return;
         tbody.innerHTML = ''; 
 
-        // Filtra apenas as ocorrências do usuário logado
         const minhasOcorrencias = window.ocorrencias.filter(o => o.autor === window.nomeUsuarioAtual);
-
         if(minhasOcorrencias.length === 0) {
             tbody.innerHTML = `<tr><td colspan="4" class="text-center py-10 text-gray-400 font-medium">Você ainda não relatou nenhuma anomalia.</td></tr>`;
             return;
@@ -508,19 +571,14 @@
 
         minhasOcorrencias.forEach((item) => {
             const badgeClass = getBadgeClasses(item.status);
-            const tr = `
+            tbody.innerHTML += `
                 <tr class="hover:bg-gray-50/50 transition-colors">
                     <td class="px-6 py-4"><strong class="text-gray-800">${item.local}</strong></td>
                     <td class="px-6 py-4 text-sm text-gray-600">${item.categoria}</td>
                     <td class="px-6 py-4 text-sm text-gray-600">${item.data}</td>
-                    <td class="px-6 py-4">
-                        <span class="px-3 py-1.5 rounded-full text-xs font-bold border ${badgeClass}">
-                            ${item.status}
-                        </span>
-                    </td>
+                    <td class="px-6 py-4"><span class="px-3 py-1.5 rounded-full text-xs font-bold border ${badgeClass}">${item.status}</span></td>
                 </tr>
             `;
-            tbody.innerHTML += tr;
         });
     }
 
@@ -546,7 +604,7 @@
             const iniciais = item.autor.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
             const badgeClass = getBadgeClasses(item.status);
 
-            const tr = `
+            tbody.innerHTML += `
                 <tr class="hover:bg-gray-50/50 transition-colors group">
                     <td class="px-6 py-4"><strong class="text-gray-800">${item.local}</strong></td>
                     <td class="px-6 py-4"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center font-bold text-xs">${iniciais}</div><span class="text-sm font-medium text-gray-700">${item.autor}</span></div></td>
@@ -555,7 +613,6 @@
                     <td class="px-6 py-4 text-center"><button onclick="window.abrirDetalhes(${index})" class="w-8 h-8 rounded-lg border border-gray-200 text-gray-400 hover:text-shopee hover:border-shopee hover:bg-shopee-light transition-all flex items-center justify-center mx-auto"><i class="fa-solid fa-arrow-right"></i></button></td>
                 </tr>
             `;
-            tbody.innerHTML += tr;
         });
 
         document.getElementById('kpi-total').innerText = window.ocorrencias.length;
@@ -564,25 +621,7 @@
         desenharGrafico(qtdPendentes, qtdResolvidos, qtdCancelados);
     }
 
-    window.abrirDropdownStatus = function(event, index) {
-        event.stopPropagation(); window.indiceEmEdicao = index;
-        const dropdown = document.getElementById('statusDropdown');
-        let x = event.clientX; let y = event.clientY;
-        if (window.innerWidth - x < 160) x = window.innerWidth - 160;
-        if (window.innerHeight - y < 150) y = window.innerHeight - 150;
-        dropdown.style.left = `${x}px`; dropdown.style.top = `${y + 10}px`; 
-        dropdown.classList.add('active');
-    }
-    window.fecharDropdownStatus = function() { document.getElementById('statusDropdown').classList.remove('active'); window.indiceEmEdicao = null; }
-    
-    document.addEventListener('click', (e) => { if (document.getElementById('statusDropdown').classList.contains('active')) window.fecharDropdownStatus(); });
-    document.addEventListener('keydown', function(event) {
-        if (event.key === "Escape" || event.key === "Esc") {
-            if (document.getElementById('slide-overlay').classList.contains('active')) window.fecharDetalhes();
-            if (document.getElementById('statusDropdown').classList.contains('active')) window.fecharDropdownStatus();
-        }
-    });
-
+    // ABRIR DETALHES (PAINEL DO GESTOR) - Atualizado para mostrar várias fotos
     window.abrirDetalhes = function(index) {
         const occ = window.ocorrencias[index];
         document.getElementById('detalhe-hub').innerText = occ.local;
@@ -596,53 +635,63 @@
         badgeStatus.className = `px-3 py-1 rounded-full text-xs font-bold border ${getBadgeClasses(occ.status)}`;
         badgeStatus.innerHTML = occ.status;
 
-        const boxFoto = document.getElementById('box-foto-evidencia');
-        const linkFoto = document.getElementById('detalhe-link-foto');
-        if(occ.foto_url) {
-            document.getElementById('detalhe-foto').src = occ.foto_url; linkFoto.href = occ.foto_url; boxFoto.style.display = 'block';
-        } else { boxFoto.style.display = 'none'; }
+        // Rendereização de Múltiplas Fotos no Painel do Admin
+        const galeria = document.getElementById('detalhe-galeria-fotos');
+        galeria.innerHTML = '';
+        
+        // Verifica se existem fotos (novo formato Array) ou o formato antigo único (foto_url)
+        let arrayFotos = occ.fotos_urls || [];
+        if(occ.foto_url && arrayFotos.length === 0) arrayFotos.push(occ.foto_url); // Retrocompatibilidade
+
+        if(arrayFotos.length > 0) {
+            arrayFotos.forEach(url => {
+                galeria.innerHTML += `
+                    <a href="${url}" target="_blank" class="block rounded-xl overflow-hidden border-2 border-gray-200 shadow-sm hover:border-shopee transition-colors h-32">
+                        <img src="${url}" class="w-full h-full object-cover">
+                    </a>
+                `;
+            });
+            galeria.parentElement.style.display = 'block';
+        } else {
+            galeria.parentElement.style.display = 'none';
+        }
 
         document.getElementById('slide-overlay').classList.add('active');
         document.getElementById('slide-panel').classList.add('active');
     }
 
     window.fecharDetalhes = function() { document.getElementById('slide-overlay').classList.remove('active'); document.getElementById('slide-panel').classList.remove('active'); }
+    window.abrirDropdownStatus = function(event, index) { event.stopPropagation(); window.indiceEmEdicao = index; const dropdown = document.getElementById('statusDropdown'); let x = event.clientX; let y = event.clientY; if (window.innerWidth - x < 160) x = window.innerWidth - 160; if (window.innerHeight - y < 150) y = window.innerHeight - 150; dropdown.style.left = `${x}px`; dropdown.style.top = `${y + 10}px`; dropdown.classList.add('active'); }
+    window.fecharDropdownStatus = function() { document.getElementById('statusDropdown').classList.remove('active'); window.indiceEmEdicao = null; }
+    
+    document.addEventListener('click', (e) => { if (document.getElementById('statusDropdown').classList.contains('active')) window.fecharDropdownStatus(); });
+    document.addEventListener('keydown', function(event) {
+        if (event.key === "Escape" || event.key === "Esc") {
+            if (document.getElementById('slide-overlay').classList.contains('active')) window.fecharDetalhes();
+            if (document.getElementById('statusDropdown').classList.contains('active')) window.fecharDropdownStatus();
+        }
+    });
 
     window.fazerLogin = function() {
         const user = document.getElementById('username').value; const pass = document.getElementById('password').value;
         if (user === "admin" && pass === "spxadminl#") {
-            window.usuarioAtual = 'admin';
-            window.nomeUsuarioAtual = 'Gestor ADM'; // Guarda no Global
-            document.getElementById('user-display-name').innerText = window.nomeUsuarioAtual; 
-            document.getElementById('user-display-avatar').innerText = 'AD';
-            
+            window.usuarioAtual = 'admin'; window.nomeUsuarioAtual = 'Gestor ADM'; 
+            document.getElementById('user-display-name').innerText = window.nomeUsuarioAtual; document.getElementById('user-display-avatar').innerText = 'AD';
             document.getElementById('login-screen').classList.add('hidden');
             document.getElementById('app-layout').classList.remove('hidden'); document.getElementById('app-layout').classList.add('flex');
-            
-            window.mudarAba('dashboard');
-            atualizarDashboardUI(); 
-            
+            window.mudarAba('dashboard'); atualizarDashboardUI(); 
         } else if (user === "davidsilveira" && pass === "1234") {
-            window.usuarioAtual = 'davidsilveira';
-            window.nomeUsuarioAtual = 'David Silveira'; // Guarda no Global
-            document.getElementById('user-display-name').innerText = window.nomeUsuarioAtual; 
-            document.getElementById('user-display-avatar').innerText = 'DS';
-            
+            window.usuarioAtual = 'davidsilveira'; window.nomeUsuarioAtual = 'David Silveira'; 
+            document.getElementById('user-display-name').innerText = window.nomeUsuarioAtual; document.getElementById('user-display-avatar').innerText = 'DS';
             document.getElementById('login-screen').classList.add('hidden');
             document.getElementById('app-layout').classList.remove('hidden'); document.getElementById('app-layout').classList.add('flex');
-            
-            window.mudarAba('menu-inspetor');
-            renderizarMeuProgresso(); // Já carrega os dados dele por baixo dos panos
-            
+            window.mudarAba('menu-inspetor'); window.renderizarMeuProgresso(); 
         } else { alert("Credenciais incorretas."); }
     }
 
     window.mudarAba = function(aba) {
-        document.getElementById('aba-dashboard').classList.add('hidden');
-        document.getElementById('aba-registro').classList.add('hidden');
-        document.getElementById('aba-menu-inspetor').classList.add('hidden');
-        document.getElementById('aba-progresso').classList.add('hidden'); // Oculta a nova aba também
-        
+        document.getElementById('aba-dashboard').classList.add('hidden'); document.getElementById('aba-registro').classList.add('hidden');
+        document.getElementById('aba-menu-inspetor').classList.add('hidden'); document.getElementById('aba-progresso').classList.add('hidden'); 
         document.getElementById('aba-' + aba).classList.remove('hidden');
     }
 
@@ -652,8 +701,7 @@
         document.getElementById('app-layout').classList.add('hidden'); document.getElementById('app-layout').classList.remove('flex');
         document.getElementById('login-screen').classList.remove('hidden');
         document.getElementById('username').value = ""; document.getElementById('password').value = "";
-        window.usuarioAtual = '';
-        window.nomeUsuarioAtual = '';
+        window.usuarioAtual = ''; window.nomeUsuarioAtual = '';
     }
 </script>
 
