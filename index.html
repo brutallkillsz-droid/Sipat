@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CIPA LMG-48</title>
+    <title>Cipa LMG-48</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -13,7 +13,7 @@
             theme: {
                 extend: {
                     colors: {
-                        shopee: { DEFAULT: '#16a34a', dark: '#15803d', light: '#dcfce7' }, // Verde CIPA Oficial
+                        shopee: { DEFAULT: '#16a34a', dark: '#15803d', light: '#dcfce7' }, 
                         darkbg: '#1f2937', surface: '#ffffff', surfaceHover: '#f3f4f6'
                     }
                 }
@@ -31,8 +31,7 @@
             background-color: #16a34a; transform: translateY(-5px); outline: none;
             box-shadow: 0 10px 15px -3px rgba(22, 163, 74, 0.4);
         }
-        .card-interaction:hover i, .card-interaction:focus i,
-        .card-interaction:hover span, .card-interaction:focus span { color: white !important; }
+        .card-interaction:hover i, .card-interaction:hover span { color: white !important; }
 
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
@@ -54,13 +53,13 @@
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
         /* ESTILO DO ZOOM DE FOTO */
-        #photo-viewer { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 10000; display: none; align-items: center; justify-content: center; padding: 20px; cursor: zoom-out; }
+        #photo-viewer { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 10000; align-items: center; justify-content: center; padding: 20px; cursor: zoom-out; }
         #photo-viewer img { max-width: 100%; max-height: 100%; border-radius: 8px; box-shadow: 0 0 50px rgba(0,0,0,0.5); object-fit: contain; }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800 flex flex-col h-screen w-full">
+<body class="bg-gray-50 text-gray-800 flex flex-col h-screen">
 
-<div id="photo-viewer" onclick="this.style.display='none'">
+<div id="photo-viewer" class="hidden" onclick="this.classList.add('hidden')">
     <img id="viewer-img" src="">
     <p class="absolute bottom-5 text-white font-bold opacity-50 pointer-events-none">Clique em qualquer lugar para fechar</p>
 </div>
@@ -118,7 +117,7 @@
             <video autoplay loop muted playsinline class="w-80 lg:w-[26rem] h-auto rounded-3xl shadow-2xl mb-8 border-4 border-white/20 bg-white object-contain">
                 <source src="https://i.imgur.com/fMAvIvu.mp4" type="video/mp4">
             </video>
-            <h1 class="text-4xl font-black tracking-tight mb-2">CIPA LMG-48</h1>
+            <h1 class="text-4xl font-black tracking-tight mb-2">Cipa LMG-48</h1>
             <p class="text-shopee-light text-lg font-medium">Prevenção e Segurança é Prioridade</p>
         </div>
     </div>
@@ -148,9 +147,9 @@
     </div>
 </div>
 
-<div id="app-layout" class="hidden flex-col h-full w-full bg-gray-50 overflow-hidden">
-    <header class="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-40 w-full">
-        <div class="max-w-6xl mx-auto flex justify-between items-center py-2 px-4 gap-2">
+<div id="app-layout" class="hidden flex-col h-full w-full bg-gray-50">
+    <header class="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-40 overflow-x-auto min-w-full">
+        <div class="max-w-6xl mx-auto flex justify-between items-center py-2 px-4 gap-2 whitespace-nowrap">
             <div class="flex items-center space-x-3 shrink-0">
                 <video autoplay loop muted playsinline class="h-10 w-auto rounded-lg"><source src="https://i.imgur.com/fMAvIvu.mp4" type="video/mp4"></video>
                 <span class="font-black text-xl text-shopee hidden sm:block">CIPA</span>
@@ -159,20 +158,22 @@
                 Segurança é Prioridade LMG-48
             </div>
             
-            <div class="flex items-center gap-4 shrink-0 ml-auto cursor-pointer hover:opacity-75 transition-opacity" onclick="window.sair()" title="Sair do Sistema">
-                <div class="text-right hidden sm:block">
-                    <h1 class="font-black text-xl text-gray-800 leading-none hover:text-shopee">Sair</h1>
-                    <p class="text-[10px] font-bold text-gray-400 tracking-widest uppercase truncate max-w-[150px]" id="user-display-name">Nome</p>
+            <div class="flex items-center gap-4 shrink-0 ml-auto cursor-pointer hover:opacity-75 transition-opacity" 
+                 onclick="localStorage.clear(); sessionStorage.clear(); window.location.href = window.location.pathname + '?v=' + new Date().getTime();" 
+                 title="Sair do Sistema" style="z-index: 9999;">
+                <div class="text-right hidden sm:block truncate max-w-[150px]">
+                    <h1 class="font-black text-xl text-gray-800 leading-none truncate hover:text-shopee">Sair</h1>
+                    <p class="text-[10px] font-bold text-gray-400 tracking-widest uppercase truncate" id="user-display-name">Nome</p>
                 </div>
                 <div id="user-display-avatar" class="w-10 h-10 rounded-full bg-shopee-light text-shopee border-2 border-white shadow-md flex items-center justify-center font-bold uppercase shrink-0">??</div>
             </div>
         </div>
     </header>
 
-    <main class="flex-1 overflow-y-auto p-4 md:p-8 w-full h-full">
+    <main class="flex-1 overflow-y-auto p-4 md:p-8">
         <div class="max-w-6xl mx-auto w-full h-full relative">
 
-            <div id="aba-menu-inspetor" class="hidden h-full flex-col justify-center max-w-2xl mx-auto pt-4 gap-4">
+            <div id="aba-menu-inspetor" class="hidden h-full flex-col justify-center max-w-2xl mx-auto pt-4 overflow-y-auto gap-4">
                 <div class="grid grid-cols-2 gap-4 md:gap-6">
                     <button onclick="window.mudarAba('registro')" class="card-interaction col-span-2 bg-white border-2 border-shopee rounded-3xl p-8 shadow-sm flex flex-col items-center justify-center space-y-4 group">
                         <i class="fa-solid fa-triangle-exclamation text-7xl text-shopee transition-colors"></i>
@@ -190,14 +191,14 @@
                         <i class="fa-solid fa-chart-simple text-4xl text-shopee transition-colors"></i>
                         <span class="font-bold text-sm text-gray-700 text-center leading-tight transition-colors">Meu Progresso</span>
                     </button>
-                    <button onclick="window.sair()" class="card-interaction bg-white rounded-3xl p-6 shadow-sm flex flex-col items-center justify-center space-y-3 border-b-4 border-gray-300 group">
+                    <button onclick="localStorage.clear(); sessionStorage.clear(); window.location.href = window.location.pathname + '?v=' + new Date().getTime();" class="card-interaction bg-white rounded-3xl p-6 shadow-sm flex flex-col items-center justify-center space-y-3 border-b-4 border-gray-300 group">
                         <i class="fa-solid fa-power-off text-4xl text-gray-400 transition-colors"></i>
                         <span class="font-bold text-sm text-gray-500 text-center leading-tight transition-colors">Deslogar do Sistema</span>
                     </button>
                 </div>
             </div>
 
-            <div id="aba-registro" class="hidden max-w-3xl mx-auto pb-10">
+            <div id="aba-registro" class="hidden max-w-3xl mx-auto pb-10 overflow-y-auto">
                 <div class="flex items-center gap-4 mb-6 sticky top-0 bg-gray-50 z-20 py-3">
                     <button onclick="window.voltarMenuInspetor()" class="w-12 h-12 rounded-2xl bg-white shadow-md border border-gray-200 flex items-center justify-center text-gray-700 hover:text-shopee hover:border-shopee hover:bg-shopee-light transition-all active:scale-95 shrink-0" title="Voltar ao Menu">
                         <i class="fa-solid fa-arrow-left text-xl"></i>
@@ -212,7 +213,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-2">Unidade Logística</label>
-                            <select id="hub_local" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-medium text-gray-700 outline-none">
+                            <select id="hub_local" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee focus:border-transparent appearance-none font-medium text-gray-700">
                                 <option value="" disabled selected>Selecionar Base...</option>
                                 <option>Hub Uberaba</option>
                                 <option>Hub Uberlândia</option>
@@ -223,7 +224,7 @@
                         </div>
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-2">Vetor de Risco</label>
-                            <select id="categoria" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-medium text-gray-700 outline-none">
+                            <select id="categoria" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee focus:border-transparent appearance-none font-medium text-gray-700">
                                 <option value="" disabled selected>Selecionar Padrão...</option>
                                 <option>Organização e Limpeza</option>
                                 <option>Movimentação de Volumosos</option>
@@ -237,17 +238,17 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-2">Data Constatada</label>
-                            <input type="date" id="data_ocorrencia" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-medium outline-none">
+                            <input type="date" id="data_ocorrencia" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee focus:border-transparent text-gray-700 font-medium">
                         </div>
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-2">Horário Exato</label>
-                            <input type="time" id="hora_ocorrencia" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-medium outline-none">
+                            <input type="time" id="hora_ocorrencia" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee focus:border-transparent text-gray-700 font-medium">
                         </div>
                     </div>
 
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-2">Laudo / Detalhamento</label>
-                        <textarea id="detalhes" rows="3" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-medium resize-none outline-none" placeholder="Descreva tecnicamente o cenário encontrado..."></textarea>
+                        <textarea id="detalhes" rows="3" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee focus:border-transparent text-gray-700 font-medium resize-none" placeholder="Descreva tecnicamente o cenário encontrado..."></textarea>
                     </div>
 
                     <div>
@@ -303,7 +304,7 @@
                 </div>
             </div>
 
-            <div id="aba-dashboard" class="hidden space-y-6 pb-10 flex-col h-full min-h-full">
+            <div id="aba-dashboard" class="hidden space-y-6 pb-10 flex-col h-full overflow-y-auto min-h-full">
                 <h2 class="text-2xl font-black text-gray-800 tracking-tight mb-2 sticky top-0 bg-gray-50 z-10 py-2">Visão Geral Gerencial</h2>
                 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 shrink-0">
@@ -338,7 +339,7 @@
                         <h3 class="font-bold text-gray-800 mb-4 w-full flex items-center gap-2 sticky top-0 bg-white z-10 py-1"><i class="fa-solid fa-chart-pie text-shopee"></i> Distribuição</h3>
                         <div class="relative w-full flex justify-center items-center h-[250px]">
                             <canvas id="graficoStatus"></canvas>
-                            <div id="grafico-vazio" class="hidden absolute inset-0 flex items-center justify-center text-gray-400 font-bold text-sm">Sem dados para exibir</div>
+                            <div id="grafico-vazio" class="hidden absolute inset-0 flex items-center justify-center text-gray-400 font-bold text-sm bg-white z-10">Sem dados para exibir</div>
                         </div>
                     </div>
 
@@ -394,107 +395,117 @@
     let graficoChartJS = null;
     const MAX_FOTOS = 5;
 
-    // ESCUTANDO O BANCO DE DADOS
+    // BLINDAGEM 1: DADOS SEGUROS NO FIREBASE
     onValue(ref(db, 'ocorrencias_lmg48'), (snapshot) => {
         try {
             const data = snapshot.val();
             window.ocorrencias = data ? Object.keys(data).map(key => ({ id: key, ...data[key] })).reverse() : [];
             
-            if(window.usuarioAtual === 'admin') window.atualizarDashboardUI();
-            else if(window.usuarioAtual !== '') window.renderizarMeuProgresso();
+            if(window.usuarioAtual === 'admin') {
+                window.atualizarDashboardUI();
+            } else if(window.usuarioAtual !== '') {
+                window.renderizarMeuProgresso();
+            }
         } catch (error) {
-            console.error("Erro na leitura do Firebase:", error);
+            console.error("Erro na leitura do BD:", error);
         }
     });
 
     window.fazerLogin = () => {
-        const u = document.getElementById('username').value.trim().toLowerCase();
-        const p = document.getElementById('password').value.trim();
-        
-        const inspetores = {
-            "davidsilveira": { senha: "1234", nome: "David Silveira" },
-            "malanesantana": { senha: "lmg4820261", nome: "Malane Santana" },
-            "diegowillian": { senha: "lmg4820262", nome: "Diego Willian" },
-            "priscilaalves": { senha: "lmg4820263", nome: "Priscila Alves" },
-            "vanessarodrigues": { senha: "lmg4820264", nome: "Vanessa Rodrigues" },
-            "adrianomanoel": { senha: "lmg4820265", nome: "Adriano Manoel" }
-        };
-        
-        if(u === "admin" && p === "spxadminl#") {
-            localStorage.setItem('sipat_user', 'admin');
-            localStorage.setItem('sipat_nome', 'Gestor ADM');
-            window.carregarSessao('admin', 'Gestor ADM');
-        } else if(inspetores[u] && inspetores[u].senha === p) {
-            localStorage.setItem('sipat_user', u);
-            localStorage.setItem('sipat_nome', inspetores[u].nome);
-            window.carregarSessao(u, inspetores[u].nome);
-        } else {
-            alert("⚠️ Acesso Negado: Usuário não cadastrado ou senha incorreta.");
+        try {
+            // Remove os espaços e força a minúscula (impede erros se copiar/colar)
+            const u = document.getElementById('username').value.trim().toLowerCase().replace(/\s+/g, '');
+            const p = document.getElementById('password').value.trim();
+            
+            const inspetores = {
+                "davidsilveira": { senha: "1234", nome: "David Silveira" },
+                "malanesantana": { senha: "lmg4820261", nome: "Malane Santana" },
+                "diegowillian": { senha: "lmg4820262", nome: "Diego Willian" },
+                "priscilaalves": { senha: "lmg4820263", nome: "Priscila Alves" },
+                "vanessarodrigues": { senha: "lmg4820264", nome: "Vanessa Rodrigues" },
+                "adrianomanoel": { senha: "lmg4820265", nome: "Adriano Manoel" }
+            };
+            
+            if(u === "admin" && p === "spxadminl#") {
+                localStorage.setItem('sipat_user', 'admin');
+                localStorage.setItem('sipat_nome', 'Gestor ADM');
+                window.carregarSessao('admin', 'Gestor ADM');
+            } else if(inspetores[u] && inspetores[u].senha === p) {
+                localStorage.setItem('sipat_user', u);
+                localStorage.setItem('sipat_nome', inspetores[u].nome);
+                window.carregarSessao(u, inspetores[u].nome);
+            } else {
+                alert("⚠️ Acesso Negado: Usuário não cadastrado ou senha incorreta.");
+            }
+        } catch(e) {
+            console.error(e);
         }
     };
 
     window.carregarSessao = (user, nome) => {
-        window.usuarioAtual = user; 
-        window.nomeUsuarioAtual = nome; 
-        
-        document.getElementById('user-display-name').innerText = nome;
-        
-        let iniciais = '??';
-        if(user === 'admin') {
-            iniciais = 'AD';
-        } else {
-            const partes = nome.split(' ');
-            if(partes.length > 1) {
-                iniciais = (partes[0][0] + partes[1][0]).toUpperCase();
+        try {
+            window.usuarioAtual = user; 
+            window.nomeUsuarioAtual = nome; 
+            
+            document.getElementById('user-display-name').innerText = nome;
+            
+            let iniciais = '??';
+            if(user === 'admin') {
+                iniciais = 'AD';
             } else {
-                iniciais = nome.substring(0,2).toUpperCase();
+                const partes = nome.split(' ');
+                if(partes.length > 1) {
+                    iniciais = (partes[0][0] + partes[1][0]).toUpperCase();
+                } else {
+                    iniciais = nome.substring(0,2).toUpperCase();
+                }
             }
-        }
-        document.getElementById('user-display-avatar').innerText = iniciais;
-        
-        // MOSTRA/ESCONDE TELAS USANDO PADRÃO TAILWIND (NUNCA TRAVA)
-        document.getElementById('login-screen').classList.add('hidden');
-        document.getElementById('app-layout').classList.remove('hidden');
-        document.getElementById('app-layout').classList.add('flex');
+            document.getElementById('user-display-avatar').innerText = iniciais;
+            
+            // Troca de tela segura e sem conflitos
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('app-layout').classList.remove('hidden');
+            document.getElementById('app-layout').classList.add('flex');
 
-        if(user === 'admin') {
-            window.mudarAba('dashboard');
-            window.atualizarDashboardUI();
-        } else {
-            window.mudarAba('menu-inspetor');
-            window.renderizarMeuProgresso();
+            if(user === 'admin') {
+                window.mudarAba('dashboard');
+                window.atualizarDashboardUI();
+            } else {
+                window.mudarAba('menu-inspetor');
+                window.renderizarMeuProgresso();
+            }
+        } catch(e) {
+            console.error(e);
         }
     };
 
     window.verificarSessao = () => {
-        const userSalvo = localStorage.getItem('sipat_user');
-        const nomeSalvo = localStorage.getItem('sipat_nome');
-        if(userSalvo && nomeSalvo) { window.carregarSessao(userSalvo, nomeSalvo); }
+        try {
+            const userSalvo = localStorage.getItem('sipat_user');
+            const nomeSalvo = localStorage.getItem('sipat_nome');
+            if(userSalvo && nomeSalvo) { window.carregarSessao(userSalvo, nomeSalvo); }
+        } catch(e) {}
     };
     window.verificarSessao();
 
-    // BOTÃO DE SAIR - FORÇA A REINICIALIZAÇÃO DO SISTEMA
-    window.sair = () => {
-        localStorage.clear();
-        sessionStorage.clear();
-        window.location.reload();
-    };
-
+    // ALTERAÇÃO DE ABAS 100% SEGURA
     window.mudarAba = (aba) => {
-        ['dashboard', 'registro', 'menu-inspetor', 'progresso'].forEach(i => {
-            const el = document.getElementById('aba-'+i);
-            if(el) {
-                el.classList.add('hidden');
-                el.classList.remove('flex');
+        try {
+            ['dashboard', 'registro', 'menu-inspetor', 'progresso'].forEach(i => {
+                const el = document.getElementById('aba-'+i);
+                if(el) {
+                    el.classList.add('hidden');
+                    el.classList.remove('flex');
+                }
+            });
+            const target = document.getElementById('aba-'+aba);
+            if(target) {
+                target.classList.remove('hidden');
+                if (aba !== 'registro') {
+                    target.classList.add('flex');
+                }
             }
-        });
-        const target = document.getElementById('aba-'+aba);
-        if(target) {
-            target.classList.remove('hidden');
-            if (aba !== 'registro') {
-                target.classList.add('flex');
-            }
-        }
+        } catch(e) { console.error(e); }
     };
 
     window.voltarMenuInspetor = () => {
@@ -520,18 +531,20 @@
     }
 
     window.processarNovaFoto = async (e) => {
-        const file = e.target.files[0];
-        if(!file) return;
-        if(window.fotosMiniaturasTemporarias.length >= MAX_FOTOS) { alert(`Você atingiu o limite de ${MAX_FOTOS} fotos.`); return; }
-        
-        document.getElementById('upload-text').innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Otimizando...`;
-        
-        const previewBase64 = await comprimirBase64(file);
-        window.fotosMiniaturasTemporarias.push(previewBase64);
-        
-        window.renderizarGradeDeFotos();
-        document.getElementById('upload-text').innerText = "Toque para adicionar foto";
-        e.target.value = '';
+        try {
+            const file = e.target.files[0];
+            if(!file) return;
+            if(window.fotosMiniaturasTemporarias.length >= MAX_FOTOS) { alert(`Você atingiu o limite de ${MAX_FOTOS} fotos.`); return; }
+            
+            document.getElementById('upload-text').innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Otimizando...`;
+            
+            const previewBase64 = await comprimirBase64(file);
+            window.fotosMiniaturasTemporarias.push(previewBase64);
+            
+            window.renderizarGradeDeFotos();
+            document.getElementById('upload-text').innerText = "Toque para adicionar foto";
+            e.target.value = '';
+        } catch(err) { console.error(err); }
     };
 
     window.removerFoto = (index) => {
@@ -540,21 +553,23 @@
     };
 
     window.renderizarGradeDeFotos = () => {
-        const container = document.getElementById('preview-fotos-container');
-        document.getElementById('contador-fotos').innerText = `${window.fotosMiniaturasTemporarias.length}/${MAX_FOTOS}`;
-        
-        let htmlFotos = '';
-        window.fotosMiniaturasTemporarias.forEach((url, index) => {
-            htmlFotos += `
-                <div class="relative w-full h-20 rounded-xl overflow-hidden border border-gray-200 shadow-sm group">
-                    <img src="${url}" class="w-full h-full object-cover">
-                    <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <button onclick="window.removerFoto(${index})" class="text-white hover:text-red-400 bg-black/50 w-8 h-8 rounded-full flex items-center justify-center"><i class="fa-solid fa-trash-can"></i></button>
+        try {
+            const container = document.getElementById('preview-fotos-container');
+            document.getElementById('contador-fotos').innerText = `${window.fotosMiniaturasTemporarias.length}/${MAX_FOTOS}`;
+            
+            let htmlFotos = '';
+            window.fotosMiniaturasTemporarias.forEach((url, index) => {
+                htmlFotos += `
+                    <div class="relative w-full h-20 rounded-xl overflow-hidden border border-gray-200 shadow-sm group">
+                        <img src="${url}" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <button onclick="window.removerFoto(${index})" class="text-white hover:text-red-400 bg-black/50 w-8 h-8 rounded-full flex items-center justify-center"><i class="fa-solid fa-trash-can"></i></button>
+                        </div>
                     </div>
-                </div>
-            `;
-        });
-        container.innerHTML = htmlFotos;
+                `;
+            });
+            container.innerHTML = htmlFotos;
+        } catch(e) { console.error(e); }
     };
 
     window.salvarFormulario = async () => {
@@ -594,8 +609,8 @@
             await set(novaOcorrenciaRef, payload);
             alert("✅ Relatório transmitido com sucesso!");
             
-            // Recarrega a página para limpar a memória do formulário instantaneamente
-            window.location.reload();
+            // ATUALIZAÇÃO FORÇADA DE FATO:
+            window.location.href = window.location.pathname + '?reload=' + new Date().getTime();
 
         } catch (error) {
             console.error(error);
@@ -614,8 +629,11 @@
 
     // ZOOM DE FOTO
     window.ampliarFoto = (src) => {
-        document.getElementById('viewer-img').src = src;
-        document.getElementById('photo-viewer').style.display = 'flex';
+        try {
+            document.getElementById('viewer-img').src = src;
+            document.getElementById('photo-viewer').classList.remove('hidden');
+            document.getElementById('photo-viewer').classList.add('flex');
+        } catch(e) { console.error(e); }
     };
 
     window.abrirDetalhes = (index) => {
@@ -636,8 +654,8 @@
             document.getElementById('detalhe-texto').innerText = detalheNome;
             document.getElementById('detalhe-autor').innerText = autorNome;
             
-            const partes = autorNome.split(' ');
-            const ini = partes.length > 1 ? partes[0][0] + partes[1][0] : autorNome.substring(0,2);
+            const partes = autorNome.trim().split(/\s+/);
+            const ini = partes.length > 1 && partes[1].length > 0 ? partes[0][0] + partes[1][0] : autorNome.substring(0,2);
             document.getElementById('detalhe-avatar-modal').innerText = ini.toUpperCase();
             
             const badgeStatus = document.getElementById('detalhe-badge-status');
@@ -689,7 +707,7 @@
         if(confirm(`⚠️ AÇÃO IRREVERSÍVEL!\nTem certeza que deseja excluir permanentemente o relatório de ${occ.local}?`)) {
             try {
                 await remove(ref(db, `ocorrencias_lmg48/${occ.id}`));
-                alert("🗑️ Relatório excluído com sucesso da nuvem.");
+                alert("🗑️ Relatório excluído com sucesso.");
             } catch (error) {
                 alert(`❌ Erro ao excluir: ${error.message}`);
             }
@@ -699,7 +717,7 @@
     document.addEventListener('click', (e) => { if (document.getElementById('statusDropdown').classList.contains('active')) window.fecharDropdownStatus(); });
     document.addEventListener('keydown', (e) => { if (e.key === "Escape") { window.fecharDetalhes(); window.fecharDropdownStatus(); } });
 
-    // TABELA BLINDADA PARA RENDERIZAR RÁPIDO
+    // TABELA BLINDADA
     window.atualizarDashboardUI = () => {
         try {
             const tbody = document.getElementById('tabela-dados');
@@ -711,22 +729,26 @@
             if(window.ocorrencias.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="5" class="text-center py-10 text-gray-400 font-medium whitespace-nowrap">Nenhuma anomalia no banco de dados.</td></tr>`;
                 document.getElementById('kpi-pendentes').innerText = 0; document.getElementById('kpi-resolvidos').innerText = 0;
-                window.desenharGrafico(0, 0, 0); 
+                
+                // ATRASA O GRÁFICO PARA NÃO TRAVAR A TELA
+                setTimeout(() => { window.desenharGrafico(0, 0, 0); }, 50);
                 return;
             }
 
-            const htmlRows = window.ocorrencias.map((item, index) => {
+            let htmlTabela = '';
+            window.ocorrencias.forEach((item, index) => {
                 const status = item.status || 'Pendente';
                 if(status === 'Pendente') p++; else if(status === 'Resolvido') r++; else c++;
                 
                 const autor = item.autor || 'Usuário';
-                const partes = autor.split(' ');
-                const iniciais = partes.length > 1 ? partes[0][0] + partes[1][0] : autor.substring(0,2);
+                const partes = autor.trim().split(/\s+/);
+                const iniciais = partes.length > 1 && partes[1].length > 0 ? partes[0][0] + partes[1][0] : autor.substring(0,2);
+                
                 const badgeClass = getBadgeClasses(status);
                 const local = item.local || '-';
                 const dataOcc = item.data || '-';
 
-                return `
+                htmlTabela += `
                     <tr class="hover:bg-gray-50/50 transition-colors group border-b border-gray-50">
                         <td class="px-6 py-4 truncate max-w-[200px]"><strong class="text-gray-800 truncate">${local}</strong></td>
                         <td class="px-6 py-4 truncate max-w-[200px]"><div class="flex items-center gap-3 shrink-0 truncate"><div class="w-8 h-8 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center font-bold text-xs uppercase shrink-0">${iniciais.toUpperCase()}</div><span class="text-sm font-medium text-gray-700 uppercase truncate">${autor}</span></div></td>
@@ -742,10 +764,10 @@
                 `;
             });
 
-            tbody.innerHTML = htmlRows.join('');
+            tbody.innerHTML = htmlTabela;
             document.getElementById('kpi-pendentes').innerText = p; document.getElementById('kpi-resolvidos').innerText = r;
             
-            window.desenharGrafico(p, r, c);
+            setTimeout(() => { window.desenharGrafico(p, r, c); }, 50);
 
         } catch(e) {
             console.error("Erro Dashboard:", e);
@@ -759,37 +781,36 @@
             if(!canvas) return;
 
             if (p === 0 && r === 0 && c === 0) {
-                 canvas.style.display = 'none';
+                 canvas.classList.add('hidden');
                  if(emptyState) emptyState.classList.remove('hidden');
                  return;
             }
             
-            canvas.style.display = 'block';
+            canvas.classList.remove('hidden');
             if(emptyState) emptyState.classList.add('hidden');
 
-            if (graficoChartJS) {
-                graficoChartJS.data.datasets[0].data = [p, r, c];
-                graficoChartJS.update();
-            } else {
-                const ctx = canvas.getContext('2d');
-                graficoChartJS = new Chart(ctx, {
-                    type: 'doughnut',
-                    data: { labels: ['Pendentes', 'Sanadas', 'Canceladas'], datasets: [{ data: [p, r, c], backgroundColor: ['#F59E0B', '#16a34a', '#EF4444'], borderWidth: 0 }] },
-                    options: { 
-                        responsive: true, 
-                        maintainAspectRatio: false,
-                        animation: false,
-                        cutout: '75%', 
-                        plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 10, font: { family: "'Inter', sans-serif", size: 12 } } }, tooltip: { cornerRadius: 8, padding: 12, boxPadding: 8, titleFont: { family: "'Inter', sans-serif", size: 13 }, bodyFont: { family: "'Inter', sans-serif", size: 13 } } } 
-                    }
-                });
+            if (window.meuGrafico) {
+                window.meuGrafico.destroy();
             }
+
+            const ctx = canvas.getContext('2d');
+            window.meuGrafico = new Chart(ctx, {
+                type: 'doughnut',
+                data: { labels: ['Pendentes', 'Sanadas', 'Canceladas'], datasets: [{ data: [p, r, c], backgroundColor: ['#F59E0B', '#16a34a', '#EF4444'], borderWidth: 0 }] },
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false,
+                    animation: false, 
+                    cutout: '75%', 
+                    plugins: { legend: { display: false }, tooltip: { cornerRadius: 8, padding: 12, boxPadding: 8, titleFont: { family: "'Inter', sans-serif", size: 13 }, bodyFont: { family: "'Inter', sans-serif", size: 13 } } } 
+                }
+            });
         } catch(e) {
             console.error("Erro Gráfico:", e);
         }
     };
 
-    // PROGRESSO DO INSPETOR BLINDADO
+    // PROGRESSO BLINDADO
     window.renderizarMeuProgresso = () => {
         try {
             const tbody = document.getElementById('tabela-meu-progresso');
@@ -803,14 +824,15 @@
                 return;
             }
 
-            const htmlProgresso = minhasOcorrencias.map((item) => {
+            let htmlProgresso = '';
+            minhasOcorrencias.forEach((item) => {
                 const status = item.status || 'Pendente';
                 const badgeClass = getBadgeClasses(status);
                 const local = item.local || '-';
                 const cat = item.categoria || '-';
                 const dataOcc = item.data || '-';
 
-                return `
+                htmlProgresso += `
                     <tr class="hover:bg-gray-50/50 transition-colors border-b border-gray-50">
                         <td class="px-6 py-4"><strong class="text-gray-800">${local}</strong></td>
                         <td class="px-6 py-4 text-sm text-gray-600">${cat}</td>
@@ -820,7 +842,7 @@
                 `;
             });
             
-            tbody.innerHTML = htmlProgresso.join('');
+            tbody.innerHTML = htmlProgresso;
         } catch(e) {
             console.error("Erro Progresso:", e);
         }
