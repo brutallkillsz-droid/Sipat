@@ -198,11 +198,13 @@
             </div>
 
             <div id="aba-registro" style="display: none;" class="max-w-3xl mx-auto pb-10 overflow-y-auto">
-                <div class="flex items-center gap-4 mb-6 sticky top-0 bg-gray-50 z-10 py-2">
-                    <button onclick="window.voltarMenuInspetor()" class="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-gray-500 hover:text-shopee hover:bg-shopee-light transition-all"><i class="fa-solid fa-arrow-left"></i></button>
+                <div class="flex items-center gap-4 mb-6 sticky top-0 bg-gray-50 z-20 py-3">
+                    <button onclick="window.voltarMenuInspetor()" class="w-12 h-12 rounded-2xl bg-white shadow-md border border-gray-200 flex items-center justify-center text-gray-700 hover:text-shopee hover:border-shopee hover:bg-shopee-light transition-all active:scale-95 shrink-0" title="Voltar ao Menu">
+                        <i class="fa-solid fa-arrow-left text-xl"></i>
+                    </button>
                     <div>
-                        <h2 class="text-2xl font-black text-gray-800 tracking-tight">Reportar Anomalia</h2>
-                        <p class="text-sm text-gray-500 font-medium">Preencha os dados técnicos da ocorrência.</p>
+                        <h2 class="text-2xl font-black text-gray-800 tracking-tight leading-tight">Reportar Anomalia</h2>
+                        <p class="text-sm text-gray-500 font-medium">Preencha os dados da ocorrência.</p>
                     </div>
                 </div>
 
@@ -270,11 +272,13 @@
             </div>
 
             <div id="aba-progresso" style="display: none;" class="max-w-4xl mx-auto pb-10 flex-col h-full gap-4">
-                <div class="flex items-center gap-4 mb-6 sticky top-0 bg-gray-50 z-10 py-2">
-                    <button onclick="window.voltarMenuInspetor()" class="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-gray-500 hover:text-shopee hover:bg-shopee-light transition-all"><i class="fa-solid fa-arrow-left"></i></button>
+                <div class="flex items-center gap-4 mb-6 sticky top-0 bg-gray-50 z-20 py-3">
+                    <button onclick="window.voltarMenuInspetor()" class="w-12 h-12 rounded-2xl bg-white shadow-md border border-gray-200 flex items-center justify-center text-gray-700 hover:text-shopee hover:border-shopee hover:bg-shopee-light transition-all active:scale-95 shrink-0" title="Voltar ao Menu">
+                        <i class="fa-solid fa-arrow-left text-xl"></i>
+                    </button>
                     <div>
-                        <h2 class="text-2xl font-black text-gray-800 tracking-tight">Meu Progresso</h2>
-                        <p class="text-sm text-gray-500 font-medium">Acompanhe o status dos relatórios enviados por você.</p>
+                        <h2 class="text-2xl font-black text-gray-800 tracking-tight leading-tight">Meu Progresso</h2>
+                        <p class="text-sm text-gray-500 font-medium">Acompanhe o status dos seus relatórios.</p>
                     </div>
                 </div>
 
@@ -403,7 +407,6 @@
     });
 
     window.fazerLogin = () => {
-        // Converte o que for digitado para minúsculo, assim o login não falha se digitarem com letra maiúscula
         const u = document.getElementById('username').value.trim().toLowerCase();
         const p = document.getElementById('password').value.trim();
         
@@ -422,7 +425,6 @@
             localStorage.setItem('sipat_nome', 'Gestor ADM');
             window.carregarSessao('admin', 'Gestor ADM');
         } else if(inspetores[u] && inspetores[u].senha === p) {
-            // Entra se o usuário existir na lista e a senha bater
             localStorage.setItem('sipat_user', u);
             localStorage.setItem('sipat_nome', inspetores[u].nome);
             window.carregarSessao(u, inspetores[u].nome);
@@ -437,7 +439,6 @@
         
         document.getElementById('user-display-name').innerText = nome;
         
-        // Geração dinâmica das Iniciais para o Avatar (ex: "David Silveira" -> "DS")
         let iniciais = '??';
         if(user === 'admin') {
             iniciais = 'AD';
@@ -470,7 +471,6 @@
     };
     window.verificarSessao();
 
-    // DESLOGAR (FUNCIONANDO)
     window.sair = () => {
         localStorage.removeItem('sipat_user');
         localStorage.removeItem('sipat_nome');
@@ -546,7 +546,6 @@
         container.innerHTML = htmlFotos;
     };
 
-    // ENVIO SEM CONGELAR TELA
     window.salvarFormulario = async () => {
         const hub = document.getElementById('hub_local').value;
         const cat = document.getElementById('categoria').value;
@@ -590,8 +589,6 @@
             window.renderizarGradeDeFotos();
 
             alert("✅ Relatório transmitido com sucesso!");
-            
-            // Vai direto para o progresso para ver a atualização instantânea
             window.mudarAba('progresso');
 
         } catch (error) {
@@ -625,7 +622,6 @@
         document.getElementById('detalhe-texto').innerText = occ.detalheCompleto;
         document.getElementById('detalhe-autor').innerText = occ.autor;
         
-        // Avatar dinâmico
         const partes = occ.autor.split(' ');
         const ini = partes.length > 1 ? partes[0][0] + partes[1][0] : occ.autor.substring(0,2);
         document.getElementById('detalhe-avatar-modal').innerText = ini.toUpperCase();
@@ -687,7 +683,6 @@
     document.addEventListener('click', (e) => { if (document.getElementById('statusDropdown').classList.contains('active')) window.fecharDropdownStatus(); });
     document.addEventListener('keydown', (e) => { if (e.key === "Escape") { window.fecharDetalhes(); window.fecharDropdownStatus(); } });
 
-    // CONSTRUTOR DA TABELA DO ADMIN
     window.atualizarDashboardUI = () => {
         const tbody = document.getElementById('tabela-dados');
         if(!tbody) return;
@@ -755,7 +750,6 @@
         });
     };
 
-    // CONSTRUTOR DA TABELA DO INSPETOR
     window.renderizarMeuProgresso = () => {
         const tbody = document.getElementById('tabela-meu-progresso');
         if(!tbody) return;
