@@ -105,7 +105,8 @@
 
         <div class="detail-block" id="box-foto-evidencia">
             <h5 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Evidências Fotográficas</h5>
-            <div id="detalhe-galeria-fotos" class="grid grid-cols-2 gap-3 mt-2 pb-10"></div>
+            <div id="detalhe-galeria-fotos" class="grid grid-cols-2 gap-3 mt-2 pb-10">
+                </div>
         </div>
     </div>
 </div>
@@ -114,7 +115,7 @@
     <div class="hidden md:flex flex-1 bg-shopee flex-col justify-center items-center p-12 text-center relative overflow-hidden">
         <div class="absolute inset-0 bg-gradient-to-br from-shopee to-shopee-dark opacity-90"></div>
         <div class="relative z-10 text-white w-full flex flex-col items-center">
-            <video autoplay loop muted playsinline class="w-80 lg:w-[26rem] h-auto rounded-3xl shadow-2xl mb-8 border-4 border-white/20 bg-white object-contain">
+            <video id="video-desktop" autoplay loop muted playsinline class="w-80 lg:w-[26rem] h-auto rounded-3xl shadow-2xl mb-8 border-4 border-white/20 bg-white object-contain">
                 <source src="https://i.imgur.com/fMAvIvu.mp4" type="video/mp4">
             </video>
             <h1 class="text-4xl font-black tracking-tight mb-2">Cipa LMG-48</h1>
@@ -125,7 +126,7 @@
         <div class="w-full max-w-md bg-white p-8 rounded-3xl shadow-xl border border-gray-100 flex flex-col items-center my-auto py-4">
             
             <div class="md:hidden flex flex-col items-center mb-6 w-full">
-                <video autoplay loop muted playsinline class="w-56 sm:w-64 mx-auto h-auto rounded-3xl shadow-lg border-2 border-shopee bg-white object-contain">
+                <video id="video-mobile" autoplay loop muted playsinline class="w-56 sm:w-64 mx-auto h-auto rounded-3xl shadow-lg border-2 border-shopee bg-white object-contain">
                     <source src="https://i.imgur.com/fMAvIvu.mp4" type="video/mp4">
                 </video>
             </div>
@@ -151,14 +152,14 @@
     <header class="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-40 overflow-x-auto min-w-full">
         <div class="max-w-6xl mx-auto flex justify-between items-center py-2 px-4 gap-2 whitespace-nowrap">
             <div class="flex items-center space-x-3 shrink-0">
-                <video autoplay loop muted playsinline class="h-10 w-auto rounded-lg"><source src="https://i.imgur.com/fMAvIvu.mp4" type="video/mp4"></video>
+                <video id="video-header" autoplay loop muted playsinline preload="none" class="h-10 w-auto rounded-lg"><source src="https://i.imgur.com/fMAvIvu.mp4" type="video/mp4"></video>
                 <span class="font-black text-xl text-shopee hidden sm:block">CIPA</span>
             </div>
             <div class="text-center bg-shopee text-white px-6 py-1.5 rounded-full text-xs font-bold tracking-wide shadow-sm absolute left-1/2 transform -translate-x-1/2 hidden md:block uppercase truncate max-w-[40%]">
                 Segurança é Prioridade LMG-48
             </div>
             
-            <div class="flex items-center gap-4 shrink-0 ml-auto cursor-pointer hover:opacity-75 transition-opacity" onclick="window.sair()" title="Sair do Sistema" style="z-index: 9999;">
+            <div class="flex items-center gap-4 shrink-0 ml-auto cursor-pointer hover:opacity-75 transition-opacity" onclick="window.sair()" title="Sair do Sistema">
                 <div class="text-right hidden sm:block truncate max-w-[150px]">
                     <h1 class="font-black text-xl text-gray-800 leading-none truncate hover:text-shopee">Sair</h1>
                     <p class="text-[10px] font-bold text-gray-400 tracking-widest uppercase truncate" id="user-display-name">Nome</p>
@@ -191,7 +192,7 @@
                     </button>
                     <button onclick="window.sair()" class="card-interaction bg-white rounded-3xl p-6 shadow-sm flex flex-col items-center justify-center space-y-3 border-b-4 border-gray-300 group">
                         <i class="fa-solid fa-power-off text-4xl text-gray-400 transition-colors"></i>
-                        <span class="font-bold text-sm text-gray-700 text-center leading-tight transition-colors">Deslogar Sistema</span>
+                        <span class="font-bold text-sm text-gray-500 text-center leading-tight transition-colors">Deslogar</span>
                     </button>
                 </div>
             </div>
@@ -335,11 +336,10 @@
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-grow min-h-0">
                     <div class="lg:col-span-1 bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center justify-center shrink-0 min-h-[300px]">
                         <h3 class="font-bold text-gray-800 mb-4 w-full flex items-center gap-2 sticky top-0 bg-white z-10 py-1"><i class="fa-solid fa-chart-pie text-shopee"></i> Distribuição</h3>
-                        
-                        <div style="width: 250px; height: 250px; position: relative; margin: 0 auto;">
+                        <div class="relative w-full flex justify-center items-center" style="height: 250px;">
                             <canvas id="graficoStatus"></canvas>
+                            <div id="grafico-vazio" class="hidden absolute inset-0 flex items-center justify-center text-gray-400 font-bold text-sm">Sem dados</div>
                         </div>
-                        
                     </div>
 
                     <div class="lg:col-span-2 bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex flex-col flex-grow min-h-0">
@@ -394,12 +394,17 @@
     let graficoChartJS = null;
     const MAX_FOTOS = 5;
 
+    // BLINDAGEM 1: Evita travar se o banco mandar lixo
     onValue(ref(db, 'ocorrencias_lmg48'), (snapshot) => {
-        const data = snapshot.val();
-        window.ocorrencias = data ? Object.keys(data).map(key => ({ id: key, ...data[key] })).reverse() : [];
-        
-        if(window.usuarioAtual === 'admin') window.atualizarDashboardUI();
-        else if(window.usuarioAtual !== '') window.renderizarMeuProgresso();
+        try {
+            const data = snapshot.val();
+            window.ocorrencias = data ? Object.keys(data).map(key => ({ id: key, ...data[key] })).reverse() : [];
+            
+            if(window.usuarioAtual === 'admin') window.atualizarDashboardUI();
+            else if(window.usuarioAtual !== '') window.renderizarMeuProgresso();
+        } catch (error) {
+            console.error("Erro na leitura do BD:", error);
+        }
     });
 
     window.fazerLogin = () => {
@@ -431,25 +436,28 @@
     window.carregarSessao = (user, nome) => {
         window.usuarioAtual = user; 
         window.nomeUsuarioAtual = nome; 
-        
         document.getElementById('user-display-name').innerText = nome;
         
         let iniciais = '??';
-        if(user === 'admin') {
-            iniciais = 'AD';
-        } else {
+        if(user === 'admin') { iniciais = 'AD'; } else {
             const partes = nome.split(' ');
-            if(partes.length > 1) {
-                iniciais = (partes[0][0] + partes[1][0]).toUpperCase();
-            } else {
-                iniciais = nome.substring(0,2).toUpperCase();
-            }
+            iniciais = partes.length > 1 ? (partes[0][0] + partes[1][0]).toUpperCase() : nome.substring(0,2).toUpperCase();
         }
         document.getElementById('user-display-avatar').innerText = iniciais;
         
-        document.getElementById('login-screen').style.display = 'none';
+        // BLINDAGEM 2: DESTRÓI OS VÍDEOS DE LOGIN PARA ALIVIAR O CELULAR/PC (Isso acaba com o congelamento!)
+        const telaLogin = document.getElementById('login-screen');
+        if(telaLogin) {
+            telaLogin.querySelectorAll('video').forEach(v => { v.pause(); v.removeAttribute('src'); v.load(); });
+            telaLogin.style.display = 'none';
+        }
+
         document.getElementById('app-layout').classList.remove('hidden');
         document.getElementById('app-layout').style.display = 'flex';
+
+        // CARREGA O CABEÇALHO DO VÍDEO OFICIAL
+        const vHeader = document.getElementById('video-header');
+        if(vHeader) vHeader.play();
 
         if(user === 'admin') {
             window.mudarAba('dashboard');
@@ -467,11 +475,11 @@
     };
     window.verificarSessao();
 
-    // COMANDO DE SAIR MODO "BRUTO": LIMPA TUDO E FORÇA O NAVEGADOR A RECARREGAR
+    // BLINDAGEM 3: SAIR FORÇA A LIMPEZA TOTAL DA ABA
     window.sair = () => {
-        localStorage.clear();
-        sessionStorage.clear();
-        window.location.replace(window.location.pathname);
+        localStorage.removeItem('sipat_user');
+        localStorage.removeItem('sipat_nome');
+        window.location.href = window.location.pathname + '?v=' + new Date().getTime(); // Fura o cache do navegador e desloga
     };
 
     window.mudarAba = (aba) => {
@@ -580,7 +588,7 @@
             await set(novaOcorrenciaRef, payload);
             alert("✅ Relatório transmitido com sucesso!");
             
-            // ATUALIZAÇÃO FORÇADA DA PÁGINA A PEDIDO DO DAVID
+            // F5 FORÇADO: Exigência do usuário para não congelar e limpar a memória limpa
             window.location.reload();
 
         } catch (error) {
@@ -598,46 +606,59 @@
         return 'bg-gray-50 text-gray-600 border-gray-200';
     }
 
+    // ZOOM DE FOTO
     window.ampliarFoto = (src) => {
         document.getElementById('viewer-img').src = src;
         document.getElementById('photo-viewer').style.display = 'flex';
     };
 
     window.abrirDetalhes = (index) => {
-        const occ = window.ocorrencias[index];
-        if(!occ) return;
-        document.getElementById('detalhe-hub').innerText = occ.local;
-        document.getElementById('detalhe-categoria').innerText = occ.categoria;
-        document.getElementById('detalhe-data').innerText = occ.data;
-        document.getElementById('detalhe-texto').innerText = occ.detalheCompleto;
-        document.getElementById('detalhe-autor').innerText = occ.autor;
-        
-        const partes = occ.autor.split(' ');
-        const ini = partes.length > 1 ? partes[0][0] + partes[1][0] : occ.autor.substring(0,2);
-        document.getElementById('detalhe-avatar-modal').innerText = ini.toUpperCase();
-        
-        const badgeStatus = document.getElementById('detalhe-badge-status');
-        badgeStatus.className = `px-3 py-1 rounded-full text-xs font-bold border ${getBadgeClasses(occ.status)}`;
-        badgeStatus.innerHTML = occ.status;
+        try {
+            const occ = window.ocorrencias[index];
+            if(!occ) return;
+            
+            // Tenta pegar o nome se existir, se não joga default para não travar
+            const autorNome = occ.autor || 'Usuário';
+            const localNome = occ.local || '-';
+            const categoriaNome = occ.categoria || '-';
+            const dataNome = occ.data || '-';
+            const detalheNome = occ.detalheCompleto || '';
+            const statusAtual = occ.status || 'Pendente';
 
-        const galeria = document.getElementById('detalhe-galeria-fotos');
-        
-        let arrayFotos = occ.fotos_urls || [];
-        let htmlFotos = '';
+            document.getElementById('detalhe-hub').innerText = localNome;
+            document.getElementById('detalhe-categoria').innerText = categoriaNome;
+            document.getElementById('detalhe-data').innerText = dataNome;
+            document.getElementById('detalhe-texto').innerText = detalheNome;
+            document.getElementById('detalhe-autor').innerText = autorNome;
+            
+            const partes = autorNome.split(' ');
+            const ini = partes.length > 1 ? partes[0][0] + partes[1][0] : autorNome.substring(0,2);
+            document.getElementById('detalhe-avatar-modal').innerText = ini.toUpperCase();
+            
+            const badgeStatus = document.getElementById('detalhe-badge-status');
+            badgeStatus.className = `px-3 py-1 rounded-full text-xs font-bold border ${getBadgeClasses(statusAtual)}`;
+            badgeStatus.innerHTML = statusAtual;
 
-        if(arrayFotos.length > 0) {
-            arrayFotos.forEach(url => {
-                htmlFotos += `
-                    <img src="${url}" onclick="window.ampliarFoto('${url}')" class="block rounded-xl overflow-hidden border border-gray-200 shadow-sm hover:border-shopee transition-colors h-24 w-full object-cover cursor-zoom-in shrink-0">
-                `;
-            });
-            galeria.innerHTML = htmlFotos;
-        } else {
-            galeria.innerHTML = '';
+            const galeria = document.getElementById('detalhe-galeria-fotos');
+            let arrayFotos = occ.fotos_urls || [];
+            let htmlFotos = '';
+
+            if(arrayFotos.length > 0) {
+                arrayFotos.forEach(url => {
+                    htmlFotos += `
+                        <img src="${url}" onclick="window.ampliarFoto('${url}')" class="block rounded-xl overflow-hidden border border-gray-200 shadow-sm hover:border-shopee transition-colors h-24 w-full object-cover cursor-zoom-in shrink-0">
+                    `;
+                });
+                galeria.innerHTML = htmlFotos;
+            } else {
+                galeria.innerHTML = '';
+            }
+
+            document.getElementById('slide-overlay').classList.add('active');
+            document.getElementById('slide-panel').classList.add('active');
+        } catch(e) {
+            console.error("Erro ao abrir detalhes:", e);
         }
-
-        document.getElementById('slide-overlay').classList.add('active');
-        document.getElementById('slide-panel').classList.add('active');
     };
 
     window.fecharDetalhes = () => { document.getElementById('slide-overlay').classList.remove('active'); document.getElementById('slide-panel').classList.remove('active'); };
@@ -660,10 +681,10 @@
     window.excluirRelatorio = async (index) => {
         const occ = window.ocorrencias[index];
         if(!occ) return;
-        if(confirm(`⚠️ AÇÃO IRREVERSÍVEL!\nTem certeza que deseja excluir permanentemente o relatório de ${occ.local} enviado por ${occ.autor}?`)) {
+        if(confirm(`⚠️ AÇÃO IRREVERSÍVEL!\nTem certeza que deseja excluir permanentemente o relatório de ${occ.local}?`)) {
             try {
                 await remove(ref(db, `ocorrencias_lmg48/${occ.id}`));
-                alert("🗑️ Relatório excluído com sucesso da nuvem.");
+                alert("🗑️ Relatório excluído com sucesso.");
             } catch (error) {
                 alert(`❌ Erro ao excluir: ${error.message}`);
             }
@@ -673,98 +694,131 @@
     document.addEventListener('click', (e) => { if (document.getElementById('statusDropdown').classList.contains('active')) window.fecharDropdownStatus(); });
     document.addEventListener('keydown', (e) => { if (e.key === "Escape") { window.fecharDetalhes(); window.fecharDropdownStatus(); } });
 
+    // TABELA BLINDADA CONTRA ERROS
     window.atualizarDashboardUI = () => {
-        const tbody = document.getElementById('tabela-dados');
-        if(!tbody) return;
+        try {
+            const tbody = document.getElementById('tabela-dados');
+            if(!tbody) return;
 
-        let p = 0, r = 0, c = 0;
-        document.getElementById('kpi-total').innerText = window.ocorrencias.length;
+            let p = 0, r = 0, c = 0;
+            document.getElementById('kpi-total').innerText = window.ocorrencias.length;
 
-        if(window.ocorrencias.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="5" class="text-center py-10 text-gray-400 font-medium whitespace-nowrap">Nenhuma anomalia no banco de dados.</td></tr>`;
-            document.getElementById('kpi-pendentes').innerText = 0; document.getElementById('kpi-resolvidos').innerText = 0;
-            window.desenharGrafico(0, 0, 0); 
-            return;
-        }
-
-        let htmlTabela = '';
-        window.ocorrencias.forEach((item, index) => {
-            if(item.status === 'Pendente') p++; else if(item.status === 'Resolvido') r++; else c++;
-            
-            const partes = item.autor.split(' ');
-            const iniciais = partes.length > 1 ? partes[0][0] + partes[1][0] : item.autor.substring(0,2);
-            const badgeClass = getBadgeClasses(item.status);
-
-            htmlTabela += `
-                <tr class="hover:bg-gray-50/50 transition-colors group border-b border-gray-50">
-                    <td class="px-6 py-4 truncate max-w-[200px]"><strong class="text-gray-800 truncate">${item.local}</strong></td>
-                    <td class="px-6 py-4 truncate max-w-[200px]"><div class="flex items-center gap-3 shrink-0 truncate"><div class="w-8 h-8 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center font-bold text-xs uppercase shrink-0">${iniciais.toUpperCase()}</div><span class="text-sm font-medium text-gray-700 uppercase truncate">${item.autor}</span></div></td>
-                    <td class="px-6 py-4 text-sm text-gray-600 truncate whitespace-nowrap">${item.data}</td>
-                    <td class="px-6 py-4 shrink-0 whitespace-nowrap max-w-[150px]"><button onclick="window.abrirDropdownStatus(event, ${index})" class="px-3 py-1.5 rounded-full text-xs font-bold border cursor-pointer hover:shadow-md transition-all flex items-center gap-2 truncate whitespace-nowrap max-w-full ${badgeClass}"><span class="truncate">${item.status}</span> <i class="fa-solid fa-caret-down opacity-50 shrink-0"></i></button></td>
-                    <td class="px-6 py-4 text-center shrink-0 whitespace-nowrap w-[150px]">
-                        <div class="flex items-center justify-center gap-2 max-w-full shrink-0">
-                            <button onclick="window.abrirDetalhes(${index})" class="w-8 h-8 rounded-lg border border-gray-200 text-gray-400 hover:text-shopee hover:border-shopee hover:bg-shopee-light transition-all flex items-center justify-center shrink-0" title="Ver Detalhes"><i class="fa-solid fa-arrow-right"></i></button>
-                            <button onclick="window.excluirRelatorio(${index})" class="w-8 h-8 rounded-lg border border-gray-200 text-gray-400 hover:text-red-500 hover:border-red-500 hover:bg-red-50 transition-all flex items-center justify-center shrink-0" title="Excluir Definitivamente"><i class="fa-solid fa-trash-can"></i></button>
-                        </div>
-                    </td>
-                </tr>
-            `;
-        });
-
-        tbody.innerHTML = htmlTabela;
-        document.getElementById('kpi-pendentes').innerText = p; document.getElementById('kpi-resolvidos').innerText = r;
-        window.desenharGrafico(p, r, c);
-    };
-
-    // TRAVA DE SEGURANÇA 2: GRÁFICO SECO E SEM ANIMAÇÃO
-    window.desenharGrafico = (p, r, c) => {
-        const canvas = document.getElementById('graficoStatus');
-        if(!canvas) return;
-
-        const ctx = canvas.getContext('2d');
-        if (graficoChartJS) { graficoChartJS.destroy(); }
-        
-        if (p === 0 && r === 0 && c === 0) {
-             return;
-        }
-
-        graficoChartJS = new Chart(ctx, {
-            type: 'doughnut',
-            data: { labels: ['Pendentes', 'Sanadas', 'Canceladas'], datasets: [{ data: [p, r, c], backgroundColor: ['#F59E0B', '#16a34a', '#EF4444'], borderWidth: 0, hoverOffset: 4 }] },
-            options: { 
-                responsive: false, // <-- A MÁGICA CONTRA O CONGELAMENTO ESTÁ AQUI
-                maintainAspectRatio: false, 
-                animation: false,
-                cutout: '75%', 
-                plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 10, font: { family: "'Inter', sans-serif", size: 12 } } }, tooltip: { cornerRadius: 8, padding: 12, boxPadding: 8, titleFont: { family: "'Inter', sans-serif", size: 13 }, bodyFont: { family: "'Inter', sans-serif", size: 13 } } } 
+            if(window.ocorrencias.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-10 text-gray-400 font-medium whitespace-nowrap">Nenhuma anomalia no banco de dados.</td></tr>`;
+                document.getElementById('kpi-pendentes').innerText = 0; document.getElementById('kpi-resolvidos').innerText = 0;
+                window.desenharGrafico(0, 0, 0); 
+                return;
             }
-        });
+
+            let htmlTabela = '';
+            window.ocorrencias.forEach((item, index) => {
+                const status = item.status || 'Pendente';
+                if(status === 'Pendente') p++; else if(status === 'Resolvido') r++; else c++;
+                
+                const autor = item.autor || 'Usuário';
+                const partes = autor.split(' ');
+                const iniciais = partes.length > 1 ? partes[0][0] + partes[1][0] : autor.substring(0,2);
+                const badgeClass = getBadgeClasses(status);
+                const local = item.local || '-';
+                const dataOcc = item.data || '-';
+
+                htmlTabela += `
+                    <tr class="hover:bg-gray-50/50 transition-colors group border-b border-gray-50">
+                        <td class="px-6 py-4 truncate max-w-[200px]"><strong class="text-gray-800 truncate">${local}</strong></td>
+                        <td class="px-6 py-4 truncate max-w-[200px]"><div class="flex items-center gap-3 shrink-0 truncate"><div class="w-8 h-8 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center font-bold text-xs uppercase shrink-0">${iniciais.toUpperCase()}</div><span class="text-sm font-medium text-gray-700 uppercase truncate">${autor}</span></div></td>
+                        <td class="px-6 py-4 text-sm text-gray-600 truncate whitespace-nowrap">${dataOcc}</td>
+                        <td class="px-6 py-4 shrink-0 whitespace-nowrap max-w-[150px]"><button onclick="window.abrirDropdownStatus(event, ${index})" class="px-3 py-1.5 rounded-full text-xs font-bold border cursor-pointer hover:shadow-md transition-all flex items-center gap-2 truncate whitespace-nowrap max-w-full ${badgeClass}"><span class="truncate">${status}</span> <i class="fa-solid fa-caret-down opacity-50 shrink-0"></i></button></td>
+                        <td class="px-6 py-4 text-center shrink-0 whitespace-nowrap w-[150px]">
+                            <div class="flex items-center justify-center gap-2 max-w-full shrink-0">
+                                <button onclick="window.abrirDetalhes(${index})" class="w-8 h-8 rounded-lg border border-gray-200 text-gray-400 hover:text-shopee hover:border-shopee hover:bg-shopee-light transition-all flex items-center justify-center shrink-0" title="Ver Detalhes"><i class="fa-solid fa-arrow-right"></i></button>
+                                <button onclick="window.excluirRelatorio(${index})" class="w-8 h-8 rounded-lg border border-gray-200 text-gray-400 hover:text-red-500 hover:border-red-500 hover:bg-red-50 transition-all flex items-center justify-center shrink-0" title="Excluir Definitivamente"><i class="fa-solid fa-trash-can"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tbody.innerHTML = htmlTabela;
+            document.getElementById('kpi-pendentes').innerText = p; document.getElementById('kpi-resolvidos').innerText = r;
+            
+            // Desloca a renderização do gráfico da tela principal para não engasgar a tabela
+            setTimeout(() => window.desenharGrafico(p, r, c), 100);
+
+        } catch(e) {
+            console.error("Erro ao gerar tabela Dashboard:", e);
+        }
     };
 
-    window.renderizarMeuProgresso = () => {
-        const tbody = document.getElementById('tabela-meu-progresso');
-        if(!tbody) return;
+    window.desenharGrafico = (p, r, c) => {
+        try {
+            const canvas = document.getElementById('graficoStatus');
+            const emptyState = document.getElementById('grafico-vazio');
+            if(!canvas) return;
 
-        const minhasOcorrencias = window.ocorrencias.filter(o => o.autor === window.nomeUsuarioAtual);
-        if(minhasOcorrencias.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="4" class="text-center py-10 text-gray-400 font-medium whitespace-nowrap">Você ainda não relatou nenhuma anomalia.</td></tr>`;
-            return;
+            const ctx = canvas.getContext('2d');
+            if (graficoChartJS) { graficoChartJS.destroy(); }
+            
+            if (p === 0 && r === 0 && c === 0) {
+                 canvas.style.display = 'none';
+                 if(emptyState) emptyState.classList.remove('hidden');
+                 return;
+            }
+            
+            canvas.style.display = 'block';
+            if(emptyState) emptyState.classList.add('hidden');
+
+            graficoChartJS = new Chart(ctx, {
+                type: 'doughnut',
+                data: { labels: ['Pendentes', 'Sanadas', 'Canceladas'], datasets: [{ data: [p, r, c], backgroundColor: ['#F59E0B', '#16a34a', '#EF4444'], borderWidth: 0 }] },
+                options: { 
+                    responsive: false, // TRAVA DE SEGURANÇA CONTRA LOOP INFINITO
+                    maintainAspectRatio: false,
+                    animation: false, // DESLIGADO PARA NÃO TRAVAR NAVEGADORES FRACOS
+                    cutout: '75%', 
+                    plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 10, font: { family: "'Inter', sans-serif", size: 12 } } }, tooltip: { cornerRadius: 8, padding: 12, boxPadding: 8, titleFont: { family: "'Inter', sans-serif", size: 13 }, bodyFont: { family: "'Inter', sans-serif", size: 13 } } } 
+                }
+            });
+        } catch(e) {
+            console.error("Erro no gráfico:", e);
         }
+    };
 
-        let htmlProgresso = '';
-        minhasOcorrencias.forEach((item) => {
-            const badgeClass = getBadgeClasses(item.status);
-            htmlProgresso += `
-                <tr class="hover:bg-gray-50/50 transition-colors border-b border-gray-50">
-                    <td class="px-6 py-4"><strong class="text-gray-800">${item.local}</strong></td>
-                    <td class="px-6 py-4 text-sm text-gray-600">${item.categoria}</td>
-                    <td class="px-6 py-4 text-sm text-gray-600 whitespace-nowrap">${item.data}</td>
-                    <td class="px-6 py-4"><span class="px-3 py-1.5 rounded-full text-xs font-bold border whitespace-nowrap ${badgeClass}">${item.status}</span></td>
-                </tr>
-            `;
-        });
-        
-        tbody.innerHTML = htmlProgresso;
+    // PROGRESSO BLINDADO
+    window.renderizarMeuProgresso = () => {
+        try {
+            const tbody = document.getElementById('tabela-meu-progresso');
+            if(!tbody) return;
+
+            const nomeLocal = (window.nomeUsuarioAtual || '').toLowerCase();
+            const minhasOcorrencias = window.ocorrencias.filter(o => (o.autor || '').toLowerCase() === nomeLocal);
+            
+            if(minhasOcorrencias.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="text-center py-10 text-gray-400 font-medium whitespace-nowrap">Você ainda não relatou nenhuma anomalia.</td></tr>`;
+                return;
+            }
+
+            let htmlProgresso = '';
+            minhasOcorrencias.forEach((item) => {
+                const status = item.status || 'Pendente';
+                const badgeClass = getBadgeClasses(status);
+                const local = item.local || '-';
+                const cat = item.categoria || '-';
+                const dataOcc = item.data || '-';
+
+                htmlProgresso += `
+                    <tr class="hover:bg-gray-50/50 transition-colors border-b border-gray-50">
+                        <td class="px-6 py-4"><strong class="text-gray-800">${local}</strong></td>
+                        <td class="px-6 py-4 text-sm text-gray-600">${cat}</td>
+                        <td class="px-6 py-4 text-sm text-gray-600 whitespace-nowrap">${dataOcc}</td>
+                        <td class="px-6 py-4"><span class="px-3 py-1.5 rounded-full text-xs font-bold border whitespace-nowrap ${badgeClass}">${status}</span></td>
+                    </tr>
+                `;
+            });
+            
+            tbody.innerHTML = htmlProgresso;
+        } catch(e) {
+            console.error("Erro ao renderizar progresso:", e);
+        }
     };
 </script>
 
