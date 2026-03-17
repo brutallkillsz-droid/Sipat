@@ -83,7 +83,7 @@
         <div class="detail-block">
             <h5 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Inspetor Responsável</h5>
             <div class="bg-white p-4 rounded-xl border border-gray-200 flex items-center gap-3 shadow-sm">
-                <div id="detalhe-avatar" class="w-10 h-10 rounded-full bg-shopee-light text-shopee flex items-center justify-center font-bold uppercase">DS</div>
+                <div id="detalhe-avatar-modal" class="w-10 h-10 rounded-full bg-shopee-light text-shopee flex items-center justify-center font-bold uppercase">??</div>
                 <strong id="detalhe-autor" class="text-gray-800 uppercase">Nome</strong>
             </div>
         </div>
@@ -164,7 +164,7 @@
                     <h1 class="font-black text-xl text-gray-800 leading-none truncate hover:text-shopee">Sair</h1>
                     <p class="text-[10px] font-bold text-gray-400 tracking-widest uppercase truncate" id="user-display-name">Nome</p>
                 </div>
-                <div id="user-display-avatar" class="w-10 h-10 rounded-full bg-shopee-light text-shopee border-2 border-white shadow-md flex items-center justify-center font-bold uppercase shrink-0">DS</div>
+                <div id="user-display-avatar" class="w-10 h-10 rounded-full bg-shopee-light text-shopee border-2 border-white shadow-md flex items-center justify-center font-bold uppercase shrink-0">??</div>
             </div>
         </div>
     </header>
@@ -269,7 +269,7 @@
                 </div>
             </div>
 
-            <div id="aba-progresso" style="display: none;" class="max-w-4xl mx-auto flex-col h-full gap-4">
+            <div id="aba-progresso" style="display: none;" class="max-w-4xl mx-auto pb-10 flex-col h-full gap-4">
                 <div class="flex items-center gap-4 mb-6 sticky top-0 bg-gray-50 z-10 py-2">
                     <button onclick="window.voltarMenuInspetor()" class="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-gray-500 hover:text-shopee hover:bg-shopee-light transition-all"><i class="fa-solid fa-arrow-left"></i></button>
                     <div>
@@ -299,7 +299,7 @@
                 </div>
             </div>
 
-            <div id="aba-dashboard" style="display: none;" class="space-y-6 flex-col h-full overflow-y-auto min-h-full">
+            <div id="aba-dashboard" style="display: none;" class="space-y-6 pb-10 flex-col h-full overflow-y-auto min-h-full">
                 <h2 class="text-2xl font-black text-gray-800 tracking-tight mb-2 sticky top-0 bg-gray-50 z-10 py-2">Visão Geral Gerencial</h2>
                 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 shrink-0">
@@ -390,34 +390,42 @@
     let graficoChartJS = null;
     const MAX_FOTOS = 5;
 
-    // ZOOM DE FOTOS
-    window.ampliarFoto = (src) => {
-        document.getElementById('viewer-img').src = src;
-        document.getElementById('photo-viewer').style.display = 'flex';
-    };
-
-    // ESCUTANDO O BANCO DE DADOS (GARANTE O HISTÓRICO)
+    // ESCUTANDO O BANCO DE DADOS (Mantém o histórico atualizado em tempo real)
     onValue(ref(db, 'ocorrencias_lmg48'), (snapshot) => {
         const data = snapshot.val();
         window.ocorrencias = data ? Object.keys(data).map(key => ({ id: key, ...data[key] })).reverse() : [];
         
-        if(window.usuarioAtual === 'admin') window.atualizarDashboardUI();
-        if(window.usuarioAtual === 'davidsilveira') window.renderizarMeuProgresso();
+        if(window.usuarioAtual === 'admin') {
+            window.atualizarDashboardUI();
+        } else if(window.usuarioAtual !== '') {
+            window.renderizarMeuProgresso();
+        }
     });
 
     window.fazerLogin = () => {
-        const u = document.getElementById('username').value.trim();
+        // Converte o que for digitado para minúsculo, assim o login não falha se digitarem com letra maiúscula
+        const u = document.getElementById('username').value.trim().toLowerCase();
         const p = document.getElementById('password').value.trim();
         
-        // APENAS ESSES DOIS LOGINS SÃO ACEITOS
+        // Banco de Dados Interno de Inspetores Cadastrados
+        const inspetores = {
+            "davidsilveira": { senha: "1234", nome: "David Silveira" },
+            "malanesantana": { senha: "lmg4820261", nome: "Malane Santana" },
+            "diegowillian": { senha: "lmg4820262", nome: "Diego Willian" },
+            "priscilaalves": { senha: "lmg4820263", nome: "Priscila Alves" },
+            "vanessarodrigues": { senha: "lmg4820264", nome: "Vanessa Rodrigues" },
+            "adrianomanoel": { senha: "lmg4820265", nome: "Adriano Manoel" }
+        };
+        
         if(u === "admin" && p === "spxadminl#") {
             localStorage.setItem('sipat_user', 'admin');
             localStorage.setItem('sipat_nome', 'Gestor ADM');
             window.carregarSessao('admin', 'Gestor ADM');
-        } else if(u === "davidsilveira" && p === "1234") {
-            localStorage.setItem('sipat_user', 'davidsilveira');
-            localStorage.setItem('sipat_nome', 'David Silveira');
-            window.carregarSessao('davidsilveira', 'David Silveira');
+        } else if(inspetores[u] && inspetores[u].senha === p) {
+            // Entra se o usuário existir na lista e a senha bater
+            localStorage.setItem('sipat_user', u);
+            localStorage.setItem('sipat_nome', inspetores[u].nome);
+            window.carregarSessao(u, inspetores[u].nome);
         } else {
             alert("⚠️ Acesso Negado: Usuário não cadastrado ou senha incorreta.");
         }
@@ -428,7 +436,20 @@
         window.nomeUsuarioAtual = nome; 
         
         document.getElementById('user-display-name').innerText = nome;
-        document.getElementById('user-display-avatar').innerText = user === 'admin' ? 'AD' : 'DS';
+        
+        // Geração dinâmica das Iniciais para o Avatar (ex: "David Silveira" -> "DS")
+        let iniciais = '??';
+        if(user === 'admin') {
+            iniciais = 'AD';
+        } else {
+            const partes = nome.split(' ');
+            if(partes.length > 1) {
+                iniciais = (partes[0][0] + partes[1][0]).toUpperCase();
+            } else {
+                iniciais = nome.substring(0,2).toUpperCase();
+            }
+        }
+        document.getElementById('user-display-avatar').innerText = iniciais;
         
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('app-layout').style.display = 'flex';
@@ -453,7 +474,7 @@
     window.sair = () => {
         localStorage.removeItem('sipat_user');
         localStorage.removeItem('sipat_nome');
-        window.location.replace(window.location.pathname);
+        window.location.reload();
     };
 
     window.mudarAba = (aba) => {
@@ -466,7 +487,7 @@
     };
 
     window.voltarMenuInspetor = () => {
-        if(window.usuarioAtual === 'davidsilveira') window.mudarAba('menu-inspetor');
+        if(window.usuarioAtual !== 'admin') window.mudarAba('menu-inspetor');
     };
 
     async function comprimirBase64(file) {
@@ -570,7 +591,7 @@
 
             alert("✅ Relatório transmitido com sucesso!");
             
-            // Vai direto para o progresso para ver a atualização sem F5
+            // Vai direto para o progresso para ver a atualização instantânea
             window.mudarAba('progresso');
 
         } catch (error) {
@@ -589,6 +610,12 @@
         return 'bg-gray-50 text-gray-600 border-gray-200';
     }
 
+    // ZOOM DE FOTO
+    window.ampliarFoto = (src) => {
+        document.getElementById('viewer-img').src = src;
+        document.getElementById('photo-viewer').style.display = 'flex';
+    };
+
     window.abrirDetalhes = (index) => {
         const occ = window.ocorrencias[index];
         if(!occ) return;
@@ -597,7 +624,11 @@
         document.getElementById('detalhe-data').innerText = occ.data;
         document.getElementById('detalhe-texto').innerText = occ.detalheCompleto;
         document.getElementById('detalhe-autor').innerText = occ.autor;
-        document.getElementById('detalhe-avatar').innerText = occ.autor.substring(0,2).toUpperCase();
+        
+        // Avatar dinâmico
+        const partes = occ.autor.split(' ');
+        const ini = partes.length > 1 ? partes[0][0] + partes[1][0] : occ.autor.substring(0,2);
+        document.getElementById('detalhe-avatar-modal').innerText = ini.toUpperCase();
         
         const badgeStatus = document.getElementById('detalhe-badge-status');
         badgeStatus.className = `px-3 py-1 rounded-full text-xs font-bold border ${getBadgeClasses(occ.status)}`;
@@ -610,7 +641,6 @@
 
         if(arrayFotos.length > 0) {
             arrayFotos.forEach(url => {
-                // AQUI FOI INJETADO O CLICK DO ZOOM
                 htmlFotos += `
                     <img src="${url}" onclick="window.ampliarFoto('${url}')" class="block rounded-xl overflow-hidden border border-gray-200 shadow-sm hover:border-shopee transition-colors h-24 w-full object-cover cursor-zoom-in shrink-0">
                 `;
@@ -657,7 +687,7 @@
     document.addEventListener('click', (e) => { if (document.getElementById('statusDropdown').classList.contains('active')) window.fecharDropdownStatus(); });
     document.addEventListener('keydown', (e) => { if (e.key === "Escape") { window.fecharDetalhes(); window.fecharDropdownStatus(); } });
 
-    // CONSTRUTOR DA TABELA DO ADMIN (DESIGN PRESERVADO)
+    // CONSTRUTOR DA TABELA DO ADMIN
     window.atualizarDashboardUI = () => {
         const tbody = document.getElementById('tabela-dados');
         if(!tbody) return;
@@ -675,13 +705,15 @@
         let htmlTabela = '';
         window.ocorrencias.forEach((item, index) => {
             if(item.status === 'Pendente') p++; else if(item.status === 'Resolvido') r++; else c++;
-            const iniciais = item.autor.substring(0,2).toUpperCase();
+            
+            const partes = item.autor.split(' ');
+            const iniciais = partes.length > 1 ? partes[0][0] + partes[1][0] : item.autor.substring(0,2);
             const badgeClass = getBadgeClasses(item.status);
 
             htmlTabela += `
                 <tr class="hover:bg-gray-50/50 transition-colors group border-b border-gray-50">
                     <td class="px-6 py-4 truncate max-w-[200px]"><strong class="text-gray-800 truncate">${item.local}</strong></td>
-                    <td class="px-6 py-4 truncate max-w-[200px]"><div class="flex items-center gap-3 shrink-0 truncate"><div class="w-8 h-8 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center font-bold text-xs uppercase shrink-0">${iniciais}</div><span class="text-sm font-medium text-gray-700 uppercase truncate">${item.autor}</span></div></td>
+                    <td class="px-6 py-4 truncate max-w-[200px]"><div class="flex items-center gap-3 shrink-0 truncate"><div class="w-8 h-8 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center font-bold text-xs uppercase shrink-0">${iniciais.toUpperCase()}</div><span class="text-sm font-medium text-gray-700 uppercase truncate">${item.autor}</span></div></td>
                     <td class="px-6 py-4 text-sm text-gray-600 truncate whitespace-nowrap">${item.data}</td>
                     <td class="px-6 py-4 shrink-0 whitespace-nowrap max-w-[150px]"><button onclick="window.abrirDropdownStatus(event, ${index})" class="px-3 py-1.5 rounded-full text-xs font-bold border cursor-pointer hover:shadow-md transition-all flex items-center gap-2 truncate whitespace-nowrap max-w-full ${badgeClass}"><span class="truncate">${item.status}</span> <i class="fa-solid fa-caret-down opacity-50 shrink-0"></i></button></td>
                     <td class="px-6 py-4 text-center shrink-0 whitespace-nowrap w-[150px]">
@@ -723,7 +755,7 @@
         });
     };
 
-    // CONSTRUTOR DA TABELA DO INSPETOR (DESIGN PRESERVADO)
+    // CONSTRUTOR DA TABELA DO INSPETOR
     window.renderizarMeuProgresso = () => {
         const tbody = document.getElementById('tabela-meu-progresso');
         if(!tbody) return;
