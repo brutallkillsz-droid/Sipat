@@ -26,7 +26,7 @@
     <style>
         body { font-family: 'Inter', sans-serif; overflow: hidden; }
         
-        .card-interaction { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .card-interaction { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; }
         .card-interaction:hover, .card-interaction:focus {
             background-color: #16a34a; transform: translateY(-5px); outline: none;
             box-shadow: 0 10px 15px -3px rgba(22, 163, 74, 0.4);
@@ -105,8 +105,7 @@
 
         <div class="detail-block" id="box-foto-evidencia">
             <h5 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Evidências Fotográficas</h5>
-            <div id="detalhe-galeria-fotos" class="grid grid-cols-2 gap-3 mt-2 pb-10">
-                </div>
+            <div id="detalhe-galeria-fotos" class="grid grid-cols-2 gap-3 mt-2 pb-10"></div>
         </div>
     </div>
 </div>
@@ -159,7 +158,7 @@
                 Segurança é Prioridade LMG-48
             </div>
             
-            <div class="flex items-center gap-4 shrink-0 ml-auto cursor-pointer hover:opacity-75 transition-opacity" onclick="window.sair()" title="Sair do Sistema">
+            <div class="flex items-center gap-4 shrink-0 ml-auto cursor-pointer hover:opacity-75 transition-opacity" onclick="window.sair()" title="Sair do Sistema" style="z-index: 9999;">
                 <div class="text-right hidden sm:block truncate max-w-[150px]">
                     <h1 class="font-black text-xl text-gray-800 leading-none truncate hover:text-shopee">Sair</h1>
                     <p class="text-[10px] font-bold text-gray-400 tracking-widest uppercase truncate" id="user-display-name">Nome</p>
@@ -186,13 +185,13 @@
                         <i class="fa-solid fa-graduation-cap text-4xl text-shopee transition-colors"></i>
                         <span class="font-bold text-sm text-gray-700 text-center leading-tight transition-colors">Treinamento</span>
                     </button>
-                    <button class="card-interaction bg-white rounded-3xl p-6 shadow-sm flex flex-col items-center justify-center space-y-3 border-b-4 border-shopee group">
-                        <i class="fa-solid fa-ranking-star text-4xl text-shopee transition-colors"></i>
-                        <span class="font-bold text-sm text-gray-700 text-center leading-tight transition-colors">Ranking</span>
-                    </button>
                     <button onclick="window.mudarAba('progresso')" class="card-interaction bg-white rounded-3xl p-6 shadow-sm flex flex-col items-center justify-center space-y-3 border-b-4 border-shopee group">
                         <i class="fa-solid fa-chart-simple text-4xl text-shopee transition-colors"></i>
                         <span class="font-bold text-sm text-gray-700 text-center leading-tight transition-colors">Meu Progresso</span>
+                    </button>
+                    <button onclick="window.sair()" class="card-interaction bg-white rounded-3xl p-6 shadow-sm flex flex-col items-center justify-center space-y-3 border-b-4 border-gray-300 group">
+                        <i class="fa-solid fa-power-off text-4xl text-gray-400 transition-colors"></i>
+                        <span class="font-bold text-sm text-gray-700 text-center leading-tight transition-colors">Deslogar Sistema</span>
                     </button>
                 </div>
             </div>
@@ -334,12 +333,11 @@
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-grow min-h-0">
-                    <div class="lg:col-span-1 bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center justify-start shrink-0 min-h-[300px]">
-                        <h3 class="font-bold text-gray-800 mb-4 w-full flex items-center gap-2"><i class="fa-solid fa-chart-pie text-shopee"></i> Distribuição</h3>
+                    <div class="lg:col-span-1 bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center justify-center shrink-0 min-h-[300px]">
+                        <h3 class="font-bold text-gray-800 mb-4 w-full flex items-center gap-2 sticky top-0 bg-white z-10 py-1"><i class="fa-solid fa-chart-pie text-shopee"></i> Distribuição</h3>
                         
-                        <div style="position: relative; height: 220px; width: 100%;">
+                        <div style="width: 250px; height: 250px; position: relative; margin: 0 auto;">
                             <canvas id="graficoStatus"></canvas>
-                            <div id="grafico-vazio" class="hidden absolute inset-0 flex items-center justify-center text-gray-400 font-bold text-sm">Sem dados para exibir</div>
                         </div>
                         
                     </div>
@@ -469,11 +467,11 @@
     };
     window.verificarSessao();
 
-    // SAIR COM CLEAR COMPLETO
+    // COMANDO DE SAIR MODO "BRUTO": LIMPA TUDO E FORÇA O NAVEGADOR A RECARREGAR
     window.sair = () => {
-        localStorage.removeItem('sipat_user');
-        localStorage.removeItem('sipat_nome');
-        window.location.reload();
+        localStorage.clear();
+        sessionStorage.clear();
+        window.location.replace(window.location.pathname);
     };
 
     window.mudarAba = (aba) => {
@@ -580,20 +578,14 @@
             };
 
             await set(novaOcorrenciaRef, payload);
-
-            document.getElementById('hub_local').value = ""; document.getElementById('categoria').value = "";
-            document.getElementById('data_ocorrencia').value = ""; document.getElementById('hora_ocorrencia').value = "";
-            document.getElementById('detalhes').value = ""; 
-            window.fotosMiniaturasTemporarias = [];
-            window.renderizarGradeDeFotos();
-
             alert("✅ Relatório transmitido com sucesso!");
-            window.mudarAba('progresso');
+            
+            // ATUALIZAÇÃO FORÇADA DA PÁGINA A PEDIDO DO DAVID
+            window.location.reload();
 
         } catch (error) {
             console.error(error);
             alert(`❌ Erro no banco de dados: ${error.message}`);
-        } finally {
             btn.disabled = false;
             btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up shrink-0"></i> <span class="truncate">Transmitir Relatório</span>`;
         }
@@ -724,31 +716,25 @@
         window.desenharGrafico(p, r, c);
     };
 
-    // A CIRURGIA ESTÁ AQUI: ANIMAÇÃO DESLIGADA PARA EVITAR CONGELAMENTO DA TELA (LOOP DE MEMÓRIA)
+    // TRAVA DE SEGURANÇA 2: GRÁFICO SECO E SEM ANIMAÇÃO
     window.desenharGrafico = (p, r, c) => {
         const canvas = document.getElementById('graficoStatus');
-        const emptyState = document.getElementById('grafico-vazio');
         if(!canvas) return;
 
         const ctx = canvas.getContext('2d');
         if (graficoChartJS) { graficoChartJS.destroy(); }
         
         if (p === 0 && r === 0 && c === 0) {
-             canvas.style.display = 'none';
-             if(emptyState) emptyState.classList.remove('hidden');
              return;
         }
-        
-        canvas.style.display = 'block';
-        if(emptyState) emptyState.classList.add('hidden');
 
         graficoChartJS = new Chart(ctx, {
             type: 'doughnut',
             data: { labels: ['Pendentes', 'Sanadas', 'Canceladas'], datasets: [{ data: [p, r, c], backgroundColor: ['#F59E0B', '#16a34a', '#EF4444'], borderWidth: 0, hoverOffset: 4 }] },
             options: { 
-                responsive: true, 
+                responsive: false, // <-- A MÁGICA CONTRA O CONGELAMENTO ESTÁ AQUI
                 maintainAspectRatio: false, 
-                animation: false, // <---- A TRAVA DE SEGURANÇA
+                animation: false,
                 cutout: '75%', 
                 plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 10, font: { family: "'Inter', sans-serif", size: 12 } } }, tooltip: { cornerRadius: 8, padding: 12, boxPadding: 8, titleFont: { family: "'Inter', sans-serif", size: 13 }, bodyFont: { family: "'Inter', sans-serif", size: 13 } } } 
             }
