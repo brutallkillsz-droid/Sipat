@@ -53,7 +53,6 @@
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* ESTILO DO ZOOM DE FOTO */
         #photo-viewer { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 10000; display: none; align-items: center; justify-content: center; padding: 20px; cursor: zoom-out; }
         #photo-viewer img { max-width: 100%; max-height: 100%; border-radius: 8px; box-shadow: 0 0 50px rgba(0,0,0,0.5); object-fit: contain; }
     </style>
@@ -105,8 +104,7 @@
 
         <div class="detail-block" id="box-foto-evidencia">
             <h5 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Evidências Fotográficas</h5>
-            <div id="detalhe-galeria-fotos" class="grid grid-cols-2 gap-3 mt-2 pb-10">
-                </div>
+            <div id="detalhe-galeria-fotos" class="grid grid-cols-2 gap-3 mt-2 pb-10"></div>
         </div>
     </div>
 </div>
@@ -115,18 +113,15 @@
     <div class="hidden md:flex flex-1 bg-shopee flex-col justify-center items-center p-12 text-center relative overflow-hidden">
         <div class="absolute inset-0 bg-gradient-to-br from-shopee to-shopee-dark opacity-90"></div>
         <div class="relative z-10 text-white w-full flex flex-col items-center">
-            <video id="video-desktop" autoplay loop muted playsinline class="w-80 lg:w-[26rem] h-auto rounded-3xl shadow-2xl mb-8 border-4 border-white/20 bg-white object-contain">
-                <source src="https://i.imgur.com/fMAvIvu.mp4" type="video/mp4">
-            </video>
-            <h1 class="text-4xl font-black tracking-tight mb-2">Cipa LMG-48</h1>
-            <p class="text-shopee-light text-lg font-medium">Prevenção e Segurança é Prioridade</p>
+            <h1 class="text-5xl font-black tracking-tight mb-2">Cipa LMG-48</h1>
+            <p class="text-shopee-light text-xl font-medium">Prevenção e Segurança é Prioridade</p>
         </div>
     </div>
     <div class="flex-1 flex justify-center items-center p-6 bg-gray-50 overflow-y-auto">
         <div class="w-full max-w-md bg-white p-8 rounded-3xl shadow-xl border border-gray-100 flex flex-col items-center my-auto py-4">
             
-            <div class="md:hidden flex flex-col items-center mb-6 w-full">
-                <video id="video-mobile" autoplay loop muted playsinline class="w-56 sm:w-64 mx-auto h-auto rounded-3xl shadow-lg border-2 border-shopee bg-white object-contain">
+            <div class="flex flex-col items-center mb-6 w-full">
+                <video autoplay loop muted playsinline class="w-48 sm:w-64 md:w-80 mx-auto h-auto rounded-3xl shadow-lg border-2 border-shopee bg-white object-contain">
                     <source src="https://i.imgur.com/fMAvIvu.mp4" type="video/mp4">
                 </video>
             </div>
@@ -152,14 +147,14 @@
     <header class="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-40 overflow-x-auto min-w-full">
         <div class="max-w-6xl mx-auto flex justify-between items-center py-2 px-4 gap-2 whitespace-nowrap">
             <div class="flex items-center space-x-3 shrink-0">
-                <video id="video-header" autoplay loop muted playsinline preload="none" class="h-10 w-auto rounded-lg"><source src="https://i.imgur.com/fMAvIvu.mp4" type="video/mp4"></video>
+                <video autoplay loop muted playsinline class="h-10 w-auto rounded-lg"><source src="https://i.imgur.com/fMAvIvu.mp4" type="video/mp4"></video>
                 <span class="font-black text-xl text-shopee hidden sm:block">CIPA</span>
             </div>
             <div class="text-center bg-shopee text-white px-6 py-1.5 rounded-full text-xs font-bold tracking-wide shadow-sm absolute left-1/2 transform -translate-x-1/2 hidden md:block uppercase truncate max-w-[40%]">
                 Segurança é Prioridade LMG-48
             </div>
             
-            <div class="flex items-center gap-4 shrink-0 ml-auto cursor-pointer hover:opacity-75 transition-opacity" onclick="window.sair()" title="Sair do Sistema">
+            <div class="flex items-center gap-4 shrink-0 ml-auto cursor-pointer hover:opacity-75 transition-opacity" onclick="window.sair()" title="Sair do Sistema" style="z-index: 9999;">
                 <div class="text-right hidden sm:block truncate max-w-[150px]">
                     <h1 class="font-black text-xl text-gray-800 leading-none truncate hover:text-shopee">Sair</h1>
                     <p class="text-[10px] font-bold text-gray-400 tracking-widest uppercase truncate" id="user-display-name">Nome</p>
@@ -192,14 +187,14 @@
                     </button>
                     <button onclick="window.sair()" class="card-interaction bg-white rounded-3xl p-6 shadow-sm flex flex-col items-center justify-center space-y-3 border-b-4 border-gray-300 group">
                         <i class="fa-solid fa-power-off text-4xl text-gray-400 transition-colors"></i>
-                        <span class="font-bold text-sm text-gray-500 text-center leading-tight transition-colors">Deslogar</span>
+                        <span class="font-bold text-sm text-gray-500 text-center leading-tight transition-colors">Deslogar do Sistema</span>
                     </button>
                 </div>
             </div>
 
             <div id="aba-registro" style="display: none;" class="max-w-3xl mx-auto pb-10 overflow-y-auto">
                 <div class="flex items-center gap-4 mb-6 sticky top-0 bg-gray-50 z-20 py-3">
-                    <button onclick="window.voltarMenuInspetor()" class="w-12 h-12 rounded-2xl bg-white shadow-md border border-gray-200 flex items-center justify-center text-gray-700 hover:text-shopee hover:border-shopee hover:bg-shopee-light transition-all active:scale-95 shrink-0" title="Voltar ao Menu">
+                    <button onclick="window.voltarMenuInspetor()" class="w-12 h-12 rounded-2xl bg-white shadow-md border border-gray-200 flex items-center justify-center text-gray-700 hover:text-shopee hover:border-shopee hover:bg-shopee-light transition-all active:scale-95 shrink-0">
                         <i class="fa-solid fa-arrow-left text-xl"></i>
                     </button>
                     <div>
@@ -212,24 +207,16 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-2">Unidade Logística</label>
-                            <select id="hub_local" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee focus:border-transparent appearance-none font-medium text-gray-700">
+                            <select id="hub_local" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-medium text-gray-700 outline-none">
                                 <option value="" disabled selected>Selecionar Base...</option>
-                                <option>Hub Uberaba</option>
-                                <option>Hub Uberlândia</option>
-                                <option>Hub Divinópolis</option>
-                                <option>Hub Lagoa da Prata</option>
-                                <option>Hub Patos de Minas</option>
+                                <option>Hub Uberaba</option><option>Hub Uberlândia</option><option>Hub Divinópolis</option><option>Hub Lagoa da Prata</option><option>Hub Patos de Minas</option>
                             </select>
                         </div>
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-2">Vetor de Risco</label>
-                            <select id="categoria" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee focus:border-transparent appearance-none font-medium text-gray-700">
+                            <select id="categoria" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-medium text-gray-700 outline-none">
                                 <option value="" disabled selected>Selecionar Padrão...</option>
-                                <option>Organização e Limpeza</option>
-                                <option>Movimentação de Volumosos</option>
-                                <option>Uso de EPIs</option>
-                                <option>Infraestrutura e Docas</option>
-                                <option>Equipamentos (Empilhadeira)</option>
+                                <option>Organização e Limpeza</option><option>Movimentação de Volumosos</option><option>Uso de EPIs</option><option>Infraestrutura e Docas</option><option>Equipamentos (Empilhadeira)</option>
                             </select>
                         </div>
                     </div>
@@ -237,17 +224,17 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-2">Data Constatada</label>
-                            <input type="date" id="data_ocorrencia" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee focus:border-transparent text-gray-700 font-medium">
+                            <input type="date" id="data_ocorrencia" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-medium outline-none">
                         </div>
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-2">Horário Exato</label>
-                            <input type="time" id="hora_ocorrencia" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee focus:border-transparent text-gray-700 font-medium">
+                            <input type="time" id="hora_ocorrencia" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-medium outline-none">
                         </div>
                     </div>
 
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-2">Laudo / Detalhamento</label>
-                        <textarea id="detalhes" rows="3" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee focus:border-transparent text-gray-700 font-medium resize-none" placeholder="Descreva tecnicamente o cenário encontrado..."></textarea>
+                        <textarea id="detalhes" rows="3" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-medium resize-none outline-none" placeholder="Descreva tecnicamente o cenário encontrado..."></textarea>
                     </div>
 
                     <div>
@@ -255,9 +242,7 @@
                             <label class="block text-sm font-bold text-gray-700">Evidências Visuais (Fotos)</label>
                             <span class="text-xs text-gray-400 font-bold bg-gray-100 px-2 py-1 rounded-md" id="contador-fotos">0/5</span>
                         </div>
-                        
                         <div id="preview-fotos-container" class="grid grid-cols-3 sm:grid-cols-5 gap-3 mb-3 empty:hidden"></div>
-
                         <div class="relative border-2 border-dashed border-gray-300 bg-gray-50 rounded-2xl p-6 text-center hover:bg-shopee-light hover:border-shopee transition-colors cursor-pointer group">
                             <i class="fa-solid fa-camera-retro text-3xl text-gray-400 group-hover:text-shopee mb-2 transition-colors"></i>
                             <p class="text-xs font-medium text-gray-500" id="upload-text">Toque para adicionar foto</p>
@@ -273,7 +258,7 @@
 
             <div id="aba-progresso" style="display: none;" class="max-w-4xl mx-auto pb-10 flex-col h-full gap-4">
                 <div class="flex items-center gap-4 mb-6 sticky top-0 bg-gray-50 z-20 py-3">
-                    <button onclick="window.voltarMenuInspetor()" class="w-12 h-12 rounded-2xl bg-white shadow-md border border-gray-200 flex items-center justify-center text-gray-700 hover:text-shopee hover:border-shopee hover:bg-shopee-light transition-all active:scale-95 shrink-0" title="Voltar ao Menu">
+                    <button onclick="window.voltarMenuInspetor()" class="w-12 h-12 rounded-2xl bg-white shadow-md border border-gray-200 flex items-center justify-center text-gray-700 hover:text-shopee hover:border-shopee hover:bg-shopee-light transition-all active:scale-95 shrink-0">
                         <i class="fa-solid fa-arrow-left text-xl"></i>
                     </button>
                     <div>
@@ -336,7 +321,7 @@
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-grow min-h-0">
                     <div class="lg:col-span-1 bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center justify-center shrink-0 min-h-[300px]">
                         <h3 class="font-bold text-gray-800 mb-4 w-full flex items-center gap-2 sticky top-0 bg-white z-10 py-1"><i class="fa-solid fa-chart-pie text-shopee"></i> Distribuição</h3>
-                        <div class="relative w-full flex justify-center items-center" style="height: 250px;">
+                        <div style="width: 250px; height: 250px; position: relative; margin: 0 auto;">
                             <canvas id="graficoStatus"></canvas>
                             <div id="grafico-vazio" class="hidden absolute inset-0 flex items-center justify-center text-gray-400 font-bold text-sm">Sem dados</div>
                         </div>
@@ -394,7 +379,7 @@
     let graficoChartJS = null;
     const MAX_FOTOS = 5;
 
-    // BLINDAGEM 1: Evita travar se o banco mandar lixo
+    // BLINDAGEM CONTRA FALHAS NO BANCO
     onValue(ref(db, 'ocorrencias_lmg48'), (snapshot) => {
         try {
             const data = snapshot.val();
@@ -403,7 +388,7 @@
             if(window.usuarioAtual === 'admin') window.atualizarDashboardUI();
             else if(window.usuarioAtual !== '') window.renderizarMeuProgresso();
         } catch (error) {
-            console.error("Erro na leitura do BD:", error);
+            console.error("Erro na leitura:", error);
         }
     });
 
@@ -445,19 +430,9 @@
         }
         document.getElementById('user-display-avatar').innerText = iniciais;
         
-        // BLINDAGEM 2: DESTRÓI OS VÍDEOS DE LOGIN PARA ALIVIAR O CELULAR/PC (Isso acaba com o congelamento!)
-        const telaLogin = document.getElementById('login-screen');
-        if(telaLogin) {
-            telaLogin.querySelectorAll('video').forEach(v => { v.pause(); v.removeAttribute('src'); v.load(); });
-            telaLogin.style.display = 'none';
-        }
-
+        document.getElementById('login-screen').style.display = 'none';
         document.getElementById('app-layout').classList.remove('hidden');
         document.getElementById('app-layout').style.display = 'flex';
-
-        // CARREGA O CABEÇALHO DO VÍDEO OFICIAL
-        const vHeader = document.getElementById('video-header');
-        if(vHeader) vHeader.play();
 
         if(user === 'admin') {
             window.mudarAba('dashboard');
@@ -475,11 +450,11 @@
     };
     window.verificarSessao();
 
-    // BLINDAGEM 3: SAIR FORÇA A LIMPEZA TOTAL DA ABA
+    // MODO BRUTO DE SAIR (LIMPEZA TOTAL DE CACHE)
     window.sair = () => {
-        localStorage.removeItem('sipat_user');
-        localStorage.removeItem('sipat_nome');
-        window.location.href = window.location.pathname + '?v=' + new Date().getTime(); // Fura o cache do navegador e desloga
+        localStorage.clear();
+        sessionStorage.clear();
+        window.location.replace(window.location.pathname);
     };
 
     window.mudarAba = (aba) => {
@@ -588,7 +563,7 @@
             await set(novaOcorrenciaRef, payload);
             alert("✅ Relatório transmitido com sucesso!");
             
-            // F5 FORÇADO: Exigência do usuário para não congelar e limpar a memória limpa
+            // F5 PARA LIMPAR MEMÓRIA
             window.location.reload();
 
         } catch (error) {
@@ -606,7 +581,6 @@
         return 'bg-gray-50 text-gray-600 border-gray-200';
     }
 
-    // ZOOM DE FOTO
     window.ampliarFoto = (src) => {
         document.getElementById('viewer-img').src = src;
         document.getElementById('photo-viewer').style.display = 'flex';
@@ -617,7 +591,6 @@
             const occ = window.ocorrencias[index];
             if(!occ) return;
             
-            // Tenta pegar o nome se existir, se não joga default para não travar
             const autorNome = occ.autor || 'Usuário';
             const localNome = occ.local || '-';
             const categoriaNome = occ.categoria || '-';
@@ -657,7 +630,7 @@
             document.getElementById('slide-overlay').classList.add('active');
             document.getElementById('slide-panel').classList.add('active');
         } catch(e) {
-            console.error("Erro ao abrir detalhes:", e);
+            console.error("Erro detalhes:", e);
         }
     };
 
@@ -681,7 +654,7 @@
     window.excluirRelatorio = async (index) => {
         const occ = window.ocorrencias[index];
         if(!occ) return;
-        if(confirm(`⚠️ AÇÃO IRREVERSÍVEL!\nTem certeza que deseja excluir permanentemente o relatório de ${occ.local}?`)) {
+        if(confirm(`⚠️ AÇÃO IRREVERSÍVEL!\nTem certeza que deseja excluir o relatório de ${occ.local}?`)) {
             try {
                 await remove(ref(db, `ocorrencias_lmg48/${occ.id}`));
                 alert("🗑️ Relatório excluído com sucesso.");
@@ -694,7 +667,7 @@
     document.addEventListener('click', (e) => { if (document.getElementById('statusDropdown').classList.contains('active')) window.fecharDropdownStatus(); });
     document.addEventListener('keydown', (e) => { if (e.key === "Escape") { window.fecharDetalhes(); window.fecharDropdownStatus(); } });
 
-    // TABELA BLINDADA CONTRA ERROS
+    // TABELA BLINDADA (MAP INVES DE FOREACH PARA MAXIMA VELOCIDADE)
     window.atualizarDashboardUI = () => {
         try {
             const tbody = document.getElementById('tabela-dados');
@@ -710,8 +683,7 @@
                 return;
             }
 
-            let htmlTabela = '';
-            window.ocorrencias.forEach((item, index) => {
+            const htmlRows = window.ocorrencias.map((item, index) => {
                 const status = item.status || 'Pendente';
                 if(status === 'Pendente') p++; else if(status === 'Resolvido') r++; else c++;
                 
@@ -722,7 +694,7 @@
                 const local = item.local || '-';
                 const dataOcc = item.data || '-';
 
-                htmlTabela += `
+                return `
                     <tr class="hover:bg-gray-50/50 transition-colors group border-b border-gray-50">
                         <td class="px-6 py-4 truncate max-w-[200px]"><strong class="text-gray-800 truncate">${local}</strong></td>
                         <td class="px-6 py-4 truncate max-w-[200px]"><div class="flex items-center gap-3 shrink-0 truncate"><div class="w-8 h-8 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center font-bold text-xs uppercase shrink-0">${iniciais.toUpperCase()}</div><span class="text-sm font-medium text-gray-700 uppercase truncate">${autor}</span></div></td>
@@ -738,26 +710,23 @@
                 `;
             });
 
-            tbody.innerHTML = htmlTabela;
+            tbody.innerHTML = htmlRows.join('');
             document.getElementById('kpi-pendentes').innerText = p; document.getElementById('kpi-resolvidos').innerText = r;
             
-            // Desloca a renderização do gráfico da tela principal para não engasgar a tabela
-            setTimeout(() => window.desenharGrafico(p, r, c), 100);
+            window.desenharGrafico(p, r, c);
 
         } catch(e) {
-            console.error("Erro ao gerar tabela Dashboard:", e);
+            console.error("Erro Dashboard:", e);
         }
     };
 
+    // ATUALIZAR GRÁFICO (EM VEZ DE DESTRUIR E CRIAR DE NOVO)
     window.desenharGrafico = (p, r, c) => {
         try {
             const canvas = document.getElementById('graficoStatus');
             const emptyState = document.getElementById('grafico-vazio');
             if(!canvas) return;
 
-            const ctx = canvas.getContext('2d');
-            if (graficoChartJS) { graficoChartJS.destroy(); }
-            
             if (p === 0 && r === 0 && c === 0) {
                  canvas.style.display = 'none';
                  if(emptyState) emptyState.classList.remove('hidden');
@@ -767,19 +736,26 @@
             canvas.style.display = 'block';
             if(emptyState) emptyState.classList.add('hidden');
 
-            graficoChartJS = new Chart(ctx, {
-                type: 'doughnut',
-                data: { labels: ['Pendentes', 'Sanadas', 'Canceladas'], datasets: [{ data: [p, r, c], backgroundColor: ['#F59E0B', '#16a34a', '#EF4444'], borderWidth: 0 }] },
-                options: { 
-                    responsive: false, // TRAVA DE SEGURANÇA CONTRA LOOP INFINITO
-                    maintainAspectRatio: false,
-                    animation: false, // DESLIGADO PARA NÃO TRAVAR NAVEGADORES FRACOS
-                    cutout: '75%', 
-                    plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 10, font: { family: "'Inter', sans-serif", size: 12 } } }, tooltip: { cornerRadius: 8, padding: 12, boxPadding: 8, titleFont: { family: "'Inter', sans-serif", size: 13 }, bodyFont: { family: "'Inter', sans-serif", size: 13 } } } 
-                }
-            });
+            if (graficoChartJS) {
+                // APENAS ATUALIZA OS NÚMEROS (IMPEDE O LOOP)
+                graficoChartJS.data.datasets[0].data = [p, r, c];
+                graficoChartJS.update();
+            } else {
+                const ctx = canvas.getContext('2d');
+                graficoChartJS = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: { labels: ['Pendentes', 'Sanadas', 'Canceladas'], datasets: [{ data: [p, r, c], backgroundColor: ['#F59E0B', '#16a34a', '#EF4444'], borderWidth: 0 }] },
+                    options: { 
+                        responsive: false, 
+                        maintainAspectRatio: false,
+                        animation: false,
+                        cutout: '75%', 
+                        plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 10, font: { family: "'Inter', sans-serif", size: 12 } } }, tooltip: { cornerRadius: 8, padding: 12, boxPadding: 8, titleFont: { family: "'Inter', sans-serif", size: 13 }, bodyFont: { family: "'Inter', sans-serif", size: 13 } } } 
+                    }
+                });
+            }
         } catch(e) {
-            console.error("Erro no gráfico:", e);
+            console.error("Erro Gráfico:", e);
         }
     };
 
@@ -797,15 +773,14 @@
                 return;
             }
 
-            let htmlProgresso = '';
-            minhasOcorrencias.forEach((item) => {
+            const htmlProgresso = minhasOcorrencias.map((item) => {
                 const status = item.status || 'Pendente';
                 const badgeClass = getBadgeClasses(status);
                 const local = item.local || '-';
                 const cat = item.categoria || '-';
                 const dataOcc = item.data || '-';
 
-                htmlProgresso += `
+                return `
                     <tr class="hover:bg-gray-50/50 transition-colors border-b border-gray-50">
                         <td class="px-6 py-4"><strong class="text-gray-800">${local}</strong></td>
                         <td class="px-6 py-4 text-sm text-gray-600">${cat}</td>
@@ -815,9 +790,9 @@
                 `;
             });
             
-            tbody.innerHTML = htmlProgresso;
+            tbody.innerHTML = htmlProgresso.join('');
         } catch(e) {
-            console.error("Erro ao renderizar progresso:", e);
+            console.error("Erro Progresso:", e);
         }
     };
 </script>
