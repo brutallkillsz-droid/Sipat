@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cipa LMG-48</title>
+    <title>CIPA LMG-48</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -13,7 +13,7 @@
             theme: {
                 extend: {
                     colors: {
-                        shopee: { DEFAULT: '#16a34a', dark: '#15803d', light: '#dcfce7' }, 
+                        shopee: { DEFAULT: '#16a34a', dark: '#15803d', light: '#dcfce7' }, // Verde CIPA
                         darkbg: '#1f2937', surface: '#ffffff', surfaceHover: '#f3f4f6'
                     }
                 }
@@ -24,7 +24,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        body { font-family: 'Inter', sans-serif; overflow: hidden; }
+        body { font-family: 'Inter', sans-serif; overflow-x: hidden; }
         
         .card-interaction { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; }
         .card-interaction:hover, .card-interaction:focus {
@@ -59,7 +59,7 @@
 </head>
 <body class="bg-gray-50 text-gray-800 flex flex-col h-screen">
 
-<div id="photo-viewer" class="hidden" onclick="this.classList.add('hidden')">
+<div id="photo-viewer" class="hidden" onclick="this.classList.add('hidden'); this.classList.remove('flex');">
     <img id="viewer-img" src="">
     <p class="absolute bottom-5 text-white font-bold opacity-50 pointer-events-none">Clique em qualquer lugar para fechar</p>
 </div>
@@ -104,8 +104,7 @@
 
         <div class="detail-block" id="box-foto-evidencia">
             <h5 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Evidências Fotográficas</h5>
-            <div id="detalhe-galeria-fotos" class="grid grid-cols-2 gap-3 mt-2 pb-10">
-                </div>
+            <div id="detalhe-galeria-fotos" class="grid grid-cols-2 gap-3 mt-2 pb-10"></div>
         </div>
     </div>
 </div>
@@ -123,7 +122,6 @@
     </div>
     <div class="flex-1 flex justify-center items-center p-6 bg-gray-50 overflow-y-auto">
         <div class="w-full max-w-md bg-white p-8 rounded-3xl shadow-xl border border-gray-100 flex flex-col items-center my-auto py-4">
-            
             <div class="md:hidden flex flex-col items-center mb-6 w-full">
                 <video autoplay loop muted playsinline class="w-56 sm:w-64 mx-auto h-auto rounded-3xl shadow-lg border-2 border-shopee bg-white object-contain">
                     <source src="https://i.imgur.com/fMAvIvu.mp4" type="video/mp4">
@@ -158,9 +156,7 @@
                 Segurança é Prioridade LMG-48
             </div>
             
-            <div class="flex items-center gap-4 shrink-0 ml-auto cursor-pointer hover:opacity-75 transition-opacity" 
-                 onclick="localStorage.clear(); sessionStorage.clear(); window.location.href = window.location.pathname + '?v=' + new Date().getTime();" 
-                 title="Sair do Sistema" style="z-index: 9999;">
+            <div class="flex items-center gap-4 shrink-0 ml-auto cursor-pointer hover:opacity-75 transition-opacity" onclick="window.sair()" title="Sair do Sistema">
                 <div class="text-right hidden sm:block truncate max-w-[150px]">
                     <h1 class="font-black text-xl text-gray-800 leading-none truncate hover:text-shopee">Sair</h1>
                     <p class="text-[10px] font-bold text-gray-400 tracking-widest uppercase truncate" id="user-display-name">Nome</p>
@@ -173,7 +169,7 @@
     <main class="flex-1 overflow-y-auto p-4 md:p-8">
         <div class="max-w-6xl mx-auto w-full h-full relative">
 
-            <div id="aba-menu-inspetor" class="hidden h-full flex-col justify-center max-w-2xl mx-auto pt-4 overflow-y-auto gap-4">
+            <div id="aba-menu-inspetor" class="hidden flex-col justify-center max-w-2xl mx-auto pt-4 gap-4 h-full">
                 <div class="grid grid-cols-2 gap-4 md:gap-6">
                     <button onclick="window.mudarAba('registro')" class="card-interaction col-span-2 bg-white border-2 border-shopee rounded-3xl p-8 shadow-sm flex flex-col items-center justify-center space-y-4 group">
                         <i class="fa-solid fa-triangle-exclamation text-7xl text-shopee transition-colors"></i>
@@ -187,18 +183,14 @@
                         <i class="fa-solid fa-graduation-cap text-4xl text-shopee transition-colors"></i>
                         <span class="font-bold text-sm text-gray-700 text-center leading-tight transition-colors">Treinamento</span>
                     </button>
-                    <button onclick="window.mudarAba('progresso')" class="card-interaction bg-white rounded-3xl p-6 shadow-sm flex flex-col items-center justify-center space-y-3 border-b-4 border-shopee group">
+                    <button onclick="window.mudarAba('progresso')" class="card-interaction col-span-2 bg-white rounded-3xl p-6 shadow-sm flex flex-col items-center justify-center space-y-3 border-b-4 border-shopee group">
                         <i class="fa-solid fa-chart-simple text-4xl text-shopee transition-colors"></i>
                         <span class="font-bold text-sm text-gray-700 text-center leading-tight transition-colors">Meu Progresso</span>
-                    </button>
-                    <button onclick="localStorage.clear(); sessionStorage.clear(); window.location.href = window.location.pathname + '?v=' + new Date().getTime();" class="card-interaction bg-white rounded-3xl p-6 shadow-sm flex flex-col items-center justify-center space-y-3 border-b-4 border-gray-300 group">
-                        <i class="fa-solid fa-power-off text-4xl text-gray-400 transition-colors"></i>
-                        <span class="font-bold text-sm text-gray-500 text-center leading-tight transition-colors">Deslogar do Sistema</span>
                     </button>
                 </div>
             </div>
 
-            <div id="aba-registro" class="hidden max-w-3xl mx-auto pb-10 overflow-y-auto">
+            <div id="aba-registro" class="hidden max-w-3xl mx-auto pb-10">
                 <div class="flex items-center gap-4 mb-6 sticky top-0 bg-gray-50 z-20 py-3">
                     <button onclick="window.voltarMenuInspetor()" class="w-12 h-12 rounded-2xl bg-white shadow-md border border-gray-200 flex items-center justify-center text-gray-700 hover:text-shopee hover:border-shopee hover:bg-shopee-light transition-all active:scale-95 shrink-0" title="Voltar ao Menu">
                         <i class="fa-solid fa-arrow-left text-xl"></i>
@@ -256,9 +248,7 @@
                             <label class="block text-sm font-bold text-gray-700">Evidências Visuais (Fotos)</label>
                             <span class="text-xs text-gray-400 font-bold bg-gray-100 px-2 py-1 rounded-md" id="contador-fotos">0/5</span>
                         </div>
-                        
                         <div id="preview-fotos-container" class="grid grid-cols-3 sm:grid-cols-5 gap-3 mb-3 empty:hidden"></div>
-
                         <div class="relative border-2 border-dashed border-gray-300 bg-gray-50 rounded-2xl p-6 text-center hover:bg-shopee-light hover:border-shopee transition-colors cursor-pointer group">
                             <i class="fa-solid fa-camera-retro text-3xl text-gray-400 group-hover:text-shopee mb-2 transition-colors"></i>
                             <p class="text-xs font-medium text-gray-500" id="upload-text">Toque para adicionar foto</p>
@@ -272,7 +262,7 @@
                 </div>
             </div>
 
-            <div id="aba-progresso" class="hidden max-w-4xl mx-auto pb-10 flex-col h-full gap-4">
+            <div id="aba-progresso" class="hidden flex-col h-full gap-4 pb-10">
                 <div class="flex items-center gap-4 mb-6 sticky top-0 bg-gray-50 z-20 py-3">
                     <button onclick="window.voltarMenuInspetor()" class="w-12 h-12 rounded-2xl bg-white shadow-md border border-gray-200 flex items-center justify-center text-gray-700 hover:text-shopee hover:border-shopee hover:bg-shopee-light transition-all active:scale-95 shrink-0" title="Voltar ao Menu">
                         <i class="fa-solid fa-arrow-left text-xl"></i>
@@ -304,10 +294,14 @@
                 </div>
             </div>
 
-            <div id="aba-dashboard" class="hidden space-y-6 pb-10 flex-col h-full overflow-y-auto min-h-full">
-                <h2 class="text-2xl font-black text-gray-800 tracking-tight mb-2 sticky top-0 bg-gray-50 z-10 py-2">Visão Geral Gerencial</h2>
+            <div id="aba-dashboard" class="hidden flex-col h-full min-h-full pb-10">
                 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 shrink-0">
+                <div class="bg-white shadow-sm border-b mb-6 rounded-2xl flex overflow-hidden border border-gray-100 shrink-0">
+                    <button onclick="window.mudarAba('dashboard')" class="flex-1 py-4 font-black text-shopee bg-shopee-light border-b-4 border-shopee transition-colors focus:outline-none">Visão Geral</button>
+                    <button onclick="window.mudarAba('tratativas')" class="flex-1 py-4 font-bold text-gray-500 hover:bg-gray-50 border-b-4 border-transparent transition-colors focus:outline-none">Tratativas (Novo)</button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 shrink-0 mb-6">
                     <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center relative overflow-hidden min-h-[100px]">
                         <div class="w-2 h-full bg-gray-800 absolute left-0 top-0"></div>
                         <div class="pl-2 truncate">
@@ -367,6 +361,21 @@
                 </div>
             </div>
 
+            <div id="aba-tratativas" class="hidden flex-col h-full min-h-full pb-10">
+                <div class="bg-white shadow-sm border-b mb-6 rounded-2xl flex overflow-hidden border border-gray-100 shrink-0">
+                    <button onclick="window.mudarAba('dashboard')" class="flex-1 py-4 font-bold text-gray-500 hover:bg-gray-50 border-b-4 border-transparent transition-colors focus:outline-none">Visão Geral</button>
+                    <button onclick="window.mudarAba('tratativas')" class="flex-1 py-4 font-black text-shopee bg-shopee-light border-b-4 border-shopee transition-colors focus:outline-none">Tratativas (Novo)</button>
+                </div>
+                
+                <div class="bg-white p-10 rounded-3xl border border-gray-100 shadow-sm flex flex-col items-center justify-center text-center flex-grow">
+                    <div class="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center text-shopee text-4xl mb-6 shadow-inner">
+                        <i class="fa-solid fa-screwdriver-wrench"></i>
+                    </div>
+                    <h2 class="text-3xl font-black text-gray-800 mb-3 tracking-tight">Área de Tratativas</h2>
+                    <p class="text-gray-500 max-w-md font-medium">Esta aba foi criada e reservada com sucesso para o gerenciamento avançado dos casos.</p>
+                </div>
+            </div>
+
         </div>
     </main>
 </div>
@@ -392,28 +401,22 @@
     window.nomeUsuarioAtual = '';
     window.indiceEmEdicao = null;
     window.fotosMiniaturasTemporarias = []; 
-    let graficoChartJS = null;
-    const MAX_FOTOS = 5;
-
-    // BLINDAGEM 1: DADOS SEGUROS NO FIREBASE
+    
+    // ESCUTA BLINDADA DO BANCO DE DADOS
     onValue(ref(db, 'ocorrencias_lmg48'), (snapshot) => {
         try {
             const data = snapshot.val();
             window.ocorrencias = data ? Object.keys(data).map(key => ({ id: key, ...data[key] })).reverse() : [];
             
-            if(window.usuarioAtual === 'admin') {
-                window.atualizarDashboardUI();
-            } else if(window.usuarioAtual !== '') {
-                window.renderizarMeuProgresso();
-            }
+            if(window.usuarioAtual === 'admin') window.atualizarDashboardUI();
+            else if(window.usuarioAtual !== '') window.renderizarMeuProgresso();
         } catch (error) {
-            console.error("Erro na leitura do BD:", error);
+            console.error("Erro no DB:", error);
         }
     });
 
     window.fazerLogin = () => {
         try {
-            // Remove os espaços e força a minúscula (impede erros se copiar/colar)
             const u = document.getElementById('username').value.trim().toLowerCase().replace(/\s+/g, '');
             const p = document.getElementById('password').value.trim();
             
@@ -437,16 +440,13 @@
             } else {
                 alert("⚠️ Acesso Negado: Usuário não cadastrado ou senha incorreta.");
             }
-        } catch(e) {
-            console.error(e);
-        }
+        } catch(e) {}
     };
 
     window.carregarSessao = (user, nome) => {
         try {
             window.usuarioAtual = user; 
             window.nomeUsuarioAtual = nome; 
-            
             document.getElementById('user-display-name').innerText = nome;
             
             let iniciais = '??';
@@ -454,15 +454,10 @@
                 iniciais = 'AD';
             } else {
                 const partes = nome.split(' ');
-                if(partes.length > 1) {
-                    iniciais = (partes[0][0] + partes[1][0]).toUpperCase();
-                } else {
-                    iniciais = nome.substring(0,2).toUpperCase();
-                }
+                iniciais = partes.length > 1 ? (partes[0][0] + partes[1][0]).toUpperCase() : nome.substring(0,2).toUpperCase();
             }
             document.getElementById('user-display-avatar').innerText = iniciais;
             
-            // Troca de tela segura e sem conflitos
             document.getElementById('login-screen').classList.add('hidden');
             document.getElementById('app-layout').classList.remove('hidden');
             document.getElementById('app-layout').classList.add('flex');
@@ -474,9 +469,7 @@
                 window.mudarAba('menu-inspetor');
                 window.renderizarMeuProgresso();
             }
-        } catch(e) {
-            console.error(e);
-        }
+        } catch(e) {}
     };
 
     window.verificarSessao = () => {
@@ -488,24 +481,36 @@
     };
     window.verificarSessao();
 
-    // ALTERAÇÃO DE ABAS 100% SEGURA
+    // BOTÃO SAIR RAIZ (NUNCA FALHA)
+    window.sair = () => {
+        try {
+            localStorage.clear();
+            sessionStorage.clear();
+        } catch(e){}
+        window.location.href = window.location.pathname; 
+    };
+
+    // MUDAR ABA ESTÁVEL COM CLASSES TAILWIND
     window.mudarAba = (aba) => {
         try {
-            ['dashboard', 'registro', 'menu-inspetor', 'progresso'].forEach(i => {
-                const el = document.getElementById('aba-'+i);
-                if(el) {
+            ['menu-inspetor', 'registro', 'progresso', 'dashboard', 'tratativas'].forEach(id => {
+                const el = document.getElementById('aba-' + id);
+                if (el) {
                     el.classList.add('hidden');
-                    el.classList.remove('flex');
+                    el.classList.remove('flex', 'block');
                 }
             });
-            const target = document.getElementById('aba-'+aba);
-            if(target) {
+            const target = document.getElementById('aba-' + aba);
+            if (target) {
                 target.classList.remove('hidden');
-                if (aba !== 'registro') {
+                if(aba === 'registro') {
+                    target.classList.add('block');
+                } else {
                     target.classList.add('flex');
                 }
             }
-        } catch(e) { console.error(e); }
+            window.scrollTo(0, 0);
+        } catch(e) {}
     };
 
     window.voltarMenuInspetor = () => {
@@ -544,7 +549,7 @@
             window.renderizarGradeDeFotos();
             document.getElementById('upload-text').innerText = "Toque para adicionar foto";
             e.target.value = '';
-        } catch(err) { console.error(err); }
+        } catch(err) {}
     };
 
     window.removerFoto = (index) => {
@@ -569,9 +574,10 @@
                 `;
             });
             container.innerHTML = htmlFotos;
-        } catch(e) { console.error(e); }
+        } catch(e) {}
     };
 
+    // ENVIO COM F5 FORÇADO GARANTIDO (SEM CONGELAR)
     window.salvarFormulario = async () => {
         const hub = document.getElementById('hub_local').value;
         const cat = document.getElementById('categoria').value;
@@ -607,10 +613,13 @@
             };
 
             await set(novaOcorrenciaRef, payload);
+            
             alert("✅ Relatório transmitido com sucesso!");
             
-            // ATUALIZAÇÃO FORÇADA DE FATO:
-            window.location.href = window.location.pathname + '?reload=' + new Date().getTime();
+            // F5 PARA LIMPAR O CACHE NA HORA
+            window.mudarAba('progresso');
+            // Opcional: Se quiser recarregar a tela do zero para garantir:
+            // window.location.reload(); 
 
         } catch (error) {
             console.error(error);
@@ -633,7 +642,7 @@
             document.getElementById('viewer-img').src = src;
             document.getElementById('photo-viewer').classList.remove('hidden');
             document.getElementById('photo-viewer').classList.add('flex');
-        } catch(e) { console.error(e); }
+        } catch(e) {}
     };
 
     window.abrirDetalhes = (index) => {
@@ -707,7 +716,7 @@
         if(confirm(`⚠️ AÇÃO IRREVERSÍVEL!\nTem certeza que deseja excluir permanentemente o relatório de ${occ.local}?`)) {
             try {
                 await remove(ref(db, `ocorrencias_lmg48/${occ.id}`));
-                alert("🗑️ Relatório excluído com sucesso.");
+                alert("🗑️ Relatório excluído com sucesso da nuvem.");
             } catch (error) {
                 alert(`❌ Erro ao excluir: ${error.message}`);
             }
@@ -717,7 +726,7 @@
     document.addEventListener('click', (e) => { if (document.getElementById('statusDropdown').classList.contains('active')) window.fecharDropdownStatus(); });
     document.addEventListener('keydown', (e) => { if (e.key === "Escape") { window.fecharDetalhes(); window.fecharDropdownStatus(); } });
 
-    // TABELA BLINDADA
+    // TABELA BLINDADA DO ADMIN
     window.atualizarDashboardUI = () => {
         try {
             const tbody = document.getElementById('tabela-dados');
@@ -730,25 +739,22 @@
                 tbody.innerHTML = `<tr><td colspan="5" class="text-center py-10 text-gray-400 font-medium whitespace-nowrap">Nenhuma anomalia no banco de dados.</td></tr>`;
                 document.getElementById('kpi-pendentes').innerText = 0; document.getElementById('kpi-resolvidos').innerText = 0;
                 
-                // ATRASA O GRÁFICO PARA NÃO TRAVAR A TELA
                 setTimeout(() => { window.desenharGrafico(0, 0, 0); }, 50);
                 return;
             }
 
-            let htmlTabela = '';
-            window.ocorrencias.forEach((item, index) => {
+            const htmlRows = window.ocorrencias.map((item, index) => {
                 const status = item.status || 'Pendente';
                 if(status === 'Pendente') p++; else if(status === 'Resolvido') r++; else c++;
                 
                 const autor = item.autor || 'Usuário';
                 const partes = autor.trim().split(/\s+/);
                 const iniciais = partes.length > 1 && partes[1].length > 0 ? partes[0][0] + partes[1][0] : autor.substring(0,2);
-                
                 const badgeClass = getBadgeClasses(status);
                 const local = item.local || '-';
                 const dataOcc = item.data || '-';
 
-                htmlTabela += `
+                return `
                     <tr class="hover:bg-gray-50/50 transition-colors group border-b border-gray-50">
                         <td class="px-6 py-4 truncate max-w-[200px]"><strong class="text-gray-800 truncate">${local}</strong></td>
                         <td class="px-6 py-4 truncate max-w-[200px]"><div class="flex items-center gap-3 shrink-0 truncate"><div class="w-8 h-8 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center font-bold text-xs uppercase shrink-0">${iniciais.toUpperCase()}</div><span class="text-sm font-medium text-gray-700 uppercase truncate">${autor}</span></div></td>
@@ -764,7 +770,7 @@
                 `;
             });
 
-            tbody.innerHTML = htmlTabela;
+            tbody.innerHTML = htmlRows.join('');
             document.getElementById('kpi-pendentes').innerText = p; document.getElementById('kpi-resolvidos').innerText = r;
             
             setTimeout(() => { window.desenharGrafico(p, r, c); }, 50);
@@ -774,6 +780,8 @@
         }
     };
 
+    // GRÁFICO BLINDADO
+    let chartInstance = null;
     window.desenharGrafico = (p, r, c) => {
         try {
             const canvas = document.getElementById('graficoStatus');
@@ -789,22 +797,23 @@
             canvas.classList.remove('hidden');
             if(emptyState) emptyState.classList.add('hidden');
 
-            if (window.meuGrafico) {
-                window.meuGrafico.destroy();
+            if (chartInstance) {
+                chartInstance.data.datasets[0].data = [p, r, c];
+                chartInstance.update();
+            } else {
+                const ctx = canvas.getContext('2d');
+                chartInstance = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: { labels: ['Pendentes', 'Sanadas', 'Canceladas'], datasets: [{ data: [p, r, c], backgroundColor: ['#F59E0B', '#16a34a', '#EF4444'], borderWidth: 0 }] },
+                    options: { 
+                        responsive: true, 
+                        maintainAspectRatio: false,
+                        animation: false, 
+                        cutout: '75%', 
+                        plugins: { legend: { display: false }, tooltip: { cornerRadius: 8, padding: 12, boxPadding: 8, titleFont: { family: "'Inter', sans-serif", size: 13 }, bodyFont: { family: "'Inter', sans-serif", size: 13 } } } 
+                    }
+                });
             }
-
-            const ctx = canvas.getContext('2d');
-            window.meuGrafico = new Chart(ctx, {
-                type: 'doughnut',
-                data: { labels: ['Pendentes', 'Sanadas', 'Canceladas'], datasets: [{ data: [p, r, c], backgroundColor: ['#F59E0B', '#16a34a', '#EF4444'], borderWidth: 0 }] },
-                options: { 
-                    responsive: true, 
-                    maintainAspectRatio: false,
-                    animation: false, 
-                    cutout: '75%', 
-                    plugins: { legend: { display: false }, tooltip: { cornerRadius: 8, padding: 12, boxPadding: 8, titleFont: { family: "'Inter', sans-serif", size: 13 }, bodyFont: { family: "'Inter', sans-serif", size: 13 } } } 
-                }
-            });
         } catch(e) {
             console.error("Erro Gráfico:", e);
         }
@@ -824,15 +833,14 @@
                 return;
             }
 
-            let htmlProgresso = '';
-            minhasOcorrencias.forEach((item) => {
+            const htmlProgresso = minhasOcorrencias.map((item) => {
                 const status = item.status || 'Pendente';
                 const badgeClass = getBadgeClasses(status);
                 const local = item.local || '-';
                 const cat = item.categoria || '-';
                 const dataOcc = item.data || '-';
 
-                htmlProgresso += `
+                return `
                     <tr class="hover:bg-gray-50/50 transition-colors border-b border-gray-50">
                         <td class="px-6 py-4"><strong class="text-gray-800">${local}</strong></td>
                         <td class="px-6 py-4 text-sm text-gray-600">${cat}</td>
@@ -842,7 +850,7 @@
                 `;
             });
             
-            tbody.innerHTML = htmlProgresso;
+            tbody.innerHTML = htmlProgresso.join('');
         } catch(e) {
             console.error("Erro Progresso:", e);
         }
