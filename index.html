@@ -24,8 +24,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* MODO SITE CONVENCIONAL: ROLAGEM LIVRE, SEM TRAVAS DE TELA */
-        body { font-family: 'Inter', sans-serif; background-color: #f9fafb; color: #1f2937; }
+        /* MODO SITE CONVENCIONAL: ROLAGEM LIVRE, SEM TELA CONGELADA/BRANCA */
+        body { font-family: 'Inter', sans-serif; background-color: #f9fafb; color: #1f2937; margin: 0; padding: 0; }
         
         .card-interaction { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; }
         .card-interaction:hover, .card-interaction:focus {
@@ -39,7 +39,7 @@
 
         .slide-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(3px); z-index: 998; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
         .slide-overlay.active { opacity: 1; pointer-events: all; }
-        .slide-panel { position: fixed; top: 0; right: 0; width: 100%; max-width: 450px; height: 100vh; background: #fff; box-shadow: -10px 0 30px rgba(0,0,0,0.2); z-index: 999; transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); display: flex; flex-direction: column; }
+        .slide-panel { position: fixed; top: 0; right: 0; width: 100%; max-width: 450px; height: 100vh; background: #fff; box-shadow: -10px 0 30px rgba(0,0,0,0.2); z-index: 999; transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); display: flex; flex-direction: column; overflow-y: auto; }
         .slide-panel.active { transform: translateX(0); }
         
         .status-dropdown { position: absolute; background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 8px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.2); z-index: 9999; display: none; flex-direction: column; gap: 4px; min-width: 150px; }
@@ -49,7 +49,7 @@
         #photo-viewer img { max-width: 100%; max-height: 100%; border-radius: 8px; box-shadow: 0 0 50px rgba(0,0,0,0.5); object-fit: contain; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col">
+<body>
 
 <div id="photo-viewer" style="display: none;" onclick="this.style.display='none'">
     <img id="viewer-img" src="">
@@ -64,11 +64,11 @@
 
 <div id="slide-overlay" class="slide-overlay" onclick="window.fecharDetalhes()"></div>
 <div id="slide-panel" class="slide-panel">
-    <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0 z-10">
+    <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0 z-10 shrink-0">
         <h2 class="font-bold text-lg text-gray-800 flex items-center gap-2"><i class="fa-solid fa-clipboard-list text-shopee"></i> Ficha da Ocorrência</h2>
         <button class="text-gray-400 hover:text-shopee transition-colors p-2" onclick="window.fecharDetalhes()" title="Fechar (ESC)"><i class="fa-solid fa-xmark text-xl"></i></button>
     </div>
-    <div class="p-6 overflow-y-auto flex-1 bg-gray-50 space-y-6">
+    <div class="p-6 flex-1 bg-gray-50 space-y-6">
         <div><span id="detalhe-badge-status" class="px-3 py-1 rounded-full text-xs font-bold border">Status</span></div>
         
         <div class="detail-block">
@@ -101,8 +101,8 @@
     </div>
 </div>
 
-<div id="login-screen" style="display: flex;" class="w-full h-screen absolute inset-0 z-50 bg-white">
-    <div class="hidden md:flex flex-1 bg-shopee flex-col justify-center items-center p-12 text-center relative overflow-hidden">
+<div id="login-screen" class="fixed inset-0 z-50 bg-white flex flex-col md:flex-row overflow-y-auto">
+    <div class="hidden md:flex flex-1 bg-shopee flex-col justify-center items-center p-12 text-center relative overflow-hidden min-h-[50vh]">
         <div class="absolute inset-0 bg-gradient-to-br from-shopee to-shopee-dark opacity-90"></div>
         <div class="relative z-10 text-white w-full flex flex-col items-center">
             <video autoplay loop muted playsinline class="w-80 lg:w-[26rem] h-auto rounded-3xl shadow-2xl mb-8 border-4 border-white/20 bg-white object-contain">
@@ -112,9 +112,8 @@
             <p class="text-shopee-light text-lg font-medium">Prevenção e Segurança é Prioridade</p>
         </div>
     </div>
-    <div class="flex-1 flex justify-center items-center p-6 bg-gray-50 overflow-y-auto">
-        <div class="w-full max-w-md bg-white p-8 rounded-3xl shadow-xl border border-gray-100 flex flex-col items-center my-auto py-4">
-            
+    <div class="flex-1 flex justify-center items-center p-6 bg-gray-50 min-h-screen md:min-h-full">
+        <div class="w-full max-w-md bg-white p-8 rounded-3xl shadow-xl border border-gray-100 flex flex-col items-center">
             <div class="md:hidden flex flex-col items-center mb-6 w-full">
                 <video autoplay loop muted playsinline class="w-56 sm:w-64 mx-auto h-auto rounded-3xl shadow-lg border-2 border-shopee bg-white object-contain">
                     <source src="https://i.imgur.com/fMAvIvu.mp4" type="video/mp4">
@@ -138,7 +137,7 @@
     </div>
 </div>
 
-<div id="app-layout" style="display: none;" class="flex-col min-h-screen w-full">
+<div id="app-layout" style="display: none;">
     <header class="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-40 w-full">
         <div class="max-w-6xl mx-auto flex justify-between items-center py-2 px-4 gap-2 whitespace-nowrap">
             <div class="flex items-center space-x-3 shrink-0">
@@ -149,9 +148,7 @@
                 Segurança é Prioridade LMG-48
             </div>
             
-            <div class="flex items-center gap-4 shrink-0 ml-auto cursor-pointer hover:opacity-75 transition-opacity" 
-                 onclick="localStorage.clear(); sessionStorage.clear(); window.location.href = window.location.pathname;" 
-                 title="Sair do Sistema">
+            <div class="flex items-center gap-4 shrink-0 ml-auto cursor-pointer hover:opacity-75 transition-opacity" onclick="window.fazerLogout()" title="Sair do Sistema">
                 <div class="text-right hidden sm:block truncate max-w-[150px]">
                     <h1 class="font-black text-xl text-gray-800 leading-none truncate hover:text-shopee">Sair</h1>
                     <p class="text-[10px] font-bold text-gray-400 tracking-widest uppercase truncate" id="user-display-name">Nome</p>
@@ -161,265 +158,266 @@
         </div>
     </header>
 
-    <main class="w-full flex-grow p-4 md:p-8">
-        <div class="max-w-6xl mx-auto w-full">
+    <main class="w-full max-w-6xl mx-auto p-4 md:p-8">
+        
+        <div id="aba-menu-inspetor" style="display: none;">
+            <div class="grid grid-cols-2 gap-4 md:gap-6 pt-4">
+                <button onclick="window.mudarAba('aba-registro')" class="card-interaction col-span-2 bg-white border-2 border-shopee rounded-3xl p-8 shadow-sm flex flex-col items-center justify-center space-y-4 group">
+                    <i class="fa-solid fa-triangle-exclamation text-7xl text-shopee transition-colors"></i>
+                    <span class="font-black text-2xl text-gray-800 uppercase group-hover:text-white transition-colors tracking-tight">Relatar Risco Agora</span>
+                </button>
+                
+                <button onclick="window.mudarAba('aba-inspecao')" class="card-interaction col-span-2 md:col-span-1 bg-white border-2 border-shopee rounded-3xl p-6 shadow-sm flex flex-col items-center justify-center space-y-3 group">
+                    <i class="fa-solid fa-clipboard-check text-5xl text-shopee transition-colors"></i>
+                    <span class="font-black text-xl text-gray-800 uppercase group-hover:text-white transition-colors tracking-tight">Inspeção Mensal</span>
+                </button>
 
-            <div id="aba-menu-inspetor" style="display: none;" class="flex-col justify-center max-w-2xl mx-auto pt-4 gap-4">
-                <div class="grid grid-cols-2 gap-4 md:gap-6">
-                    <button onclick="window.mudarAba('registro')" class="card-interaction col-span-2 bg-white border-2 border-shopee rounded-3xl p-8 shadow-sm flex flex-col items-center justify-center space-y-4 group">
-                        <i class="fa-solid fa-triangle-exclamation text-7xl text-shopee transition-colors"></i>
-                        <span class="font-black text-2xl text-gray-800 uppercase group-hover:text-white transition-colors tracking-tight">Relatar Risco Agora</span>
-                    </button>
-                    <button onclick="window.mudarAba('inspecao')" class="card-interaction col-span-2 bg-white border-2 border-shopee rounded-3xl p-6 shadow-sm flex flex-col items-center justify-center space-y-3 group">
-                        <i class="fa-solid fa-clipboard-check text-5xl text-shopee transition-colors"></i>
-                        <span class="font-black text-xl text-gray-800 uppercase group-hover:text-white transition-colors tracking-tight">Inspeção Mensal</span>
-                    </button>
+                <button onclick="window.mudarAba('aba-progresso')" class="card-interaction col-span-2 md:col-span-1 bg-white rounded-3xl p-6 shadow-sm flex flex-col items-center justify-center space-y-3 border-b-4 border-shopee group">
+                    <i class="fa-solid fa-chart-simple text-4xl text-shopee transition-colors"></i>
+                    <span class="font-bold text-sm text-gray-700 text-center leading-tight transition-colors">Meu Progresso</span>
+                </button>
 
-                    <button class="card-interaction bg-white rounded-3xl p-6 shadow-sm flex flex-col items-center justify-center space-y-3 border-b-4 border-shopee group">
-                        <i class="fa-solid fa-file-shield text-4xl text-shopee transition-colors"></i>
-                        <span class="font-bold text-sm text-gray-700 text-center leading-tight transition-colors">Procedimentos</span>
-                    </button>
-                    <button class="card-interaction bg-white rounded-3xl p-6 shadow-sm flex flex-col items-center justify-center space-y-3 border-b-4 border-shopee group">
-                        <i class="fa-solid fa-graduation-cap text-4xl text-shopee transition-colors"></i>
-                        <span class="font-bold text-sm text-gray-700 text-center leading-tight transition-colors">Treinamento</span>
-                    </button>
-                    <button onclick="window.mudarAba('progresso')" class="card-interaction col-span-2 bg-white rounded-3xl p-6 shadow-sm flex flex-col items-center justify-center space-y-3 border-b-4 border-shopee group">
-                        <i class="fa-solid fa-chart-simple text-4xl text-shopee transition-colors"></i>
-                        <span class="font-bold text-sm text-gray-700 text-center leading-tight transition-colors">Meu Progresso</span>
-                    </button>
-                    <button onclick="localStorage.clear(); window.location.href = window.location.pathname;" class="card-interaction col-span-2 bg-white rounded-3xl p-6 shadow-sm flex flex-col items-center justify-center space-y-3 border-b-4 border-gray-300 group">
-                        <i class="fa-solid fa-power-off text-3xl text-gray-400 transition-colors"></i>
-                        <span class="font-bold text-sm text-gray-500 text-center leading-tight transition-colors">Sair do Sistema</span>
-                    </button>
+                <button class="card-interaction bg-white rounded-3xl p-6 shadow-sm flex flex-col items-center justify-center space-y-3 border-b-4 border-shopee group">
+                    <i class="fa-solid fa-file-shield text-4xl text-shopee transition-colors"></i>
+                    <span class="font-bold text-sm text-gray-700 text-center leading-tight transition-colors">Procedimentos</span>
+                </button>
+                
+                <button class="card-interaction bg-white rounded-3xl p-6 shadow-sm flex flex-col items-center justify-center space-y-3 border-b-4 border-shopee group">
+                    <i class="fa-solid fa-graduation-cap text-4xl text-shopee transition-colors"></i>
+                    <span class="font-bold text-sm text-gray-700 text-center leading-tight transition-colors">Treinamento</span>
+                </button>
+                
+                <button onclick="window.fazerLogout()" class="card-interaction col-span-2 bg-white rounded-3xl p-6 shadow-sm flex flex-col items-center justify-center space-y-3 border-b-4 border-gray-300 group">
+                    <i class="fa-solid fa-power-off text-3xl text-gray-400 transition-colors"></i>
+                    <span class="font-bold text-sm text-gray-500 text-center leading-tight transition-colors">Sair do Sistema</span>
+                </button>
+            </div>
+        </div>
+
+        <div id="aba-inspecao" style="display: none;" class="max-w-3xl mx-auto pb-10">
+            <div class="flex items-center gap-4 mb-6 py-3">
+                <button onclick="window.voltarMenuInspetor()" class="w-12 h-12 rounded-2xl bg-white shadow-md border border-gray-200 flex items-center justify-center text-gray-700 hover:text-shopee hover:border-shopee hover:bg-shopee-light transition-all active:scale-95 shrink-0">
+                    <i class="fa-solid fa-arrow-left text-xl"></i>
+                </button>
+                <div>
+                    <h2 class="text-2xl font-black text-gray-800 tracking-tight leading-tight">Inspeção Mensal</h2>
+                    <p class="text-sm text-gray-500 font-medium">Preencha o checklist de segurança oficial.</p>
                 </div>
             </div>
 
-            <div id="aba-inspecao" style="display: none;" class="max-w-3xl mx-auto pb-10">
-                <div class="flex items-center gap-4 mb-6 sticky top-0 bg-gray-50 z-20 py-3">
-                    <button onclick="window.voltarMenuInspetor()" class="w-12 h-12 rounded-2xl bg-white shadow-md border border-gray-200 flex items-center justify-center text-gray-700 hover:text-shopee hover:border-shopee hover:bg-shopee-light transition-all active:scale-95 shrink-0">
-                        <i class="fa-solid fa-arrow-left text-xl"></i>
-                    </button>
-                    <div>
-                        <h2 class="text-2xl font-black text-gray-800 tracking-tight leading-tight">Inspeção Mensal</h2>
-                        <p class="text-sm text-gray-500 font-medium">Preencha o checklist de segurança.</p>
-                    </div>
+            <div class="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 space-y-6">
+                <div class="p-4 border-l-4 border-shopee bg-shopee-light rounded-r-xl mb-6">
+                    <p class="text-sm font-bold text-shopee-dark"><i class="fa-solid fa-check-circle"></i> O formulário base foi criado com sucesso. Aguardando o comando para popular as perguntas.</p>
                 </div>
 
-                <div class="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 space-y-6">
-                    <div class="p-4 border-l-4 border-shopee bg-shopee-light rounded-r-xl mb-6">
-                        <p class="text-sm font-bold text-shopee-dark"><i class="fa-solid fa-info-circle"></i> Módulo base criado! Aguardando o comando "inspeção" para montar o questionário oficial.</p>
-                    </div>
-                    
-                    <div class="space-y-6">
-                        <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-2">1. Título da Pergunta de Exemplo?</label>
-                            <select class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee font-medium text-gray-700">
-                                <option value="" disabled selected>Selecione uma opção...</option>
-                                <option>Conforme</option>
-                                <option>Não Conforme</option>
-                                <option>Não se Aplica</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-2">Observações / Comentários</label>
-                            <textarea rows="3" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee font-medium text-gray-700 resize-none" placeholder="Digite detalhes adicionais se necessário..."></textarea>
-                        </div>
-                        <button class="w-full bg-gray-300 text-gray-500 font-black text-lg tracking-wide rounded-2xl py-4 mt-4 shadow-sm cursor-not-allowed">
-                            <i class="fa-solid fa-lock"></i> Finalizar Inspeção
-                        </button>
-                    </div>
+                <div>
+                    <h3 class="block text-lg font-black text-gray-800 mb-3 border-b pb-2">1. Condição Geral e Sinalização</h3>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Qual o status das placas e marcações no piso?</label>
+                    <select class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee font-medium text-gray-700 outline-none">
+                        <option value="" disabled selected>Selecione uma opção...</option>
+                        <option>Conforme</option>
+                        <option>Não Conforme</option>
+                        <option>Não se Aplica</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Observações / Justificativas</label>
+                    <textarea rows="3" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee font-medium text-gray-700 resize-none outline-none" placeholder="Digite detalhes adicionais, se necessário..."></textarea>
+                </div>
+
+                <button class="w-full bg-gray-300 text-gray-500 font-black text-lg tracking-wide rounded-2xl py-4 mt-6 shadow-sm cursor-not-allowed text-center">
+                    <i class="fa-solid fa-lock"></i> Finalizar Inspeção
+                </button>
+            </div>
+        </div>
+
+        <div id="aba-registro" style="display: none;" class="max-w-3xl mx-auto pb-10">
+            <div class="flex items-center gap-4 mb-6 py-3">
+                <button onclick="window.voltarMenuInspetor()" class="w-12 h-12 rounded-2xl bg-white shadow-md border border-gray-200 flex items-center justify-center text-gray-700 hover:text-shopee hover:border-shopee hover:bg-shopee-light transition-all active:scale-95 shrink-0" title="Voltar ao Menu">
+                    <i class="fa-solid fa-arrow-left text-xl"></i>
+                </button>
+                <div>
+                    <h2 class="text-2xl font-black text-gray-800 tracking-tight leading-tight">Reportar Anomalia</h2>
+                    <p class="text-sm text-gray-500 font-medium">Preencha os dados da ocorrência.</p>
                 </div>
             </div>
 
-            <div id="aba-registro" style="display: none;" class="max-w-3xl mx-auto pb-10">
-                <div class="flex items-center gap-4 mb-6 sticky top-0 bg-gray-50 z-20 py-3">
-                    <button onclick="window.voltarMenuInspetor()" class="w-12 h-12 rounded-2xl bg-white shadow-md border border-gray-200 flex items-center justify-center text-gray-700 hover:text-shopee hover:border-shopee hover:bg-shopee-light transition-all active:scale-95 shrink-0" title="Voltar ao Menu">
-                        <i class="fa-solid fa-arrow-left text-xl"></i>
-                    </button>
+            <div class="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <h2 class="text-2xl font-black text-gray-800 tracking-tight leading-tight">Reportar Anomalia</h2>
-                        <p class="text-sm text-gray-500 font-medium">Preencha os dados da ocorrência.</p>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Unidade Logística</label>
+                        <select id="hub_local" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee focus:border-transparent appearance-none font-medium text-gray-700">
+                            <option value="" disabled selected>Selecionar Base...</option>
+                            <option>Hub Uberaba</option>
+                            <option>Hub Uberlândia</option>
+                            <option>Hub Divinópolis</option>
+                            <option>Hub Lagoa da Prata</option>
+                            <option>Hub Patos de Minas</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Vetor de Risco</label>
+                        <select id="categoria" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee focus:border-transparent appearance-none font-medium text-gray-700">
+                            <option value="" disabled selected>Selecionar Padrão...</option>
+                            <option>Organização e Limpeza</option>
+                            <option>Movimentação de Volumosos</option>
+                            <option>Uso de EPIs</option>
+                            <option>Infraestrutura e Docas</option>
+                            <option>Equipamentos (Empilhadeira)</option>
+                        </select>
                     </div>
                 </div>
 
-                <div class="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 space-y-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-2">Unidade Logística</label>
-                            <select id="hub_local" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee focus:border-transparent appearance-none font-medium text-gray-700">
-                                <option value="" disabled selected>Selecionar Base...</option>
-                                <option>Hub Uberaba</option>
-                                <option>Hub Uberlândia</option>
-                                <option>Hub Divinópolis</option>
-                                <option>Hub Lagoa da Prata</option>
-                                <option>Hub Patos de Minas</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-2">Vetor de Risco</label>
-                            <select id="categoria" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee focus:border-transparent appearance-none font-medium text-gray-700">
-                                <option value="" disabled selected>Selecionar Padrão...</option>
-                                <option>Organização e Limpeza</option>
-                                <option>Movimentação de Volumosos</option>
-                                <option>Uso de EPIs</option>
-                                <option>Infraestrutura e Docas</option>
-                                <option>Equipamentos (Empilhadeira)</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-2">Data Constatada</label>
-                            <input type="date" id="data_ocorrencia" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee focus:border-transparent text-gray-700 font-medium">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-2">Horário Exato</label>
-                            <input type="time" id="hora_ocorrencia" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee focus:border-transparent text-gray-700 font-medium">
-                        </div>
-                    </div>
-
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-2">Laudo / Detalhamento</label>
-                        <textarea id="detalhes" rows="3" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee focus:border-transparent text-gray-700 font-medium resize-none" placeholder="Descreva tecnicamente o cenário encontrado..."></textarea>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Data Constatada</label>
+                        <input type="date" id="data_ocorrencia" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee focus:border-transparent text-gray-700 font-medium">
                     </div>
-
                     <div>
-                        <div class="flex justify-between items-center mb-2">
-                            <label class="block text-sm font-bold text-gray-700">Evidências Visuais (Fotos)</label>
-                            <span class="text-xs text-gray-400 font-bold bg-gray-100 px-2 py-1 rounded-md" id="contador-fotos">0/5</span>
-                        </div>
-                        
-                        <div id="preview-fotos-container" class="grid grid-cols-3 sm:grid-cols-5 gap-3 mb-3 empty:hidden"></div>
-
-                        <div class="relative border-2 border-dashed border-gray-300 bg-gray-50 rounded-2xl p-6 text-center hover:bg-shopee-light hover:border-shopee transition-colors cursor-pointer group">
-                            <i class="fa-solid fa-camera-retro text-3xl text-gray-400 group-hover:text-shopee mb-2 transition-colors"></i>
-                            <p class="text-xs font-medium text-gray-500" id="upload-text">Toque para adicionar foto</p>
-                            <input type="file" id="foto_upload" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="window.processarNovaFoto(event)">
-                        </div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Horário Exato</label>
+                        <input type="time" id="hora_ocorrencia" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee focus:border-transparent text-gray-700 font-medium">
                     </div>
+                </div>
 
-                    <button id="btn-enviar" onclick="window.salvarFormulario()" class="w-full bg-shopee hover:bg-shopee-dark text-white font-black text-lg tracking-wide rounded-2xl py-4 mt-4 shadow-lg shadow-shopee/30 transition-all active:scale-95 flex justify-center items-center gap-2 overflow-hidden truncate whitespace-nowrap">
-                        <i class="fa-solid fa-cloud-arrow-up shrink-0"></i> <span class="truncate">Transmitir Relatório</span>
-                    </button>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Laudo / Detalhamento</label>
+                    <textarea id="detalhes" rows="3" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee focus:border-transparent text-gray-700 font-medium resize-none" placeholder="Descreva tecnicamente o cenário encontrado..."></textarea>
+                </div>
+
+                <div>
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="block text-sm font-bold text-gray-700">Evidências Visuais (Fotos)</label>
+                        <span class="text-xs text-gray-400 font-bold bg-gray-100 px-2 py-1 rounded-md" id="contador-fotos">0/5</span>
+                    </div>
+                    <div id="preview-fotos-container" class="grid grid-cols-3 sm:grid-cols-5 gap-3 mb-3 empty:hidden"></div>
+                    <div class="relative border-2 border-dashed border-gray-300 bg-gray-50 rounded-2xl p-6 text-center hover:bg-shopee-light hover:border-shopee transition-colors cursor-pointer group">
+                        <i class="fa-solid fa-camera-retro text-3xl text-gray-400 group-hover:text-shopee mb-2 transition-colors"></i>
+                        <p class="text-xs font-medium text-gray-500" id="upload-text">Toque para adicionar foto</p>
+                        <input type="file" id="foto_upload" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="window.processarNovaFoto(event)">
+                    </div>
+                </div>
+
+                <button id="btn-enviar" onclick="window.salvarFormulario()" class="w-full bg-shopee hover:bg-shopee-dark text-white font-black text-lg tracking-wide rounded-2xl py-4 mt-4 shadow-lg shadow-shopee/30 transition-all active:scale-95 flex justify-center items-center gap-2 overflow-hidden truncate whitespace-nowrap">
+                    <i class="fa-solid fa-cloud-arrow-up shrink-0"></i> <span class="truncate">Transmitir Relatório</span>
+                </button>
+            </div>
+        </div>
+
+        <div id="aba-progresso" style="display: none;" class="max-w-4xl mx-auto pb-10">
+            <div class="flex items-center gap-4 mb-6 py-3">
+                <button onclick="window.voltarMenuInspetor()" class="w-12 h-12 rounded-2xl bg-white shadow-md border border-gray-200 flex items-center justify-center text-gray-700 hover:text-shopee hover:border-shopee hover:bg-shopee-light transition-all active:scale-95 shrink-0" title="Voltar ao Menu">
+                    <i class="fa-solid fa-arrow-left text-xl"></i>
+                </button>
+                <div>
+                    <h2 class="text-2xl font-black text-gray-800 tracking-tight leading-tight">Meu Progresso</h2>
+                    <p class="text-sm text-gray-500 font-medium">Acompanhe o status dos seus relatórios.</p>
                 </div>
             </div>
 
-            <div id="aba-progresso" style="display: none;" class="flex-col gap-4 pb-10">
-                <div class="flex items-center gap-4 mb-6 sticky top-0 bg-gray-50 z-20 py-3">
-                    <button onclick="window.voltarMenuInspetor()" class="w-12 h-12 rounded-2xl bg-white shadow-md border border-gray-200 flex items-center justify-center text-gray-700 hover:text-shopee hover:border-shopee hover:bg-shopee-light transition-all active:scale-95 shrink-0" title="Voltar ao Menu">
-                        <i class="fa-solid fa-arrow-left text-xl"></i>
-                    </button>
-                    <div>
-                        <h2 class="text-2xl font-black text-gray-800 tracking-tight leading-tight">Meu Progresso</h2>
-                        <p class="text-sm text-gray-500 font-medium">Acompanhe o status dos seus relatórios.</p>
+            <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+                <div class="p-6 border-b border-gray-50 bg-gray-50/50">
+                    <h3 class="font-bold text-gray-800 flex items-center gap-2"><i class="fa-solid fa-clock-rotate-left text-shopee"></i> Histórico Pessoal</h3>
+                </div>
+                <div class="overflow-x-auto w-full p-4">
+                    <table class="w-full text-left whitespace-nowrap min-w-[700px]">
+                        <thead>
+                            <tr class="bg-white border-b border-gray-100 py-2">
+                                <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Unidade</th>
+                                <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Classificação</th>
+                                <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Data / Hora</th>
+                                <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Status Atual</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabela-meu-progresso" class="divide-y divide-gray-50">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="aba-dashboard" style="display: none;" class="pb-10">
+            
+            <div class="bg-white shadow-sm border-b mb-6 rounded-2xl flex overflow-hidden border border-gray-100">
+                <button onclick="window.mudarAba('aba-dashboard')" class="flex-1 py-4 font-black text-shopee bg-shopee-light border-b-4 border-shopee transition-colors focus:outline-none">Visão Geral</button>
+                <button onclick="window.mudarAba('aba-tratativas')" class="flex-1 py-4 font-bold text-gray-500 hover:bg-gray-50 border-b-4 border-transparent transition-colors focus:outline-none">Tratativas</button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center relative overflow-hidden">
+                    <div class="w-2 h-full bg-gray-800 absolute left-0 top-0"></div>
+                    <div class="pl-2 truncate">
+                        <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1 truncate">Ocorrências</h4>
+                        <h2 id="kpi-total" class="text-4xl font-black text-gray-800 truncate">0</h2>
+                    </div>
+                    <div class="w-14 h-14 rounded-2xl bg-gray-50 flex justify-center items-center text-gray-400 text-2xl shrink-0"><i class="fa-solid fa-layer-group"></i></div>
+                </div>
+                <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center relative overflow-hidden">
+                    <div class="w-2 h-full bg-yellow-500 absolute left-0 top-0"></div>
+                    <div class="pl-2 truncate">
+                        <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1 truncate">Aguardando</h4>
+                        <h2 id="kpi-pendentes" class="text-4xl font-black text-gray-800 truncate">0</h2>
+                    </div>
+                    <div class="w-14 h-14 rounded-2xl bg-yellow-50 flex justify-center items-center text-yellow-500 text-2xl shrink-0"><i class="fa-solid fa-clock-rotate-left"></i></div>
+                </div>
+                <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center relative overflow-hidden">
+                    <div class="w-2 h-full bg-shopee absolute left-0 top-0"></div>
+                    <div class="pl-2 truncate">
+                        <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1 truncate">Sanadas</h4>
+                        <h2 id="kpi-resolvidos" class="text-4xl font-black text-gray-800 truncate">0</h2>
+                    </div>
+                    <div class="w-14 h-14 rounded-2xl bg-shopee-light flex justify-center items-center text-shopee text-2xl shrink-0"><i class="fa-solid fa-shield-check"></i></div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-1 bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center justify-center">
+                    <h3 class="font-bold text-gray-800 mb-4 w-full flex items-center gap-2"><i class="fa-solid fa-chart-pie text-shopee"></i> Distribuição</h3>
+                    <div style="width: 250px; height: 250px; position: relative; margin: 0 auto;">
+                        <canvas id="graficoStatus" width="250" height="250"></canvas>
+                        <div id="grafico-vazio" class="hidden absolute inset-0 flex items-center justify-center text-gray-400 font-bold text-sm bg-white z-10">Sem dados para exibir</div>
                     </div>
                 </div>
 
-                <div class="bg-white rounded-3xl shadow-sm border border-gray-100 flex-grow overflow-hidden flex flex-col">
-                    <div class="p-6 border-b border-gray-50 bg-gray-50/50">
-                        <h3 class="font-bold text-gray-800 flex items-center gap-2"><i class="fa-solid fa-clock-rotate-left text-shopee"></i> Histórico Pessoal</h3>
+                <div class="lg:col-span-2 bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
+                    <div class="p-6 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
+                        <h3 class="font-bold text-gray-800 flex items-center gap-2"><i class="fa-solid fa-cloud text-shopee"></i> Banco de Dados RTDB</h3>
+                        <span class="text-xs font-bold bg-shopee-light text-shopee-dark px-3 py-1 rounded-full"><i class="fa-solid fa-circle-nodes"></i> Online</span>
                     </div>
                     <div class="overflow-x-auto w-full p-4">
-                        <table class="w-full text-left whitespace-nowrap min-w-[700px]">
+                        <table class="w-full text-left whitespace-nowrap min-w-[800px]">
                             <thead>
                                 <tr class="bg-white border-b border-gray-100 py-2">
                                     <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Unidade</th>
-                                    <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Classificação</th>
+                                    <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Inspetor</th>
                                     <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Data / Hora</th>
-                                    <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Status Atual</th>
+                                    <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Status</th>
+                                    <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-center">Ação</th>
                                 </tr>
                             </thead>
-                            <tbody id="tabela-meu-progresso" class="divide-y divide-gray-50">
+                            <tbody id="tabela-dados" class="divide-y divide-gray-50">
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
-
-            <div id="aba-dashboard" style="display: none;" class="space-y-6 pb-10 flex-col">
-                
-                <div class="bg-white shadow-sm border-b mb-6 rounded-2xl flex overflow-hidden border border-gray-100 shrink-0">
-                    <button onclick="window.mudarAba('dashboard')" class="flex-1 py-4 font-black text-shopee bg-shopee-light border-b-4 border-shopee transition-colors focus:outline-none">Visão Geral</button>
-                    <button onclick="window.mudarAba('tratativas')" class="flex-1 py-4 font-bold text-gray-500 hover:bg-gray-50 border-b-4 border-transparent transition-colors focus:outline-none">Tratativas</button>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 shrink-0">
-                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center relative overflow-hidden">
-                        <div class="w-2 h-full bg-gray-800 absolute left-0 top-0"></div>
-                        <div class="pl-2 truncate">
-                            <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1 truncate">Ocorrências</h4>
-                            <h2 id="kpi-total" class="text-4xl font-black text-gray-800 truncate">0</h2>
-                        </div>
-                        <div class="w-14 h-14 rounded-2xl bg-gray-50 flex justify-center items-center text-gray-400 text-2xl shrink-0"><i class="fa-solid fa-layer-group"></i></div>
-                    </div>
-                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center relative overflow-hidden">
-                        <div class="w-2 h-full bg-yellow-500 absolute left-0 top-0"></div>
-                        <div class="pl-2 truncate">
-                            <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1 truncate">Aguardando</h4>
-                            <h2 id="kpi-pendentes" class="text-4xl font-black text-gray-800 truncate">0</h2>
-                        </div>
-                        <div class="w-14 h-14 rounded-2xl bg-yellow-50 flex justify-center items-center text-yellow-500 text-2xl shrink-0"><i class="fa-solid fa-clock-rotate-left"></i></div>
-                    </div>
-                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center relative overflow-hidden">
-                        <div class="w-2 h-full bg-shopee absolute left-0 top-0"></div>
-                        <div class="pl-2 truncate">
-                            <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1 truncate">Sanadas</h4>
-                            <h2 id="kpi-resolvidos" class="text-4xl font-black text-gray-800 truncate">0</h2>
-                        </div>
-                        <div class="w-14 h-14 rounded-2xl bg-shopee-light flex justify-center items-center text-shopee text-2xl shrink-0"><i class="fa-solid fa-shield-check"></i></div>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div class="lg:col-span-1 bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center justify-center shrink-0">
-                        <h3 class="font-bold text-gray-800 mb-4 w-full flex items-center gap-2"><i class="fa-solid fa-chart-pie text-shopee"></i> Distribuição</h3>
-                        <div class="relative w-full flex justify-center items-center" style="height: 250px;">
-                            <canvas id="graficoStatus"></canvas>
-                            <div id="grafico-vazio" class="hidden absolute inset-0 flex items-center justify-center text-gray-400 font-bold text-sm bg-white z-10">Sem dados</div>
-                        </div>
-                    </div>
-
-                    <div class="lg:col-span-2 bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
-                        <div class="p-6 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
-                            <h3 class="font-bold text-gray-800 flex items-center gap-2"><i class="fa-solid fa-cloud text-shopee"></i> Banco de Dados RTDB</h3>
-                            <span class="text-xs font-bold bg-shopee-light text-shopee-dark px-3 py-1 rounded-full"><i class="fa-solid fa-circle-nodes"></i> Online</span>
-                        </div>
-                        <div class="overflow-x-auto w-full p-4">
-                            <table class="w-full text-left whitespace-nowrap min-w-[800px]">
-                                <thead>
-                                    <tr class="bg-white border-b border-gray-100 py-2">
-                                        <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Unidade</th>
-                                        <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Inspetor</th>
-                                        <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Data / Hora</th>
-                                        <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Status</th>
-                                        <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-center">Ação</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tabela-dados" class="divide-y divide-gray-50">
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="aba-tratativas" style="display: none;" class="flex-col pb-10">
-                <div class="bg-white shadow-sm border-b mb-6 rounded-2xl flex overflow-hidden border border-gray-100 shrink-0">
-                    <button onclick="window.mudarAba('dashboard')" class="flex-1 py-4 font-bold text-gray-500 hover:bg-gray-50 border-b-4 border-transparent transition-colors focus:outline-none">Visão Geral</button>
-                    <button onclick="window.mudarAba('tratativas')" class="flex-1 py-4 font-black text-shopee bg-shopee-light border-b-4 border-shopee transition-colors focus:outline-none">Tratativas</button>
-                </div>
-                
-                <div class="bg-white p-10 rounded-3xl border border-gray-100 shadow-sm flex flex-col items-center justify-center text-center">
-                    <div class="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center text-shopee text-4xl mb-6 shadow-inner">
-                        <i class="fa-solid fa-screwdriver-wrench"></i>
-                    </div>
-                    <h2 class="text-3xl font-black text-gray-800 mb-3 tracking-tight">Área de Tratativas</h2>
-                    <p class="text-gray-500 max-w-md font-medium">Esta aba foi reservada para o gerenciamento avançado dos casos e criação de planos de ação.</p>
-                </div>
-            </div>
-
         </div>
+
+        <div id="aba-tratativas" style="display: none;" class="pb-10">
+            <div class="bg-white shadow-sm border-b mb-6 rounded-2xl flex overflow-hidden border border-gray-100">
+                <button onclick="window.mudarAba('aba-dashboard')" class="flex-1 py-4 font-bold text-gray-500 hover:bg-gray-50 border-b-4 border-transparent transition-colors focus:outline-none">Visão Geral</button>
+                <button onclick="window.mudarAba('aba-tratativas')" class="flex-1 py-4 font-black text-shopee bg-shopee-light border-b-4 border-shopee transition-colors focus:outline-none">Tratativas</button>
+            </div>
+            
+            <div class="bg-white p-10 rounded-3xl border border-gray-100 shadow-sm flex flex-col items-center justify-center text-center">
+                <div class="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center text-shopee text-4xl mb-6 shadow-inner">
+                    <i class="fa-solid fa-screwdriver-wrench"></i>
+                </div>
+                <h2 class="text-3xl font-black text-gray-800 mb-3 tracking-tight">Área de Tratativas</h2>
+                <p class="text-gray-500 max-w-md font-medium">Esta aba foi reservada para o gerenciamento avançado dos casos e criação de planos de ação.</p>
+            </div>
+        </div>
+
     </main>
 </div>
 
@@ -502,13 +500,13 @@
             document.getElementById('user-display-avatar').innerText = iniciais;
             
             document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('app-layout').style.display = 'flex';
+            document.getElementById('app-layout').style.display = 'block'; // Block convencional
 
             if(user === 'admin') {
-                window.mudarAba('dashboard');
+                window.mudarAba('aba-dashboard');
                 window.atualizarDashboardUI();
             } else {
-                window.mudarAba('menu-inspetor');
+                window.mudarAba('aba-menu-inspetor');
                 window.renderizarMeuProgresso();
             }
         } catch(e) {}
@@ -523,23 +521,32 @@
     };
     window.verificarSessao();
 
-    // MUDAR ABA (SIMPLES, ESTÁVEL, SEM NAVEGADOR TRAVAR)
-    window.mudarAba = (aba) => {
+    // BOTÃO DE SAIR RAIZ (À PROVA DE FALHAS)
+    window.fazerLogout = () => {
         try {
-            ['menu-inspetor', 'registro', 'progresso', 'dashboard', 'tratativas', 'inspecao'].forEach(id => {
-                const el = document.getElementById('aba-' + id);
+            localStorage.clear();
+            sessionStorage.clear();
+        } catch(e) {}
+        // Recarrega a página de forma limpa, como um site convencional
+        window.location.href = window.location.pathname; 
+    };
+
+    // MUDANÇA DE ABAS CONVENCIONAL
+    window.mudarAba = (abaId) => {
+        try {
+            const todasAbas = ['aba-menu-inspetor', 'aba-registro', 'aba-progresso', 'aba-dashboard', 'aba-tratativas', 'aba-inspecao'];
+            todasAbas.forEach(id => {
+                const el = document.getElementById(id);
                 if (el) el.style.display = 'none';
             });
-            const target = document.getElementById('aba-' + aba);
-            if (target) {
-                target.style.display = (aba === 'registro' || aba === 'inspecao') ? 'block' : 'flex';
-            }
+            const target = document.getElementById(abaId);
+            if (target) target.style.display = 'block';
             window.scrollTo(0, 0);
         } catch(e) {}
     };
 
     window.voltarMenuInspetor = () => {
-        if(window.usuarioAtual !== 'admin') window.mudarAba('menu-inspetor');
+        if(window.usuarioAtual !== 'admin') window.mudarAba('aba-menu-inspetor');
     };
 
     async function comprimirBase64(file) {
@@ -602,7 +609,7 @@
         } catch(e) {}
     };
 
-    // ENVIO SEM F5: TELA MUDA NA HORA E BANCO ATUALIZA SOZINHO
+    // ENVIO E ATUALIZAÇÃO CONVENCIONAL DE SITE
     window.salvarFormulario = async () => {
         const hub = document.getElementById('hub_local').value;
         const cat = document.getElementById('categoria').value;
@@ -638,22 +645,14 @@
             };
 
             await set(novaOcorrenciaRef, payload);
-            
-            document.getElementById('hub_local').value = ""; document.getElementById('categoria').value = "";
-            document.getElementById('data_ocorrencia').value = ""; document.getElementById('hora_ocorrencia').value = "";
-            document.getElementById('detalhes').value = ""; 
-            window.fotosMiniaturasTemporarias = [];
-            window.renderizarGradeDeFotos();
-
             alert("✅ Relatório transmitido com sucesso!");
             
-            // Vai para a tela de progresso instantaneamente sem recarregar a aba
-            window.mudarAba('progresso');
+            // ATUALIZAÇÃO CONVENCIONAL: Força o site a buscar as informações recentes do banco
+            window.location.href = window.location.pathname + '?reload=' + new Date().getTime();
 
         } catch (error) {
             console.error(error);
             alert(`❌ Erro no banco de dados: ${error.message}`);
-        } finally {
             btn.disabled = false;
             btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up shrink-0"></i> <span class="truncate">Transmitir Relatório</span>`;
         }
@@ -666,7 +665,6 @@
         return 'bg-gray-50 text-gray-600 border-gray-200';
     }
 
-    // ABRIR FOTO EM ZOOM
     window.ampliarFoto = (src) => {
         try {
             document.getElementById('viewer-img').src = src;
@@ -727,7 +725,9 @@
 
             document.getElementById('slide-overlay').classList.add('active');
             document.getElementById('slide-panel').classList.add('active');
-        } catch(e) {}
+        } catch(e) {
+            console.error("Erro detalhes:", e);
+        }
     };
 
     window.fecharDetalhes = () => { document.getElementById('slide-overlay').classList.remove('active'); document.getElementById('slide-panel').classList.remove('active'); };
@@ -754,9 +754,7 @@
             try {
                 await remove(ref(db, `ocorrencias_lmg48/${occ.id}`));
                 alert("🗑️ Relatório excluído com sucesso.");
-            } catch (error) {
-                alert(`❌ Erro ao excluir: ${error.message}`);
-            }
+            } catch (error) {}
         }
     };
 
@@ -766,7 +764,6 @@
     });
     document.addEventListener('keydown', (e) => { if (e.key === "Escape") { window.fecharDetalhes(); window.fecharDropdownStatus(); } });
 
-    // DASHBOARD ADMIN
     window.atualizarDashboardUI = () => {
         try {
             const tbody = document.getElementById('tabela-dados');
@@ -782,8 +779,7 @@
                 return;
             }
 
-            let htmlTabela = '';
-            window.ocorrencias.forEach((item, index) => {
+            const htmlRows = window.ocorrencias.map((item, index) => {
                 const status = item.status || 'Pendente';
                 if(status === 'Pendente') p++; else if(status === 'Resolvido') r++; else c++;
                 
@@ -794,7 +790,7 @@
                 const local = item.local || '-';
                 const dataOcc = item.data || '-';
 
-                htmlTabela += `
+                return `
                     <tr class="hover:bg-gray-50/50 transition-colors border-b border-gray-50">
                         <td class="px-6 py-4 truncate max-w-[200px]"><strong class="text-gray-800 truncate">${local}</strong></td>
                         <td class="px-6 py-4 truncate max-w-[200px]"><div class="flex items-center gap-3 shrink-0 truncate"><div class="w-8 h-8 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center font-bold text-xs uppercase shrink-0">${iniciais.toUpperCase()}</div><span class="text-sm font-medium text-gray-700 uppercase truncate">${autor}</span></div></td>
@@ -810,12 +806,14 @@
                 `;
             });
 
-            tbody.innerHTML = htmlTabela;
+            tbody.innerHTML = htmlRows.join('');
             document.getElementById('kpi-pendentes').innerText = p; document.getElementById('kpi-resolvidos').innerText = r;
             
-            setTimeout(() => { window.desenharGrafico(p, r, c); }, 50);
+            window.desenharGrafico(p, r, c);
 
-        } catch(e) { console.error("Erro Dashboard:", e); }
+        } catch(e) {
+            console.error("Erro Dashboard:", e);
+        }
     };
 
     let chartInstance = null;
@@ -843,18 +841,19 @@
                     type: 'doughnut',
                     data: { labels: ['Pendentes', 'Sanadas', 'Canceladas'], datasets: [{ data: [p, r, c], backgroundColor: ['#F59E0B', '#16a34a', '#EF4444'], borderWidth: 0 }] },
                     options: { 
-                        responsive: true, 
+                        responsive: false, 
                         maintainAspectRatio: false,
                         animation: false, 
                         cutout: '75%', 
-                        plugins: { legend: { display: false }, tooltip: { cornerRadius: 8, padding: 12, boxPadding: 8, titleFont: { family: "'Inter', sans-serif", size: 13 }, bodyFont: { family: "'Inter', sans-serif", size: 13 } } } 
+                        plugins: { legend: { display: false } } 
                     }
                 });
             }
-        } catch(e) {}
+        } catch(e) {
+            console.error("Erro Gráfico:", e);
+        }
     };
 
-    // PROGRESSO DO INSPETOR
     window.renderizarMeuProgresso = () => {
         try {
             const tbody = document.getElementById('tabela-meu-progresso');
@@ -868,15 +867,14 @@
                 return;
             }
 
-            let htmlProgresso = '';
-            minhasOcorrencias.forEach((item) => {
+            const htmlProgresso = minhasOcorrencias.map((item) => {
                 const status = item.status || 'Pendente';
                 const badgeClass = getBadgeClasses(status);
                 const local = item.local || '-';
                 const cat = item.categoria || '-';
                 const dataOcc = item.data || '-';
 
-                htmlProgresso += `
+                return `
                     <tr class="hover:bg-gray-50/50 transition-colors border-b border-gray-50">
                         <td class="px-6 py-4"><strong class="text-gray-800">${local}</strong></td>
                         <td class="px-6 py-4 text-sm text-gray-600">${cat}</td>
@@ -886,8 +884,10 @@
                 `;
             });
             
-            tbody.innerHTML = htmlProgresso;
-        } catch(e) {}
+            tbody.innerHTML = htmlProgresso.join('');
+        } catch(e) {
+            console.error("Erro Progresso:", e);
+        }
     };
 </script>
 
