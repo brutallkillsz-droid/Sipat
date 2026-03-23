@@ -34,6 +34,11 @@
         }
         .card-interaction:hover i, .card-interaction:hover span { color: white !important; }
 
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
         input[type="date"]::-webkit-calendar-picker-indicator,
         input[type="time"]::-webkit-calendar-picker-indicator { cursor: pointer; opacity: 0.6; }
 
@@ -137,7 +142,7 @@
     </div>
 </div>
 
-<div id="app-layout" style="display: none;">
+<div id="app-layout" style="display: none;" class="flex-col min-h-screen w-full">
     <header class="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-40 w-full">
         <div class="max-w-6xl mx-auto flex justify-between items-center py-2 px-4 gap-2 whitespace-nowrap">
             <div class="flex items-center space-x-3 shrink-0">
@@ -148,7 +153,9 @@
                 Segurança é Prioridade LMG-48
             </div>
             
-            <div class="flex items-center gap-4 shrink-0 ml-auto cursor-pointer hover:opacity-75 transition-opacity" onclick="window.fazerLogout()" title="Sair do Sistema">
+            <div class="flex items-center gap-4 shrink-0 ml-auto cursor-pointer hover:opacity-75 transition-opacity" 
+                 onclick="localStorage.clear(); sessionStorage.clear(); window.location.href = window.location.pathname;" 
+                 title="Sair do Sistema">
                 <div class="text-right hidden sm:block truncate max-w-[150px]">
                     <h1 class="font-black text-xl text-gray-800 leading-none truncate hover:text-shopee">Sair</h1>
                     <p class="text-[10px] font-bold text-gray-400 tracking-widest uppercase truncate" id="user-display-name">Nome</p>
@@ -158,250 +165,251 @@
         </div>
     </header>
 
-    <main class="w-full max-w-6xl mx-auto p-4 md:p-8">
-        
-        <div id="aba-menu-inspetor" style="display: none;">
-            <div class="grid grid-cols-2 gap-4 md:gap-6 pt-4">
-                <button onclick="window.mudarAba('aba-registro')" class="card-interaction col-span-2 bg-white border-2 border-shopee rounded-3xl p-8 shadow-sm flex flex-col items-center justify-center space-y-4 group">
-                    <i class="fa-solid fa-triangle-exclamation text-7xl text-shopee transition-colors"></i>
-                    <span class="font-black text-2xl text-gray-800 uppercase group-hover:text-white transition-colors tracking-tight">Relatar Risco Agora</span>
-                </button>
-                
-                <button onclick="window.mudarAba('aba-inspecao')" class="card-interaction col-span-2 md:col-span-1 bg-white border-2 border-shopee rounded-3xl p-6 shadow-sm flex flex-col items-center justify-center space-y-3 group">
-                    <i class="fa-solid fa-clipboard-check text-5xl text-shopee transition-colors"></i>
-                    <span class="font-black text-xl text-gray-800 uppercase group-hover:text-white transition-colors tracking-tight">Inspeção Mensal</span>
-                </button>
+    <main class="w-full flex-grow p-4 md:p-8">
+        <div class="max-w-6xl mx-auto w-full">
 
-                <button onclick="window.mudarAba('aba-progresso')" class="card-interaction col-span-2 md:col-span-1 bg-white rounded-3xl p-6 shadow-sm flex flex-col items-center justify-center space-y-3 border-b-4 border-shopee group">
-                    <i class="fa-solid fa-chart-simple text-4xl text-shopee transition-colors"></i>
-                    <span class="font-bold text-sm text-gray-700 text-center leading-tight transition-colors">Meu Progresso</span>
-                </button>
+            <div id="aba-menu-inspetor" style="display: none;">
+                <div class="grid grid-cols-2 gap-4 md:gap-6 pt-4">
+                    <button onclick="window.mudarAba('aba-registro')" class="card-interaction col-span-2 bg-white border-2 border-shopee rounded-3xl p-8 shadow-sm flex flex-col items-center justify-center space-y-4 group">
+                        <i class="fa-solid fa-triangle-exclamation text-7xl text-shopee transition-colors"></i>
+                        <span class="font-black text-2xl text-gray-800 uppercase group-hover:text-white transition-colors tracking-tight">Relatar Risco Agora</span>
+                    </button>
+                    
+                    <button onclick="window.mudarAba('aba-inspecao')" class="card-interaction col-span-2 md:col-span-1 bg-white border-2 border-shopee rounded-3xl p-6 shadow-sm flex flex-col items-center justify-center space-y-3 group">
+                        <i class="fa-solid fa-clipboard-check text-5xl text-shopee transition-colors"></i>
+                        <span class="font-black text-xl text-gray-800 uppercase group-hover:text-white transition-colors tracking-tight">Inspeção Mensal</span>
+                    </button>
 
-                <button class="card-interaction bg-white rounded-3xl p-6 shadow-sm flex flex-col items-center justify-center space-y-3 border-b-4 border-shopee group">
-                    <i class="fa-solid fa-file-shield text-4xl text-shopee transition-colors"></i>
-                    <span class="font-bold text-sm text-gray-700 text-center leading-tight transition-colors">Procedimentos</span>
-                </button>
-                
-                <button class="card-interaction bg-white rounded-3xl p-6 shadow-sm flex flex-col items-center justify-center space-y-3 border-b-4 border-shopee group">
-                    <i class="fa-solid fa-graduation-cap text-4xl text-shopee transition-colors"></i>
-                    <span class="font-bold text-sm text-gray-700 text-center leading-tight transition-colors">Treinamento</span>
-                </button>
-                
-                <button onclick="window.fazerLogout()" class="card-interaction col-span-2 bg-white rounded-3xl p-6 shadow-sm flex flex-col items-center justify-center space-y-3 border-b-4 border-gray-300 group">
-                    <i class="fa-solid fa-power-off text-3xl text-gray-400 transition-colors"></i>
-                    <span class="font-bold text-sm text-gray-500 text-center leading-tight transition-colors">Sair do Sistema</span>
-                </button>
-            </div>
-        </div>
+                    <button onclick="window.mudarAba('aba-progresso')" class="card-interaction col-span-2 md:col-span-1 bg-white rounded-3xl p-6 shadow-sm flex flex-col items-center justify-center space-y-3 border-b-4 border-shopee group">
+                        <i class="fa-solid fa-chart-simple text-4xl text-shopee transition-colors"></i>
+                        <span class="font-bold text-sm text-gray-700 text-center leading-tight transition-colors">Meu Progresso</span>
+                    </button>
 
-        <div id="aba-inspecao" style="display: none;" class="max-w-3xl mx-auto pb-10">
-            <div class="flex items-center gap-4 mb-6 py-3">
-                <button onclick="window.voltarMenuInspetor()" class="w-12 h-12 rounded-2xl bg-white shadow-md border border-gray-200 flex items-center justify-center text-gray-700 hover:text-shopee hover:border-shopee hover:bg-shopee-light transition-all active:scale-95 shrink-0">
-                    <i class="fa-solid fa-arrow-left text-xl"></i>
-                </button>
-                <div>
-                    <h2 class="text-2xl font-black text-gray-800 tracking-tight leading-tight">Inspeção Mensal</h2>
-                    <p class="text-sm text-gray-500 font-medium">Preencha o checklist de segurança oficial.</p>
+                    <button class="card-interaction bg-white rounded-3xl p-6 shadow-sm flex flex-col items-center justify-center space-y-3 border-b-4 border-shopee group">
+                        <i class="fa-solid fa-file-shield text-4xl text-shopee transition-colors"></i>
+                        <span class="font-bold text-sm text-gray-700 text-center leading-tight transition-colors">Procedimentos</span>
+                    </button>
+                    
+                    <button class="card-interaction bg-white rounded-3xl p-6 shadow-sm flex flex-col items-center justify-center space-y-3 border-b-4 border-shopee group">
+                        <i class="fa-solid fa-graduation-cap text-4xl text-shopee transition-colors"></i>
+                        <span class="font-bold text-sm text-gray-700 text-center leading-tight transition-colors">Treinamento</span>
+                    </button>
+                    
+                    <button onclick="window.fazerLogout()" class="card-interaction col-span-2 bg-white rounded-3xl p-6 shadow-sm flex flex-col items-center justify-center space-y-3 border-b-4 border-gray-300 group">
+                        <i class="fa-solid fa-power-off text-3xl text-gray-400 transition-colors"></i>
+                        <span class="font-bold text-sm text-gray-500 text-center leading-tight transition-colors">Sair do Sistema</span>
+                    </button>
                 </div>
             </div>
 
-            <div class="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 space-y-6">
-                <div class="p-4 border-l-4 border-shopee bg-shopee-light rounded-r-xl mb-6">
-                    <p class="text-sm font-bold text-shopee-dark"><i class="fa-solid fa-check-circle"></i> O formulário base foi criado com sucesso. Aguardando o comando para popular as perguntas.</p>
-                </div>
-
-                <div>
-                    <h3 class="block text-lg font-black text-gray-800 mb-3 border-b pb-2">1. Condição Geral e Sinalização</h3>
-                    <label class="block text-sm font-bold text-gray-700 mb-2">Qual o status das placas e marcações no piso?</label>
-                    <select class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee font-medium text-gray-700 outline-none">
-                        <option value="" disabled selected>Selecione uma opção...</option>
-                        <option>Conforme</option>
-                        <option>Não Conforme</option>
-                        <option>Não se Aplica</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-2">Observações / Justificativas</label>
-                    <textarea rows="3" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee font-medium text-gray-700 resize-none outline-none" placeholder="Digite detalhes adicionais, se necessário..."></textarea>
-                </div>
-
-                <button class="w-full bg-gray-300 text-gray-500 font-black text-lg tracking-wide rounded-2xl py-4 mt-6 shadow-sm cursor-not-allowed text-center">
-                    <i class="fa-solid fa-lock"></i> Finalizar Inspeção
-                </button>
-            </div>
-        </div>
-
-        <div id="aba-registro" style="display: none;" class="max-w-3xl mx-auto pb-10">
-            <div class="flex items-center gap-4 mb-6 py-3">
-                <button onclick="window.voltarMenuInspetor()" class="w-12 h-12 rounded-2xl bg-white shadow-md border border-gray-200 flex items-center justify-center text-gray-700 hover:text-shopee hover:border-shopee hover:bg-shopee-light transition-all active:scale-95 shrink-0" title="Voltar ao Menu">
-                    <i class="fa-solid fa-arrow-left text-xl"></i>
-                </button>
-                <div>
-                    <h2 class="text-2xl font-black text-gray-800 tracking-tight leading-tight">Reportar Anomalia</h2>
-                    <p class="text-sm text-gray-500 font-medium">Preencha os dados da ocorrência.</p>
-                </div>
-            </div>
-
-            <div class="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 space-y-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div id="aba-inspecao" style="display: none;" class="max-w-3xl mx-auto pb-10">
+                <div class="flex items-center gap-4 mb-6 py-3">
+                    <button onclick="window.voltarMenuInspetor()" class="w-12 h-12 rounded-2xl bg-white shadow-md border border-gray-200 flex items-center justify-center text-gray-700 hover:text-shopee hover:border-shopee hover:bg-shopee-light transition-all active:scale-95 shrink-0">
+                        <i class="fa-solid fa-arrow-left text-xl"></i>
+                    </button>
                     <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-2">Unidade Logística</label>
-                        <select id="hub_local" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee focus:border-transparent appearance-none font-medium text-gray-700">
-                            <option value="" disabled selected>Selecionar Base...</option>
-                            <option>Hub Uberaba</option>
-                            <option>Hub Uberlândia</option>
-                            <option>Hub Divinópolis</option>
-                            <option>Hub Lagoa da Prata</option>
-                            <option>Hub Patos de Minas</option>
+                        <h2 class="text-2xl font-black text-gray-800 tracking-tight leading-tight">Inspeção Mensal</h2>
+                        <p class="text-sm text-gray-500 font-medium">Preencha o checklist de segurança oficial.</p>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 space-y-6">
+                    <div class="p-4 border-l-4 border-shopee bg-shopee-light rounded-r-xl mb-6">
+                        <p class="text-sm font-bold text-shopee-dark"><i class="fa-solid fa-check-circle"></i> O formulário base foi criado com sucesso. Aguardando o comando para popular as perguntas.</p>
+                    </div>
+
+                    <div>
+                        <h3 class="block text-lg font-black text-gray-800 mb-3 border-b pb-2">1. Condição Geral e Sinalização</h3>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Qual o status das placas e marcações no piso?</label>
+                        <select class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee font-medium text-gray-700 outline-none">
+                            <option value="" disabled selected>Selecione uma opção...</option>
+                            <option>Conforme</option>
+                            <option>Não Conforme</option>
+                            <option>Não se Aplica</option>
                         </select>
                     </div>
+
                     <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-2">Vetor de Risco</label>
-                        <select id="categoria" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee focus:border-transparent appearance-none font-medium text-gray-700">
-                            <option value="" disabled selected>Selecionar Padrão...</option>
-                            <option>Organização e Limpeza</option>
-                            <option>Movimentação de Volumosos</option>
-                            <option>Uso de EPIs</option>
-                            <option>Infraestrutura e Docas</option>
-                            <option>Equipamentos (Empilhadeira)</option>
-                        </select>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Observações / Justificativas</label>
+                        <textarea rows="3" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee font-medium text-gray-700 resize-none outline-none" placeholder="Digite detalhes adicionais, se necessário..."></textarea>
                     </div>
-                </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <button class="w-full bg-gray-300 text-gray-500 font-black text-lg tracking-wide rounded-2xl py-4 mt-6 shadow-sm cursor-not-allowed text-center">
+                        <i class="fa-solid fa-lock"></i> Finalizar Inspeção
+                    </button>
+                </div>
+            </div>
+
+            <div id="aba-registro" style="display: none;" class="max-w-3xl mx-auto pb-10">
+                <div class="flex items-center gap-4 mb-6 py-3">
+                    <button onclick="window.voltarMenuInspetor()" class="w-12 h-12 rounded-2xl bg-white shadow-md border border-gray-200 flex items-center justify-center text-gray-700 hover:text-shopee hover:border-shopee hover:bg-shopee-light transition-all active:scale-95 shrink-0" title="Voltar ao Menu">
+                        <i class="fa-solid fa-arrow-left text-xl"></i>
+                    </button>
                     <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-2">Data Constatada</label>
-                        <input type="date" id="data_ocorrencia" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee focus:border-transparent text-gray-700 font-medium">
+                        <h2 class="text-2xl font-black text-gray-800 tracking-tight leading-tight">Reportar Anomalia</h2>
+                        <p class="text-sm text-gray-500 font-medium">Preencha os dados da ocorrência.</p>
                     </div>
+                </div>
+
+                <div class="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Unidade Logística</label>
+                            <select id="hub_local" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee focus:border-transparent appearance-none font-medium text-gray-700">
+                                <option value="" disabled selected>Selecionar Base...</option>
+                                <option>Hub Uberaba</option>
+                                <option>Hub Uberlândia</option>
+                                <option>Hub Divinópolis</option>
+                                <option>Hub Lagoa da Prata</option>
+                                <option>Hub Patos de Minas</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Vetor de Risco</label>
+                            <select id="categoria" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee focus:border-transparent appearance-none font-medium text-gray-700">
+                                <option value="" disabled selected>Selecionar Padrão...</option>
+                                <option>Organização e Limpeza</option>
+                                <option>Movimentação de Volumosos</option>
+                                <option>Uso de EPIs</option>
+                                <option>Infraestrutura e Docas</option>
+                                <option>Equipamentos (Empilhadeira)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Data Constatada</label>
+                            <input type="date" id="data_ocorrencia" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee focus:border-transparent text-gray-700 font-medium">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Horário Exato</label>
+                            <input type="time" id="hora_ocorrencia" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee focus:border-transparent text-gray-700 font-medium">
+                        </div>
+                    </div>
+
                     <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-2">Horário Exato</label>
-                        <input type="time" id="hora_ocorrencia" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee focus:border-transparent text-gray-700 font-medium">
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Laudo / Detalhamento</label>
+                        <textarea id="detalhes" rows="3" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee focus:border-transparent text-gray-700 font-medium resize-none" placeholder="Descreva tecnicamente o cenário encontrado..."></textarea>
                     </div>
-                </div>
 
-                <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-2">Laudo / Detalhamento</label>
-                    <textarea id="detalhes" rows="3" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee focus:border-transparent text-gray-700 font-medium resize-none" placeholder="Descreva tecnicamente o cenário encontrado..."></textarea>
-                </div>
-
-                <div>
-                    <div class="flex justify-between items-center mb-2">
-                        <label class="block text-sm font-bold text-gray-700">Evidências Visuais (Fotos)</label>
-                        <span class="text-xs text-gray-400 font-bold bg-gray-100 px-2 py-1 rounded-md" id="contador-fotos">0/5</span>
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="block text-sm font-bold text-gray-700">Evidências Visuais (Fotos)</label>
+                            <span class="text-xs text-gray-400 font-bold bg-gray-100 px-2 py-1 rounded-md" id="contador-fotos">0/5</span>
+                        </div>
+                        <div id="preview-fotos-container" class="grid grid-cols-3 sm:grid-cols-5 gap-3 mb-3 empty:hidden"></div>
+                        <div class="relative border-2 border-dashed border-gray-300 bg-gray-50 rounded-2xl p-6 text-center hover:bg-shopee-light hover:border-shopee transition-colors cursor-pointer group">
+                            <i class="fa-solid fa-camera-retro text-3xl text-gray-400 group-hover:text-shopee mb-2 transition-colors"></i>
+                            <p class="text-xs font-medium text-gray-500" id="upload-text">Toque para adicionar foto</p>
+                            <input type="file" id="foto_upload" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="window.processarNovaFoto(event)">
+                        </div>
                     </div>
-                    <div id="preview-fotos-container" class="grid grid-cols-3 sm:grid-cols-5 gap-3 mb-3 empty:hidden"></div>
-                    <div class="relative border-2 border-dashed border-gray-300 bg-gray-50 rounded-2xl p-6 text-center hover:bg-shopee-light hover:border-shopee transition-colors cursor-pointer group">
-                        <i class="fa-solid fa-camera-retro text-3xl text-gray-400 group-hover:text-shopee mb-2 transition-colors"></i>
-                        <p class="text-xs font-medium text-gray-500" id="upload-text">Toque para adicionar foto</p>
-                        <input type="file" id="foto_upload" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="window.processarNovaFoto(event)">
-                    </div>
-                </div>
 
-                <button id="btn-enviar" onclick="window.salvarFormulario()" class="w-full bg-shopee hover:bg-shopee-dark text-white font-black text-lg tracking-wide rounded-2xl py-4 mt-4 shadow-lg shadow-shopee/30 transition-all active:scale-95 flex justify-center items-center gap-2 overflow-hidden truncate whitespace-nowrap">
-                    <i class="fa-solid fa-cloud-arrow-up shrink-0"></i> <span class="truncate">Transmitir Relatório</span>
-                </button>
-            </div>
-        </div>
-
-        <div id="aba-progresso" style="display: none;" class="max-w-4xl mx-auto pb-10">
-            <div class="flex items-center gap-4 mb-6 py-3">
-                <button onclick="window.voltarMenuInspetor()" class="w-12 h-12 rounded-2xl bg-white shadow-md border border-gray-200 flex items-center justify-center text-gray-700 hover:text-shopee hover:border-shopee hover:bg-shopee-light transition-all active:scale-95 shrink-0" title="Voltar ao Menu">
-                    <i class="fa-solid fa-arrow-left text-xl"></i>
-                </button>
-                <div>
-                    <h2 class="text-2xl font-black text-gray-800 tracking-tight leading-tight">Meu Progresso</h2>
-                    <p class="text-sm text-gray-500 font-medium">Acompanhe o status dos seus relatórios.</p>
+                    <button id="btn-enviar" onclick="window.salvarFormulario()" class="w-full bg-shopee hover:bg-shopee-dark text-white font-black text-lg tracking-wide rounded-2xl py-4 mt-4 shadow-lg shadow-shopee/30 transition-all active:scale-95 flex justify-center items-center gap-2 overflow-hidden truncate whitespace-nowrap">
+                        <i class="fa-solid fa-cloud-arrow-up shrink-0"></i> <span class="truncate">Transmitir Relatório</span>
+                    </button>
                 </div>
             </div>
 
-            <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-                <div class="p-6 border-b border-gray-50 bg-gray-50/50">
-                    <h3 class="font-bold text-gray-800 flex items-center gap-2"><i class="fa-solid fa-clock-rotate-left text-shopee"></i> Histórico Pessoal</h3>
-                </div>
-                <div class="overflow-x-auto w-full p-4">
-                    <table class="w-full text-left whitespace-nowrap min-w-[700px]">
-                        <thead>
-                            <tr class="bg-white border-b border-gray-100 py-2">
-                                <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Unidade</th>
-                                <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Classificação</th>
-                                <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Data / Hora</th>
-                                <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Status Atual</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tabela-meu-progresso" class="divide-y divide-gray-50">
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <div id="aba-dashboard" style="display: none;" class="pb-10">
-            
-            <div class="bg-white shadow-sm border-b mb-6 rounded-2xl flex overflow-hidden border border-gray-100">
-                <button onclick="window.mudarAba('aba-dashboard')" class="flex-1 py-4 font-black text-shopee bg-shopee-light border-b-4 border-shopee transition-colors focus:outline-none">Visão Geral</button>
-                <button onclick="window.mudarAba('aba-tratativas')" class="flex-1 py-4 font-bold text-gray-500 hover:bg-gray-50 border-b-4 border-transparent transition-colors focus:outline-none">Tratativas</button>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center relative overflow-hidden">
-                    <div class="w-2 h-full bg-gray-800 absolute left-0 top-0"></div>
-                    <div class="pl-2 truncate">
-                        <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1 truncate">Ocorrências</h4>
-                        <h2 id="kpi-total" class="text-4xl font-black text-gray-800 truncate">0</h2>
-                    </div>
-                    <div class="w-14 h-14 rounded-2xl bg-gray-50 flex justify-center items-center text-gray-400 text-2xl shrink-0"><i class="fa-solid fa-layer-group"></i></div>
-                </div>
-                <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center relative overflow-hidden">
-                    <div class="w-2 h-full bg-yellow-500 absolute left-0 top-0"></div>
-                    <div class="pl-2 truncate">
-                        <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1 truncate">Aguardando</h4>
-                        <h2 id="kpi-pendentes" class="text-4xl font-black text-gray-800 truncate">0</h2>
-                    </div>
-                    <div class="w-14 h-14 rounded-2xl bg-yellow-50 flex justify-center items-center text-yellow-500 text-2xl shrink-0"><i class="fa-solid fa-clock-rotate-left"></i></div>
-                </div>
-                <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center relative overflow-hidden">
-                    <div class="w-2 h-full bg-shopee absolute left-0 top-0"></div>
-                    <div class="pl-2 truncate">
-                        <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1 truncate">Sanadas</h4>
-                        <h2 id="kpi-resolvidos" class="text-4xl font-black text-gray-800 truncate">0</h2>
-                    </div>
-                    <div class="w-14 h-14 rounded-2xl bg-shopee-light flex justify-center items-center text-shopee text-2xl shrink-0"><i class="fa-solid fa-shield-check"></i></div>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div class="lg:col-span-1 bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center justify-center">
-                    <h3 class="font-bold text-gray-800 mb-4 w-full flex items-center gap-2"><i class="fa-solid fa-chart-pie text-shopee"></i> Distribuição</h3>
-                    <div style="width: 250px; height: 250px; position: relative; margin: 0 auto;">
-                        <canvas id="graficoStatus" width="250" height="250"></canvas>
-                        <div id="grafico-vazio" class="hidden absolute inset-0 flex items-center justify-center text-gray-400 font-bold text-sm bg-white z-10">Sem dados para exibir</div>
+            <div id="aba-progresso" style="display: none;" class="max-w-4xl mx-auto pb-10">
+                <div class="flex items-center gap-4 mb-6 py-3">
+                    <button onclick="window.voltarMenuInspetor()" class="w-12 h-12 rounded-2xl bg-white shadow-md border border-gray-200 flex items-center justify-center text-gray-700 hover:text-shopee hover:border-shopee hover:bg-shopee-light transition-all active:scale-95 shrink-0" title="Voltar ao Menu">
+                        <i class="fa-solid fa-arrow-left text-xl"></i>
+                    </button>
+                    <div>
+                        <h2 class="text-2xl font-black text-gray-800 tracking-tight leading-tight">Meu Progresso</h2>
+                        <p class="text-sm text-gray-500 font-medium">Acompanhe o status dos seus relatórios.</p>
                     </div>
                 </div>
 
-                <div class="lg:col-span-2 bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
-                    <div class="p-6 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
-                        <h3 class="font-bold text-gray-800 flex items-center gap-2"><i class="fa-solid fa-cloud text-shopee"></i> Banco de Dados RTDB</h3>
-                        <span class="text-xs font-bold bg-shopee-light text-shopee-dark px-3 py-1 rounded-full"><i class="fa-solid fa-circle-nodes"></i> Online</span>
+                <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex flex-col min-h-[500px]">
+                    <div class="p-6 border-b border-gray-50 bg-gray-50/50">
+                        <h3 class="font-bold text-gray-800 flex items-center gap-2"><i class="fa-solid fa-clock-rotate-left text-shopee"></i> Histórico Pessoal</h3>
                     </div>
-                    <div class="overflow-x-auto w-full p-4">
-                        <table class="w-full text-left whitespace-nowrap min-w-[800px]">
+                    <div class="overflow-x-auto w-full p-4 flex-grow">
+                        <table class="w-full text-left whitespace-nowrap min-w-[700px]">
                             <thead>
                                 <tr class="bg-white border-b border-gray-100 py-2">
                                     <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Unidade</th>
-                                    <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Inspetor</th>
+                                    <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Classificação</th>
                                     <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Data / Hora</th>
-                                    <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Status</th>
-                                    <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-center">Ação</th>
+                                    <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Status Atual</th>
                                 </tr>
                             </thead>
-                            <tbody id="tabela-dados" class="divide-y divide-gray-50">
+                            <tbody id="tabela-meu-progresso" class="divide-y divide-gray-50">
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
-        </div>
+
+            <div id="aba-dashboard" style="display: none;" class="pb-10">
+                
+                <div class="bg-white shadow-sm border-b mb-6 rounded-2xl flex overflow-hidden border border-gray-100">
+                    <button onclick="window.mudarAba('aba-dashboard')" class="flex-1 py-4 font-black text-shopee bg-shopee-light border-b-4 border-shopee transition-colors focus:outline-none">Visão Geral</button>
+                    <button onclick="window.mudarAba('aba-tratativas')" class="flex-1 py-4 font-bold text-gray-500 hover:bg-gray-50 border-b-4 border-transparent transition-colors focus:outline-none">Tratativas</button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center relative overflow-hidden">
+                        <div class="w-2 h-full bg-gray-800 absolute left-0 top-0"></div>
+                        <div class="pl-2 truncate">
+                            <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1 truncate">Ocorrências</h4>
+                            <h2 id="kpi-total" class="text-4xl font-black text-gray-800 truncate">0</h2>
+                        </div>
+                        <div class="w-14 h-14 rounded-2xl bg-gray-50 flex justify-center items-center text-gray-400 text-2xl shrink-0"><i class="fa-solid fa-layer-group"></i></div>
+                    </div>
+                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center relative overflow-hidden">
+                        <div class="w-2 h-full bg-yellow-500 absolute left-0 top-0"></div>
+                        <div class="pl-2 truncate">
+                            <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1 truncate">Aguardando</h4>
+                            <h2 id="kpi-pendentes" class="text-4xl font-black text-gray-800 truncate">0</h2>
+                        </div>
+                        <div class="w-14 h-14 rounded-2xl bg-yellow-50 flex justify-center items-center text-yellow-500 text-2xl shrink-0"><i class="fa-solid fa-clock-rotate-left"></i></div>
+                    </div>
+                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center relative overflow-hidden">
+                        <div class="w-2 h-full bg-shopee absolute left-0 top-0"></div>
+                        <div class="pl-2 truncate">
+                            <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1 truncate">Sanadas</h4>
+                            <h2 id="kpi-resolvidos" class="text-4xl font-black text-gray-800 truncate">0</h2>
+                        </div>
+                        <div class="w-14 h-14 rounded-2xl bg-shopee-light flex justify-center items-center text-shopee text-2xl shrink-0"><i class="fa-solid fa-shield-check"></i></div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-1 bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center justify-center">
+                        <h3 class="font-bold text-gray-800 mb-4 w-full flex items-center gap-2"><i class="fa-solid fa-chart-pie text-shopee"></i> Distribuição</h3>
+                        <div style="width: 100%; height: 250px; position: relative; margin: 0 auto;">
+                            <canvas id="graficoStatus"></canvas>
+                            <div id="grafico-vazio" class="hidden absolute inset-0 flex items-center justify-center text-gray-400 font-bold text-sm bg-white z-10">Sem dados para exibir</div>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-2 bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex flex-col min-h-[500px]">
+                        <div class="p-6 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
+                            <h3 class="font-bold text-gray-800 flex items-center gap-2"><i class="fa-solid fa-cloud text-shopee"></i> Banco de Dados RTDB</h3>
+                            <span class="text-xs font-bold bg-shopee-light text-shopee-dark px-3 py-1 rounded-full"><i class="fa-solid fa-circle-nodes"></i> Online</span>
+                        </div>
+                        <div class="overflow-x-auto w-full p-4 flex-grow">
+                            <table class="w-full text-left whitespace-nowrap min-w-[800px]">
+                                <thead>
+                                    <tr class="bg-white border-b border-gray-100 py-2">
+                                        <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Unidade</th>
+                                        <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Inspetor</th>
+                                        <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Data / Hora</th>
+                                        <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Status</th>
+                                        <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-center">Ação</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabela-dados" class="divide-y divide-gray-50">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
         <div id="aba-tratativas" style="display: none;" class="pb-10">
             <div class="bg-white shadow-sm border-b mb-6 rounded-2xl flex overflow-hidden border border-gray-100">
@@ -418,6 +426,7 @@
             </div>
         </div>
 
+        </div>
     </main>
 </div>
 
@@ -500,7 +509,7 @@
             document.getElementById('user-display-avatar').innerText = iniciais;
             
             document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('app-layout').style.display = 'block'; // Block convencional
+            document.getElementById('app-layout').style.display = 'flex';
 
             if(user === 'admin') {
                 window.mudarAba('aba-dashboard');
@@ -521,17 +530,14 @@
     };
     window.verificarSessao();
 
-    // BOTÃO DE SAIR RAIZ (À PROVA DE FALHAS)
     window.fazerLogout = () => {
         try {
             localStorage.clear();
             sessionStorage.clear();
         } catch(e) {}
-        // Recarrega a página de forma limpa, como um site convencional
         window.location.href = window.location.pathname; 
     };
 
-    // MUDANÇA DE ABAS CONVENCIONAL
     window.mudarAba = (abaId) => {
         try {
             const todasAbas = ['aba-menu-inspetor', 'aba-registro', 'aba-progresso', 'aba-dashboard', 'aba-tratativas', 'aba-inspecao'];
@@ -609,7 +615,6 @@
         } catch(e) {}
     };
 
-    // ENVIO E ATUALIZAÇÃO CONVENCIONAL DE SITE
     window.salvarFormulario = async () => {
         const hub = document.getElementById('hub_local').value;
         const cat = document.getElementById('categoria').value;
@@ -646,8 +651,6 @@
 
             await set(novaOcorrenciaRef, payload);
             alert("✅ Relatório transmitido com sucesso!");
-            
-            // ATUALIZAÇÃO CONVENCIONAL: Força o site a buscar as informações recentes do banco
             window.location.href = window.location.pathname + '?reload=' + new Date().getTime();
 
         } catch (error) {
@@ -791,7 +794,7 @@
                 const dataOcc = item.data || '-';
 
                 return `
-                    <tr class="hover:bg-gray-50/50 transition-colors border-b border-gray-50">
+                    <tr class="hover:bg-gray-50/50 transition-colors group border-b border-gray-50">
                         <td class="px-6 py-4 truncate max-w-[200px]"><strong class="text-gray-800 truncate">${local}</strong></td>
                         <td class="px-6 py-4 truncate max-w-[200px]"><div class="flex items-center gap-3 shrink-0 truncate"><div class="w-8 h-8 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center font-bold text-xs uppercase shrink-0">${iniciais.toUpperCase()}</div><span class="text-sm font-medium text-gray-700 uppercase truncate">${autor}</span></div></td>
                         <td class="px-6 py-4 text-sm text-gray-600 truncate whitespace-nowrap">${dataOcc}</td>
@@ -809,7 +812,7 @@
             tbody.innerHTML = htmlRows.join('');
             document.getElementById('kpi-pendentes').innerText = p; document.getElementById('kpi-resolvidos').innerText = r;
             
-            window.desenharGrafico(p, r, c);
+            setTimeout(() => { window.desenharGrafico(p, r, c); }, 50);
 
         } catch(e) {
             console.error("Erro Dashboard:", e);
@@ -841,7 +844,7 @@
                     type: 'doughnut',
                     data: { labels: ['Pendentes', 'Sanadas', 'Canceladas'], datasets: [{ data: [p, r, c], backgroundColor: ['#F59E0B', '#16a34a', '#EF4444'], borderWidth: 0 }] },
                     options: { 
-                        responsive: false, 
+                        responsive: true, 
                         maintainAspectRatio: false,
                         animation: false, 
                         cutout: '75%', 
