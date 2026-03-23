@@ -52,7 +52,6 @@
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* ESTILO DO ZOOM DE FOTO */
         #photo-viewer { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 10000; align-items: center; justify-content: center; padding: 20px; cursor: zoom-out; }
         #photo-viewer img { max-width: 100%; max-height: 100%; border-radius: 8px; box-shadow: 0 0 50px rgba(0,0,0,0.5); object-fit: contain; }
     </style>
@@ -179,6 +178,11 @@
                         <i class="fa-solid fa-triangle-exclamation text-7xl text-shopee transition-colors"></i>
                         <span class="font-black text-2xl text-gray-800 uppercase group-hover:text-white transition-colors tracking-tight">Relatar Risco Agora</span>
                     </button>
+                    <button onclick="window.mudarAba('inspecao')" class="card-interaction col-span-2 bg-white border-2 border-shopee rounded-3xl p-6 shadow-sm flex flex-col items-center justify-center space-y-3 group">
+                        <i class="fa-solid fa-clipboard-check text-5xl text-shopee transition-colors"></i>
+                        <span class="font-black text-xl text-gray-800 uppercase group-hover:text-white transition-colors tracking-tight">Inspeção Mensal</span>
+                    </button>
+                    
                     <button class="card-interaction bg-white rounded-3xl p-6 shadow-sm flex flex-col items-center justify-center space-y-3 border-b-4 border-shopee group">
                         <i class="fa-solid fa-file-shield text-4xl text-shopee transition-colors"></i>
                         <span class="font-bold text-sm text-gray-700 text-center leading-tight transition-colors">Procedimentos</span>
@@ -187,13 +191,274 @@
                         <i class="fa-solid fa-graduation-cap text-4xl text-shopee transition-colors"></i>
                         <span class="font-bold text-sm text-gray-700 text-center leading-tight transition-colors">Treinamento</span>
                     </button>
-                    <button onclick="window.mudarAba('progresso')" class="card-interaction bg-white rounded-3xl p-6 shadow-sm flex flex-col items-center justify-center space-y-3 border-b-4 border-shopee group">
+                    <button onclick="window.mudarAba('progresso')" class="card-interaction col-span-2 bg-white rounded-3xl p-6 shadow-sm flex flex-col items-center justify-center space-y-3 border-b-4 border-shopee group">
                         <i class="fa-solid fa-chart-simple text-4xl text-shopee transition-colors"></i>
                         <span class="font-bold text-sm text-gray-700 text-center leading-tight transition-colors">Meu Progresso</span>
                     </button>
-                    <button onclick="localStorage.clear(); sessionStorage.clear(); window.location.href = window.location.pathname + '?v=' + new Date().getTime();" class="card-interaction bg-white rounded-3xl p-6 shadow-sm flex flex-col items-center justify-center space-y-3 border-b-4 border-gray-300 group">
+                    <button onclick="localStorage.clear(); sessionStorage.clear(); window.location.href = window.location.pathname + '?v=' + new Date().getTime();" class="card-interaction col-span-2 bg-white rounded-3xl p-6 shadow-sm flex flex-col items-center justify-center space-y-3 border-b-4 border-gray-300 group">
                         <i class="fa-solid fa-power-off text-4xl text-gray-400 transition-colors"></i>
                         <span class="font-bold text-sm text-gray-500 text-center leading-tight transition-colors">Deslogar do Sistema</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="aba-inspecao" class="hidden max-w-3xl mx-auto pb-10 w-full">
+                <div class="flex items-center gap-4 mb-6 sticky top-0 bg-gray-50 z-20 py-3">
+                    <button onclick="window.voltarMenuInspetor()" class="w-12 h-12 rounded-2xl bg-white shadow-md border border-gray-200 flex items-center justify-center text-gray-700 hover:text-shopee hover:border-shopee hover:bg-shopee-light transition-all active:scale-95 shrink-0" title="Voltar ao Menu">
+                        <i class="fa-solid fa-arrow-left text-xl"></i>
+                    </button>
+                    <div>
+                        <h2 class="text-2xl font-black text-gray-800 tracking-tight leading-tight">Inspeção Mensal</h2>
+                        <p class="text-sm text-gray-500 font-medium">Preencha o checklist de segurança oficial.</p>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100">
+                    
+                    <h3 class="font-black text-lg text-shopee-dark border-b-2 border-shopee-light pb-2 mb-4 flex items-center gap-2"><i class="fa-solid fa-clipboard-check text-shopee"></i> Formulário de Inspeção CIPA</h3>
+                    
+                    <div class="mb-5 p-5 border border-gray-100 rounded-2xl bg-gray-50/50 shadow-sm">
+                        <label class="block text-sm font-bold text-gray-800 mb-3">1. As reuniões da CIPA e Brigada possuem Ata e Lista de Presença?</label>
+                        <div class="flex flex-wrap gap-4 mb-4">
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_1" value="Sim" class="w-4 h-4 text-shopee focus:ring-shopee"> <span class="text-sm font-bold text-gray-700">Sim</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_1" value="Não" class="w-4 h-4 text-red-600 focus:ring-red-600"> <span class="text-sm font-bold text-gray-700">Não</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_1" value="N/A" class="w-4 h-4 text-gray-400 focus:ring-gray-400"> <span class="text-sm font-bold text-gray-700">N/A</span></label>
+                        </div>
+                        <textarea class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações (opcional)..."></textarea>
+                    </div>
+
+                    <div class="mb-5 p-5 border border-gray-100 rounded-2xl bg-gray-50/50 shadow-sm">
+                        <label class="block text-sm font-bold text-gray-800 mb-3">2. As fichas de EPI estão atualizadas?</label>
+                        <div class="flex flex-wrap gap-4 mb-4">
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_2" value="Sim" class="w-4 h-4 text-shopee focus:ring-shopee"> <span class="text-sm font-bold text-gray-700">Sim</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_2" value="Não" class="w-4 h-4 text-red-600 focus:ring-red-600"> <span class="text-sm font-bold text-gray-700">Não</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_2" value="N/A" class="w-4 h-4 text-gray-400 focus:ring-gray-400"> <span class="text-sm font-bold text-gray-700">N/A</span></label>
+                        </div>
+                        <textarea class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações (opcional)..."></textarea>
+                    </div>
+
+                    <div class="mb-5 p-5 border border-gray-100 rounded-2xl bg-gray-50/50 shadow-sm">
+                        <label class="block text-sm font-bold text-gray-800 mb-3">3. O Banner das "Regras de Ouro" está fixado e visível?</label>
+                        <div class="flex flex-wrap gap-4 mb-4">
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_3" value="Sim" class="w-4 h-4 text-shopee focus:ring-shopee"> <span class="text-sm font-bold text-gray-700">Sim</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_3" value="Não" class="w-4 h-4 text-red-600 focus:ring-red-600"> <span class="text-sm font-bold text-gray-700">Não</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_3" value="N/A" class="w-4 h-4 text-gray-400 focus:ring-gray-400"> <span class="text-sm font-bold text-gray-700">N/A</span></label>
+                        </div>
+                        <textarea class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações (opcional)..."></textarea>
+                    </div>
+
+                    <h3 class="font-black text-lg text-shopee-dark border-b-2 border-shopee-light pb-2 mt-8 mb-4 flex items-center gap-2"><i class="fa-solid fa-plug text-shopee"></i> Elétrica e Equipamentos</h3>
+
+                    <div class="mb-5 p-5 border border-gray-100 rounded-2xl bg-gray-50/50 shadow-sm">
+                        <label class="block text-sm font-bold text-gray-800 mb-3">4. Quadros elétricos estão trancados, desobstruídos e sem fios expostos?</label>
+                        <div class="flex flex-wrap gap-4 mb-4">
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_4" value="Sim" class="w-4 h-4 text-shopee focus:ring-shopee"> <span class="text-sm font-bold text-gray-700">Sim</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_4" value="Não" class="w-4 h-4 text-red-600 focus:ring-red-600"> <span class="text-sm font-bold text-gray-700">Não</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_4" value="N/A" class="w-4 h-4 text-gray-400 focus:ring-gray-400"> <span class="text-sm font-bold text-gray-700">N/A</span></label>
+                        </div>
+                        <textarea class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações (opcional)..."></textarea>
+                    </div>
+
+                    <div class="mb-5 p-5 border border-gray-100 rounded-2xl bg-gray-50/50 shadow-sm">
+                        <label class="block text-sm font-bold text-gray-800 mb-3">5. Tomadas possuem identificação de voltagem e fiação adequada?</label>
+                        <div class="flex flex-wrap gap-4 mb-4">
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_5" value="Sim" class="w-4 h-4 text-shopee focus:ring-shopee"> <span class="text-sm font-bold text-gray-700">Sim</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_5" value="Não" class="w-4 h-4 text-red-600 focus:ring-red-600"> <span class="text-sm font-bold text-gray-700">Não</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_5" value="N/A" class="w-4 h-4 text-gray-400 focus:ring-gray-400"> <span class="text-sm font-bold text-gray-700">N/A</span></label>
+                        </div>
+                        <textarea class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações (opcional)..."></textarea>
+                    </div>
+
+                    <div class="mb-5 p-5 border border-gray-100 rounded-2xl bg-gray-50/50 shadow-sm">
+                        <label class="block text-sm font-bold text-gray-800 mb-3">6. Ventiladores possuem proteção e placa de "Proibido Ajustes"?</label>
+                        <div class="flex flex-wrap gap-4 mb-4">
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_6" value="Sim" class="w-4 h-4 text-shopee focus:ring-shopee"> <span class="text-sm font-bold text-gray-700">Sim</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_6" value="Não" class="w-4 h-4 text-red-600 focus:ring-red-600"> <span class="text-sm font-bold text-gray-700">Não</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_6" value="N/A" class="w-4 h-4 text-gray-400 focus:ring-gray-400"> <span class="text-sm font-bold text-gray-700">N/A</span></label>
+                        </div>
+                        <textarea class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações (opcional)..."></textarea>
+                    </div>
+
+                    <div class="mb-5 p-5 border border-gray-100 rounded-2xl bg-gray-50/50 shadow-sm">
+                        <label class="block text-sm font-bold text-gray-800 mb-3">7. Esteiras possuem proteção na junção e cordão de emergência?</label>
+                        <div class="flex flex-wrap gap-4 mb-4">
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_7" value="Sim" class="w-4 h-4 text-shopee focus:ring-shopee"> <span class="text-sm font-bold text-gray-700">Sim</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_7" value="Não" class="w-4 h-4 text-red-600 focus:ring-red-600"> <span class="text-sm font-bold text-gray-700">Não</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_7" value="N/A" class="w-4 h-4 text-gray-400 focus:ring-gray-400"> <span class="text-sm font-bold text-gray-700">N/A</span></label>
+                        </div>
+                        <textarea class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações (opcional)..."></textarea>
+                    </div>
+
+                    <div class="mb-5 p-5 border border-gray-100 rounded-2xl bg-gray-50/50 shadow-sm">
+                        <label class="block text-sm font-bold text-gray-800 mb-3">8. Os colaboradores estão utilizando os EPI corretamente?</label>
+                        <div class="flex flex-wrap gap-4 mb-4">
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_8" value="Sim" class="w-4 h-4 text-shopee focus:ring-shopee"> <span class="text-sm font-bold text-gray-700">Sim</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_8" value="Não" class="w-4 h-4 text-red-600 focus:ring-red-600"> <span class="text-sm font-bold text-gray-700">Não</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_8" value="N/A" class="w-4 h-4 text-gray-400 focus:ring-gray-400"> <span class="text-sm font-bold text-gray-700">N/A</span></label>
+                        </div>
+                        <textarea class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações (opcional)..."></textarea>
+                    </div>
+
+                    <div class="mb-5 p-5 border border-gray-100 rounded-2xl bg-gray-50/50 shadow-sm">
+                        <label class="block text-sm font-bold text-gray-800 mb-3">9. Operadores de máquinas realizam checklist antes da operação?</label>
+                        <div class="flex flex-wrap gap-4 mb-4">
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_9" value="Sim" class="w-4 h-4 text-shopee focus:ring-shopee"> <span class="text-sm font-bold text-gray-700">Sim</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_9" value="Não" class="w-4 h-4 text-red-600 focus:ring-red-600"> <span class="text-sm font-bold text-gray-700">Não</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_9" value="N/A" class="w-4 h-4 text-gray-400 focus:ring-gray-400"> <span class="text-sm font-bold text-gray-700">N/A</span></label>
+                        </div>
+                        <textarea class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações (opcional)..."></textarea>
+                    </div>
+
+                    <h3 class="font-black text-lg text-shopee-dark border-b-2 border-shopee-light pb-2 mt-8 mb-4 flex items-center gap-2"><i class="fa-solid fa-truck-medical text-shopee"></i> Emergência e Saúde</h3>
+
+                    <div class="mb-5 p-5 border border-gray-100 rounded-2xl bg-gray-50/50 shadow-sm">
+                        <label class="block text-sm font-bold text-gray-800 mb-3">10. Equipamentos de incêndio estão no prazo e o Líder sabe operar a central?</label>
+                        <div class="flex flex-wrap gap-4 mb-4">
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_10" value="Sim" class="w-4 h-4 text-shopee focus:ring-shopee"> <span class="text-sm font-bold text-gray-700">Sim</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_10" value="Não" class="w-4 h-4 text-red-600 focus:ring-red-600"> <span class="text-sm font-bold text-gray-700">Não</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_10" value="N/A" class="w-4 h-4 text-gray-400 focus:ring-gray-400"> <span class="text-sm font-bold text-gray-700">N/A</span></label>
+                        </div>
+                        <textarea class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações (opcional)..."></textarea>
+                    </div>
+
+                    <div class="mb-5 p-5 border border-gray-100 rounded-2xl bg-gray-50/50 shadow-sm">
+                        <label class="block text-sm font-bold text-gray-800 mb-3">11. Portas de emergência estão destrancadas e desobstruídas?</label>
+                        <div class="flex flex-wrap gap-4 mb-4">
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_11" value="Sim" class="w-4 h-4 text-shopee focus:ring-shopee"> <span class="text-sm font-bold text-gray-700">Sim</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_11" value="Não" class="w-4 h-4 text-red-600 focus:ring-red-600"> <span class="text-sm font-bold text-gray-700">Não</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_11" value="N/A" class="w-4 h-4 text-gray-400 focus:ring-gray-400"> <span class="text-sm font-bold text-gray-700">N/A</span></label>
+                        </div>
+                        <textarea class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações (opcional)..."></textarea>
+                    </div>
+
+                    <div class="mb-5 p-5 border border-gray-100 rounded-2xl bg-gray-50/50 shadow-sm">
+                        <label class="block text-sm font-bold text-gray-800 mb-3">12. O Kit de Primeiros Socorros está completo e sinalizado (faixa verde)?</label>
+                        <div class="flex flex-wrap gap-4 mb-4">
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_12" value="Sim" class="w-4 h-4 text-shopee focus:ring-shopee"> <span class="text-sm font-bold text-gray-700">Sim</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_12" value="Não" class="w-4 h-4 text-red-600 focus:ring-red-600"> <span class="text-sm font-bold text-gray-700">Não</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_12" value="N/A" class="w-4 h-4 text-gray-400 focus:ring-gray-400"> <span class="text-sm font-bold text-gray-700">N/A</span></label>
+                        </div>
+                        <textarea class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações (opcional)..."></textarea>
+                    </div>
+
+                    <div class="mb-5 p-5 border border-gray-100 rounded-2xl bg-gray-50/50 shadow-sm">
+                        <label class="block text-sm font-bold text-gray-800 mb-3">13. Banheiros e bebedouros estão limpos e em bom estado?</label>
+                        <div class="flex flex-wrap gap-4 mb-4">
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_13" value="Sim" class="w-4 h-4 text-shopee focus:ring-shopee"> <span class="text-sm font-bold text-gray-700">Sim</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_13" value="Não" class="w-4 h-4 text-red-600 focus:ring-red-600"> <span class="text-sm font-bold text-gray-700">Não</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_13" value="N/A" class="w-4 h-4 text-gray-400 focus:ring-gray-400"> <span class="text-sm font-bold text-gray-700">N/A</span></label>
+                        </div>
+                        <textarea class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações (opcional)..."></textarea>
+                    </div>
+
+                    <h3 class="font-black text-lg text-shopee-dark border-b-2 border-shopee-light pb-2 mt-8 mb-4 flex items-center gap-2"><i class="fa-solid fa-truck-ramp-box text-shopee"></i> Operação e Docas</h3>
+
+                    <div class="mb-5 p-5 border border-gray-100 rounded-2xl bg-gray-50/50 shadow-sm">
+                        <label class="block text-sm font-bold text-gray-800 mb-3">14. Nas docas: calços de rodas são usados e chaves são recolhidas?</label>
+                        <div class="flex flex-wrap gap-4 mb-4">
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_14" value="Sim" class="w-4 h-4 text-shopee focus:ring-shopee"> <span class="text-sm font-bold text-gray-700">Sim</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_14" value="Não" class="w-4 h-4 text-red-600 focus:ring-red-600"> <span class="text-sm font-bold text-gray-700">Não</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_14" value="N/A" class="w-4 h-4 text-gray-400 focus:ring-gray-400"> <span class="text-sm font-bold text-gray-700">N/A</span></label>
+                        </div>
+                        <textarea class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações (opcional)..."></textarea>
+                    </div>
+
+                    <div class="mb-5 p-5 border border-gray-100 rounded-2xl bg-gray-50/50 shadow-sm">
+                        <label class="block text-sm font-bold text-gray-800 mb-3">15. Portas e niveladoras das docas estão sem defeitos?</label>
+                        <div class="flex flex-wrap gap-4 mb-4">
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_15" value="Sim" class="w-4 h-4 text-shopee focus:ring-shopee"> <span class="text-sm font-bold text-gray-700">Sim</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_15" value="Não" class="w-4 h-4 text-red-600 focus:ring-red-600"> <span class="text-sm font-bold text-gray-700">Não</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_15" value="N/A" class="w-4 h-4 text-gray-400 focus:ring-gray-400"> <span class="text-sm font-bold text-gray-700">N/A</span></label>
+                        </div>
+                        <textarea class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações (opcional)..."></textarea>
+                    </div>
+
+                    <div class="mb-5 p-5 border border-gray-100 rounded-2xl bg-gray-50/50 shadow-sm">
+                        <label class="block text-sm font-bold text-gray-800 mb-3">16. Empilhamento de paletes (10/15) e gaiolas estão em bom estado?</label>
+                        <div class="flex flex-wrap gap-4 mb-4">
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_16" value="Sim" class="w-4 h-4 text-shopee focus:ring-shopee"> <span class="text-sm font-bold text-gray-700">Sim</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_16" value="Não" class="w-4 h-4 text-red-600 focus:ring-red-600"> <span class="text-sm font-bold text-gray-700">Não</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_16" value="N/A" class="w-4 h-4 text-gray-400 focus:ring-gray-400"> <span class="text-sm font-bold text-gray-700">N/A</span></label>
+                        </div>
+                        <textarea class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações (opcional)..."></textarea>
+                    </div>
+
+                    <div class="mb-5 p-5 border border-gray-100 rounded-2xl bg-gray-50/50 shadow-sm">
+                        <label class="block text-sm font-bold text-gray-800 mb-3">17. Caminhos seguros e faixas de sinalização estão conservados?</label>
+                        <div class="flex flex-wrap gap-4 mb-4">
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_17" value="Sim" class="w-4 h-4 text-shopee focus:ring-shopee"> <span class="text-sm font-bold text-gray-700">Sim</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_17" value="Não" class="w-4 h-4 text-red-600 focus:ring-red-600"> <span class="text-sm font-bold text-gray-700">Não</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_17" value="N/A" class="w-4 h-4 text-gray-400 focus:ring-gray-400"> <span class="text-sm font-bold text-gray-700">N/A</span></label>
+                        </div>
+                        <textarea class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações (opcional)..."></textarea>
+                    </div>
+
+                    <h3 class="font-black text-lg text-shopee-dark border-b-2 border-shopee-light pb-2 mt-8 mb-4 flex items-center gap-2"><i class="fa-solid fa-users-gear text-shopee"></i> Comportamento e Segurança do Time</h3>
+
+                    <div class="mb-5 p-5 border border-gray-100 rounded-2xl bg-gray-50/50 shadow-sm">
+                        <label class="block text-sm font-bold text-gray-800 mb-3">18. O time utiliza EPIs corretamente (colete fechado e cabelo preso)?</label>
+                        <div class="flex flex-wrap gap-4 mb-4">
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_18" value="Sim" class="w-4 h-4 text-shopee focus:ring-shopee"> <span class="text-sm font-bold text-gray-700">Sim</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_18" value="Não" class="w-4 h-4 text-red-600 focus:ring-red-600"> <span class="text-sm font-bold text-gray-700">Não</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_18" value="N/A" class="w-4 h-4 text-gray-400 focus:ring-gray-400"> <span class="text-sm font-bold text-gray-700">N/A</span></label>
+                        </div>
+                        <textarea class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações (opcional)..."></textarea>
+                    </div>
+
+                    <div class="mb-5 p-5 border border-gray-100 rounded-2xl bg-gray-50/50 shadow-sm">
+                        <label class="block text-sm font-bold text-gray-800 mb-3">19. Colaboradores evitam correr ou usar celular durante a caminhada?</label>
+                        <div class="flex flex-wrap gap-4 mb-4">
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_19" value="Sim" class="w-4 h-4 text-shopee focus:ring-shopee"> <span class="text-sm font-bold text-gray-700">Sim</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_19" value="Não" class="w-4 h-4 text-red-600 focus:ring-red-600"> <span class="text-sm font-bold text-gray-700">Não</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_19" value="N/A" class="w-4 h-4 text-gray-400 focus:ring-gray-400"> <span class="text-sm font-bold text-gray-700">N/A</span></label>
+                        </div>
+                        <textarea class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações (opcional)..."></textarea>
+                    </div>
+
+                    <div class="mb-5 p-5 border border-gray-100 rounded-2xl bg-gray-50/50 shadow-sm">
+                        <label class="block text-sm font-bold text-gray-800 mb-3">20. O manuseio de pacotes e tração de gaiolas é feito corretamente?</label>
+                        <div class="flex flex-wrap gap-4 mb-4">
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_20" value="Sim" class="w-4 h-4 text-shopee focus:ring-shopee"> <span class="text-sm font-bold text-gray-700">Sim</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_20" value="Não" class="w-4 h-4 text-red-600 focus:ring-red-600"> <span class="text-sm font-bold text-gray-700">Não</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_20" value="N/A" class="w-4 h-4 text-gray-400 focus:ring-gray-400"> <span class="text-sm font-bold text-gray-700">N/A</span></label>
+                        </div>
+                        <textarea class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações (opcional)..."></textarea>
+                    </div>
+
+                    <h3 class="font-black text-lg text-shopee-dark border-b-2 border-shopee-light pb-2 mt-8 mb-4 flex items-center gap-2"><i class="fa-solid fa-flask text-shopee"></i> Químicos e Ambiental</h3>
+
+                    <div class="mb-5 p-5 border border-gray-100 rounded-2xl bg-gray-50/50 shadow-sm">
+                        <label class="block text-sm font-bold text-gray-800 mb-3">21. Produtos químicos estão adequados e sinalizados?</label>
+                        <div class="flex flex-wrap gap-4 mb-4">
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_21" value="Sim" class="w-4 h-4 text-shopee focus:ring-shopee"> <span class="text-sm font-bold text-gray-700">Sim</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_21" value="Não" class="w-4 h-4 text-red-600 focus:ring-red-600"> <span class="text-sm font-bold text-gray-700">Não</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_21" value="N/A" class="w-4 h-4 text-gray-400 focus:ring-gray-400"> <span class="text-sm font-bold text-gray-700">N/A</span></label>
+                        </div>
+                        <textarea class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações (opcional)..."></textarea>
+                    </div>
+
+                    <div class="mb-5 p-5 border border-gray-100 rounded-2xl bg-gray-50/50 shadow-sm">
+                        <label class="block text-sm font-bold text-gray-800 mb-3">22. Bombonas estão sobre paletes de contenção e sinalizadas?</label>
+                        <div class="flex flex-wrap gap-4 mb-4">
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_22" value="Sim" class="w-4 h-4 text-shopee focus:ring-shopee"> <span class="text-sm font-bold text-gray-700">Sim</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_22" value="Não" class="w-4 h-4 text-red-600 focus:ring-red-600"> <span class="text-sm font-bold text-gray-700">Não</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_22" value="N/A" class="w-4 h-4 text-gray-400 focus:ring-gray-400"> <span class="text-sm font-bold text-gray-700">N/A</span></label>
+                        </div>
+                        <textarea class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações (opcional)..."></textarea>
+                    </div>
+
+                    <div class="mb-5 p-5 border border-gray-100 rounded-2xl bg-gray-50/50 shadow-sm">
+                        <label class="block text-sm font-bold text-gray-800 mb-3">23. O Kit Ambiental está organizado e sinalizado?</label>
+                        <div class="flex flex-wrap gap-4 mb-4">
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_23" value="Sim" class="w-4 h-4 text-shopee focus:ring-shopee"> <span class="text-sm font-bold text-gray-700">Sim</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_23" value="Não" class="w-4 h-4 text-red-600 focus:ring-red-600"> <span class="text-sm font-bold text-gray-700">Não</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_23" value="N/A" class="w-4 h-4 text-gray-400 focus:ring-gray-400"> <span class="text-sm font-bold text-gray-700">N/A</span></label>
+                        </div>
+                        <textarea class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações (opcional)..."></textarea>
+                    </div>
+
+                    <button onclick="alert('Módulo de Inspeção em construção. O envio será ativado em breve.')" class="w-full bg-shopee hover:bg-shopee-dark text-white font-black text-lg tracking-wide rounded-2xl py-4 mt-4 shadow-lg shadow-shopee/30 transition-all active:scale-95 flex justify-center items-center gap-2">
+                        <i class="fa-solid fa-paper-plane"></i> Finalizar Inspeção
                     </button>
                 </div>
             </div>
@@ -414,7 +679,6 @@
     let graficoChartJS = null;
     const MAX_FOTOS = 5;
 
-    // ESCUTA DE BANCO DE DADOS BLINDADA
     onValue(ref(db, 'ocorrencias_lmg48'), (snapshot) => {
         try {
             const data = snapshot.val();
@@ -470,7 +734,6 @@
             }
             document.getElementById('user-display-avatar').innerText = iniciais;
             
-            // TROCA DE TELA 100% SEGURA
             document.getElementById('login-screen').classList.add('hidden');
             document.getElementById('login-screen').classList.remove('flex');
             
@@ -496,10 +759,9 @@
     };
     window.verificarSessao();
 
-    // MUDANÇA DE ABA BLINDADA COM TAILWIND (EVITA TELA BRANCA)
     window.mudarAba = (aba) => {
         try {
-            ['menu-inspetor', 'registro', 'progresso', 'dashboard', 'tratativas'].forEach(id => {
+            ['menu-inspetor', 'registro', 'progresso', 'dashboard', 'tratativas', 'inspecao'].forEach(id => {
                 const el = document.getElementById('aba-' + id);
                 if (el) {
                     el.classList.add('hidden');
@@ -509,7 +771,7 @@
             const target = document.getElementById('aba-' + aba);
             if (target) {
                 target.classList.remove('hidden');
-                if(aba === 'registro') {
+                if(aba === 'registro' || aba === 'inspecao') {
                     target.classList.add('block');
                 } else {
                     target.classList.add('flex');
@@ -523,25 +785,8 @@
         if(window.usuarioAtual !== 'admin') window.mudarAba('menu-inspetor');
     };
 
-    async function comprimirBase64(file) {
-        return new Promise(resolve => {
-            const img = new Image();
-            const url = URL.createObjectURL(file);
-            img.onload = () => {
-                URL.revokeObjectURL(url);
-                const canvas = document.createElement('canvas');
-                const MAX = 640; 
-                let w = img.width, h = img.height;
-                if(w > MAX) { h *= MAX/w; w = MAX; }
-                canvas.width = w; canvas.height = h;
-                canvas.getContext('2d').drawImage(img, 0,0,w,h);
-                resolve(canvas.toDataURL('image/jpeg', 0.4));
-            };
-            img.src = url;
-        });
-    }
-
-    window.processarNovaFoto = async (e) => {
+    // A FOTO AGORA SOBE 100% SEGURA USANDO FILEREADER E APARECE NO ADMIN
+    window.processarNovaFoto = (e) => {
         try {
             const file = e.target.files[0];
             if(!file) return;
@@ -549,13 +794,41 @@
             
             document.getElementById('upload-text').innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Otimizando...`;
             
-            const previewBase64 = await comprimirBase64(file);
-            window.fotosMiniaturasTemporarias.push(previewBase64);
-            
-            window.renderizarGradeDeFotos();
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const MAX = 640; 
+                    let w = img.width, h = img.height;
+                    if(w > MAX) { h *= MAX/w; w = MAX; }
+                    canvas.width = w; canvas.height = h;
+                    
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0,0,w,h);
+                    
+                    const base64Final = canvas.toDataURL('image/jpeg', 0.5);
+                    window.fotosMiniaturasTemporarias.push(base64Final);
+                    
+                    window.renderizarGradeDeFotos();
+                    document.getElementById('upload-text').innerText = "Toque para adicionar foto";
+                };
+                img.onerror = function() {
+                    alert("Erro ao ler a foto.");
+                    document.getElementById('upload-text').innerText = "Toque para adicionar foto";
+                };
+                img.src = event.target.result;
+            };
+            reader.onerror = function() {
+                alert("Erro ao acessar a foto do celular.");
+                document.getElementById('upload-text').innerText = "Toque para adicionar foto";
+            };
+            reader.readAsDataURL(file);
+            e.target.value = ''; 
+        } catch(err) {
+            console.error(err);
             document.getElementById('upload-text').innerText = "Toque para adicionar foto";
-            e.target.value = '';
-        } catch(err) {}
+        }
     };
 
     window.removerFoto = (index) => {
@@ -563,6 +836,7 @@
         window.renderizarGradeDeFotos();
     };
 
+    // BOTÃO X PERMANENTEMENTE VISÍVEL (OPACITY-100)
     window.renderizarGradeDeFotos = () => {
         try {
             const container = document.getElementById('preview-fotos-container');
@@ -571,11 +845,11 @@
             let htmlFotos = '';
             window.fotosMiniaturasTemporarias.forEach((url, index) => {
                 htmlFotos += `
-                    <div class="relative w-full h-20 rounded-xl overflow-hidden border border-gray-200 shadow-sm group">
+                    <div class="relative w-full h-24 rounded-xl overflow-hidden border border-gray-200 shadow-sm">
                         <img src="${url}" class="w-full h-full object-cover">
-                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                            <button onclick="window.removerFoto(${index})" class="text-white hover:text-red-400 bg-black/50 w-8 h-8 rounded-full flex items-center justify-center"><i class="fa-solid fa-trash-can"></i></button>
-                        </div>
+                        <button type="button" onclick="window.removerFoto(${index})" class="absolute top-1 right-1 text-white bg-red-600 hover:bg-red-700 w-8 h-8 rounded-full flex items-center justify-center border-2 border-white cursor-pointer opacity-100" style="z-index: 20;">
+                            <i class="fa-solid fa-xmark text-sm font-black"></i>
+                        </button>
                     </div>
                 `;
             });
@@ -583,7 +857,7 @@
         } catch(e) {}
     };
 
-    // ENVIO SEM CONGELAR TELA
+    // ENVIO SEM CONGELAR TELA (MUDANDO DE ABA SUAVEMENTE)
     window.salvarFormulario = async () => {
         const hub = document.getElementById('hub_local').value;
         const cat = document.getElementById('categoria').value;
@@ -601,7 +875,6 @@
         btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin shrink-0"></i> <span class="truncate">Enviando para Nuvem...</span>`;
 
         try {
-            // CLONA O ARRAY DE FOTOS PARA EVITAR PERDA DE DADOS NO BANCO
             const urlsDasFotos = window.fotosMiniaturasTemporarias.length > 0 ? [...window.fotosMiniaturasTemporarias] : null;
             const partesData = dat.split('-');
             const dataFormatada = `${partesData[2]}/${partesData[1]}/${partesData[0]} às ${hor}`;
@@ -629,12 +902,13 @@
 
             alert("✅ Relatório transmitido com sucesso!");
             
-            // F5 PARA LIMPAR O CACHE NA HORA
-            window.location.reload();
+            // JOGA O USUARIO PARA O PROGRESSO SUAVEMENTE SEM F5 (NÃO CONGELA A TELA)
+            window.mudarAba('progresso');
 
         } catch (error) {
             console.error(error);
             alert(`❌ Erro no banco de dados: ${error.message}`);
+        } finally {
             btn.disabled = false;
             btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up shrink-0"></i> <span class="truncate">Transmitir Relatório</span>`;
         }
@@ -655,7 +929,6 @@
         } catch(e) {}
     };
 
-    // FUNÇÃO ABRIR DETALHES 100% REFEITA PARA LER FOTOS NOVAS E ANTIGAS
     window.abrirDetalhes = (index) => {
         try {
             const occ = window.ocorrencias[index];
@@ -685,14 +958,11 @@
             const galeria = document.getElementById('detalhe-galeria-fotos');
             const boxFoto = document.getElementById('box-foto-evidencia');
             
-            // TRATAMENTO APROVA DE BALAS PARA FOTOS ANTIGAS (foto_url) E NOVAS (fotos_urls)
             let arrayFotos = [];
             if (occ.fotos_urls) {
-                // Se vier como Array do firebase ou como Objeto {0: "...", 1: "..."}
                 arrayFotos = Array.isArray(occ.fotos_urls) ? occ.fotos_urls : Object.values(occ.fotos_urls);
             }
             if (occ.foto_url && arrayFotos.length === 0) {
-                // Resgata foto do sistema antigo
                 arrayFotos.push(occ.foto_url); 
             }
 
@@ -750,7 +1020,6 @@
     document.addEventListener('click', (e) => { if (document.getElementById('statusDropdown').classList.contains('active')) window.fecharDropdownStatus(); });
     document.addEventListener('keydown', (e) => { if (e.key === "Escape") { window.fecharDetalhes(); window.fecharDropdownStatus(); } });
 
-    // DASHBOARD ADMIN BLINDADO
     window.atualizarDashboardUI = () => {
         try {
             const tbody = document.getElementById('tabela-dados');
@@ -841,7 +1110,6 @@
         }
     };
 
-    // PROGRESSO BLINDADO
     window.renderizarMeuProgresso = () => {
         try {
             const tbody = document.getElementById('tabela-meu-progresso');
