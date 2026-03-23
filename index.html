@@ -53,7 +53,7 @@
         #photo-viewer img { max-width: 100%; max-height: 100%; border-radius: 8px; box-shadow: 0 0 50px rgba(0,0,0,0.5); object-fit: contain; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col">
+<body class="min-h-screen flex flex-col w-full">
 
 <div id="photo-viewer" style="display: none;" onclick="this.style.display='none'">
     <img id="viewer-img" src="">
@@ -449,7 +449,6 @@
     window.indiceEmEdicao = null;
     window.fotosMiniaturasTemporarias = []; 
     
-    // ESCUTA DO BANCO DE DADOS EM TEMPO REAL
     onValue(ref(db, 'ocorrencias_lmg48'), (snapshot) => {
         try {
             const data = snapshot.val();
@@ -532,7 +531,7 @@
             localStorage.clear();
             sessionStorage.clear();
         } catch(e) {}
-        window.location.href = window.location.pathname; 
+        window.location.reload(); 
     };
 
     window.mudarAba = (abaId) => {
@@ -543,7 +542,10 @@
                 if (el) el.style.display = 'none';
             });
             const target = document.getElementById(abaId);
-            if (target) target.style.display = 'block';
+            if (target) {
+                if(abaId === 'aba-menu-inspetor') target.style.display = 'flex';
+                else target.style.display = 'block';
+            }
             window.scrollTo(0, 0);
         } catch(e) {}
     };
@@ -552,7 +554,7 @@
         if(window.usuarioAtual !== 'admin') window.mudarAba('aba-menu-inspetor');
     };
 
-    // MOTOR DE FOTO 100% SEGURO (MÉTODO CLÁSSICO SEM PROMISES MODERNAS)
+    // AQUI ESTÁ O CORAÇÃO DA SOLUÇÃO: O motor de fotos antigo, puro e inquebrável (FileReader)
     window.processarNovaFoto = (e) => {
         try {
             const file = e.target.files[0];
@@ -574,19 +576,22 @@
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0,0,w,h);
                     
-                    const base64Final = canvas.toDataURL('image/jpeg', 0.5);
+                    const base64Final = canvas.toDataURL('image/jpeg', 0.6);
                     window.fotosMiniaturasTemporarias.push(base64Final);
                     
                     window.renderizarGradeDeFotos();
                     document.getElementById('upload-text').innerText = "Toque para adicionar foto";
                 };
+                img.onerror = function() {
+                    alert("Erro ao processar imagem. Tente novamente.");
+                    document.getElementById('upload-text').innerText = "Toque para adicionar foto";
+                };
                 img.src = event.target.result;
             };
             reader.readAsDataURL(file);
-            
-            e.target.value = ''; // Zera input para permitir foto igual
+            e.target.value = ''; 
         } catch(err) {
-            console.error("Erro na foto:", err);
+            console.error("Erro foto:", err);
             document.getElementById('upload-text').innerText = "Toque para adicionar foto";
         }
     };
@@ -596,38 +601,27 @@
         window.renderizarGradeDeFotos();
     };
 
-    // RENDERIZA A GRADE DE FOTOS CRIANDO ELEMENTOS (PROTEGE O NAVEGADOR CONTRA TEXTOS GIGANTES)
     window.renderizarGradeDeFotos = () => {
         try {
             const container = document.getElementById('preview-fotos-container');
             document.getElementById('contador-fotos').innerText = `${window.fotosMiniaturasTemporarias.length}/${MAX_FOTOS}`;
             
-            container.innerHTML = '';
-            
+            let htmlFotos = '';
             window.fotosMiniaturasTemporarias.forEach((url, index) => {
-                const div = document.createElement('div');
-                div.className = "relative w-full h-20 rounded-xl overflow-hidden border border-gray-200 shadow-sm group";
-                
-                const img = document.createElement('img');
-                img.src = url;
-                img.className = "w-full h-full object-cover";
-                
-                const overlay = document.createElement('div');
-                overlay.className = "absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center";
-                
-                const btn = document.createElement('button');
-                btn.className = "text-white hover:text-red-400 bg-black/50 w-8 h-8 rounded-full flex items-center justify-center";
-                btn.innerHTML = '<i class="fa-solid fa-trash-can"></i>';
-                btn.onclick = () => window.removerFoto(index);
-                
-                overlay.appendChild(btn);
-                div.appendChild(img);
-                div.appendChild(overlay);
-                container.appendChild(div);
+                htmlFotos += `
+                    <div class="relative w-full h-20 rounded-xl overflow-hidden border border-gray-200 shadow-sm group">
+                        <img src="${url}" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <button onclick="window.removerFoto(${index})" class="text-white hover:text-red-400 bg-black/50 w-8 h-8 rounded-full flex items-center justify-center"><i class="fa-solid fa-trash-can"></i></button>
+                        </div>
+                    </div>
+                `;
             });
+            container.innerHTML = htmlFotos;
         } catch(e) {}
     };
 
+    // ENVIO SEGURO - SEM F5. Ele apenas envia e mostra a tela de sucesso para não congelar o celular
     window.salvarFormulario = async () => {
         const hub = document.getElementById('hub_local').value;
         const cat = document.getElementById('categoria').value;
@@ -663,13 +657,22 @@
             };
 
             await set(novaOcorrenciaRef, payload);
+            
+            document.getElementById('hub_local').value = ""; document.getElementById('categoria').value = "";
+            document.getElementById('data_ocorrencia').value = ""; document.getElementById('hora_ocorrencia').value = "";
+            document.getElementById('detalhes').value = ""; 
+            window.fotosMiniaturasTemporarias = [];
+            window.renderizarGradeDeFotos();
+
             alert("✅ Relatório transmitido com sucesso!");
             
-            window.location.href = window.location.pathname + '?reload=' + new Date().getTime();
+            // Vai direto para aba de progresso, suave e sem recarregar!
+            window.mudarAba('aba-progresso');
 
         } catch (error) {
             console.error(error);
             alert(`❌ Erro no banco de dados: ${error.message}`);
+        } finally {
             btn.disabled = false;
             btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up shrink-0"></i> <span class="truncate">Transmitir Relatório</span>`;
         }
@@ -689,7 +692,6 @@
         } catch(e) {}
     };
 
-    // RENDERIZAR FOTOS DO ADMIN CRIANDO ELEMENTOS (PROTEGE O CELULAR)
     window.abrirDetalhes = (index) => {
         try {
             const occ = window.ocorrencias[index];
@@ -720,29 +722,27 @@
             const boxFoto = document.getElementById('box-foto-evidencia');
             
             let arrayFotos = [];
-            try {
-                if (occ.fotos_urls) {
-                    if (typeof occ.fotos_urls === 'string') {
-                        arrayFotos = [occ.fotos_urls];
-                    } else if (Array.isArray(occ.fotos_urls)) {
-                        arrayFotos = occ.fotos_urls;
-                    } else if (typeof occ.fotos_urls === 'object') {
-                        arrayFotos = Object.values(occ.fotos_urls);
-                    }
-                } else if (occ.foto_url) {
-                    arrayFotos = [occ.foto_url];
+            if (occ.fotos_urls) {
+                if (Array.isArray(occ.fotos_urls)) {
+                    arrayFotos = occ.fotos_urls;
+                } else {
+                    arrayFotos = Object.values(occ.fotos_urls);
                 }
-            } catch(e) {}
+            } else if (occ.foto_url) {
+                arrayFotos = [occ.foto_url];
+            }
 
-            if(arrayFotos.length > 0) {
+            if(arrayFotos && arrayFotos.length > 0) {
                 boxFoto.style.display = 'block';
                 galeria.innerHTML = '';
                 arrayFotos.forEach((url) => {
-                    const imgEl = document.createElement('img');
-                    imgEl.src = url;
-                    imgEl.className = "block rounded-xl overflow-hidden border border-gray-200 shadow-sm hover:border-shopee transition-colors h-24 w-full object-cover cursor-zoom-in shrink-0";
-                    imgEl.onclick = () => window.ampliarFoto(url);
-                    galeria.appendChild(imgEl);
+                    if (url) {
+                        const imgEl = document.createElement('img');
+                        imgEl.src = url;
+                        imgEl.className = "block rounded-xl overflow-hidden border border-gray-200 shadow-sm hover:border-shopee transition-colors h-24 w-full object-cover cursor-zoom-in shrink-0";
+                        imgEl.onclick = () => window.ampliarFoto(url);
+                        galeria.appendChild(imgEl);
+                    }
                 });
             } else {
                 boxFoto.style.display = 'none';
