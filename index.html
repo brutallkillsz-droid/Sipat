@@ -24,7 +24,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* SITE CONVENCIONAL: Rolagem livre, sem travar a tela */
+        /* SITE CONVENCIONAL */
         body { font-family: 'Inter', sans-serif; background-color: #f9fafb; color: #1f2937; margin: 0; padding: 0; }
         
         .card-interaction { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; }
@@ -49,12 +49,11 @@
         
         .status-dropdown { position: absolute; background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 8px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.2); z-index: 9999; display: none; flex-direction: column; gap: 4px; min-width: 150px; }
 
-        /* ESTILO DO ZOOM DE FOTO */
         #photo-viewer { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 10000; align-items: center; justify-content: center; padding: 20px; cursor: zoom-out; }
         #photo-viewer img { max-width: 100%; max-height: 100%; border-radius: 8px; box-shadow: 0 0 50px rgba(0,0,0,0.5); object-fit: contain; }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800 flex flex-col h-screen w-full">
+<body class="min-h-screen flex flex-col">
 
 <div id="photo-viewer" style="display: none;" onclick="this.style.display='none'">
     <img id="viewer-img" src="">
@@ -296,9 +295,7 @@
                             <label class="block text-sm font-bold text-gray-700">Evidências Visuais (Fotos)</label>
                             <span class="text-xs text-gray-400 font-bold bg-gray-100 px-2 py-1 rounded-md" id="contador-fotos">0/5</span>
                         </div>
-                        
                         <div id="preview-fotos-container" class="grid grid-cols-3 sm:grid-cols-5 gap-3 mb-3 empty:hidden"></div>
-
                         <div class="relative border-2 border-dashed border-gray-300 bg-gray-50 rounded-2xl p-6 text-center hover:bg-shopee-light hover:border-shopee transition-colors cursor-pointer group">
                             <i class="fa-solid fa-camera-retro text-3xl text-gray-400 group-hover:text-shopee mb-2 transition-colors"></i>
                             <p class="text-xs font-medium text-gray-500" id="upload-text">Toque para adicionar foto</p>
@@ -411,20 +408,20 @@
                 </div>
             </div>
 
-            <div id="aba-tratativas" style="display: none;" class="pb-10">
-                <div class="bg-white shadow-sm border-b mb-6 rounded-2xl flex overflow-hidden border border-gray-100">
-                    <button onclick="window.mudarAba('aba-dashboard')" class="flex-1 py-4 font-bold text-gray-500 hover:bg-gray-50 border-b-4 border-transparent transition-colors focus:outline-none">Visão Geral</button>
-                    <button onclick="window.mudarAba('aba-tratativas')" class="flex-1 py-4 font-black text-shopee bg-shopee-light border-b-4 border-shopee transition-colors focus:outline-none">Tratativas</button>
-                </div>
-                
-                <div class="bg-white p-10 rounded-3xl border border-gray-100 shadow-sm flex flex-col items-center justify-center text-center min-h-[400px]">
-                    <div class="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center text-shopee text-4xl mb-6 shadow-inner">
-                        <i class="fa-solid fa-screwdriver-wrench"></i>
-                    </div>
-                    <h2 class="text-3xl font-black text-gray-800 mb-3 tracking-tight">Área de Tratativas</h2>
-                    <p class="text-gray-500 max-w-md font-medium">Esta aba foi reservada para o gerenciamento avançado dos casos e criação de planos de ação.</p>
-                </div>
+        <div id="aba-tratativas" style="display: none;" class="pb-10">
+            <div class="bg-white shadow-sm border-b mb-6 rounded-2xl flex overflow-hidden border border-gray-100">
+                <button onclick="window.mudarAba('aba-dashboard')" class="flex-1 py-4 font-bold text-gray-500 hover:bg-gray-50 border-b-4 border-transparent transition-colors focus:outline-none">Visão Geral</button>
+                <button onclick="window.mudarAba('aba-tratativas')" class="flex-1 py-4 font-black text-shopee bg-shopee-light border-b-4 border-shopee transition-colors focus:outline-none">Tratativas</button>
             </div>
+            
+            <div class="bg-white p-10 rounded-3xl border border-gray-100 shadow-sm flex flex-col items-center justify-center text-center min-h-[400px]">
+                <div class="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center text-shopee text-4xl mb-6 shadow-inner">
+                    <i class="fa-solid fa-screwdriver-wrench"></i>
+                </div>
+                <h2 class="text-3xl font-black text-gray-800 mb-3 tracking-tight">Área de Tratativas</h2>
+                <p class="text-gray-500 max-w-md font-medium">Esta aba foi reservada para o gerenciamento avançado dos casos e criação de planos de ação.</p>
+            </div>
+        </div>
 
         </div>
     </main>
@@ -452,6 +449,7 @@
     window.indiceEmEdicao = null;
     window.fotosMiniaturasTemporarias = []; 
     
+    // ESCUTA DO BANCO DE DADOS EM TEMPO REAL
     onValue(ref(db, 'ocorrencias_lmg48'), (snapshot) => {
         try {
             const data = snapshot.val();
@@ -545,10 +543,7 @@
                 if (el) el.style.display = 'none';
             });
             const target = document.getElementById(abaId);
-            if (target) {
-                target.style.display = 'block';
-                if(abaId === 'aba-menu-inspetor') target.style.display = 'flex'; 
-            }
+            if (target) target.style.display = 'block';
             window.scrollTo(0, 0);
         } catch(e) {}
     };
@@ -557,7 +552,7 @@
         if(window.usuarioAtual !== 'admin') window.mudarAba('aba-menu-inspetor');
     };
 
-    // FUNÇÃO CLÁSSICA E SEGURA PARA LER A FOTO (SEM PROMISES MODERNAS)
+    // MOTOR DE FOTO 100% SEGURO (MÉTODO CLÁSSICO SEM PROMISES MODERNAS)
     window.processarNovaFoto = (e) => {
         try {
             const file = e.target.files[0];
@@ -567,17 +562,17 @@
             document.getElementById('upload-text').innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Otimizando...`;
             
             const reader = new FileReader();
-            reader.onload = (event) => {
+            reader.onload = function(event) {
                 const img = new Image();
-                img.onload = () => {
+                img.onload = function() {
                     const canvas = document.createElement('canvas');
                     const MAX = 640; 
                     let w = img.width, h = img.height;
-                    
                     if(w > MAX) { h *= MAX/w; w = MAX; }
-                    
                     canvas.width = w; canvas.height = h;
-                    canvas.getContext('2d').drawImage(img, 0,0,w,h);
+                    
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0,0,w,h);
                     
                     const base64Final = canvas.toDataURL('image/jpeg', 0.5);
                     window.fotosMiniaturasTemporarias.push(base64Final);
@@ -589,11 +584,9 @@
             };
             reader.readAsDataURL(file);
             
-            // Permite tirar a mesma foto novamente se errar
-            e.target.value = '';
-            
+            e.target.value = ''; // Zera input para permitir foto igual
         } catch(err) {
-            console.error(err);
+            console.error("Erro na foto:", err);
             document.getElementById('upload-text').innerText = "Toque para adicionar foto";
         }
     };
@@ -603,23 +596,35 @@
         window.renderizarGradeDeFotos();
     };
 
+    // RENDERIZA A GRADE DE FOTOS CRIANDO ELEMENTOS (PROTEGE O NAVEGADOR CONTRA TEXTOS GIGANTES)
     window.renderizarGradeDeFotos = () => {
         try {
             const container = document.getElementById('preview-fotos-container');
             document.getElementById('contador-fotos').innerText = `${window.fotosMiniaturasTemporarias.length}/${MAX_FOTOS}`;
             
-            let htmlFotos = '';
+            container.innerHTML = '';
+            
             window.fotosMiniaturasTemporarias.forEach((url, index) => {
-                htmlFotos += `
-                    <div class="relative w-full h-20 rounded-xl overflow-hidden border border-gray-200 shadow-sm group">
-                        <img src="${url}" class="w-full h-full object-cover">
-                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                            <button onclick="window.removerFoto(${index})" class="text-white hover:text-red-400 bg-black/50 w-8 h-8 rounded-full flex items-center justify-center"><i class="fa-solid fa-trash-can"></i></button>
-                        </div>
-                    </div>
-                `;
+                const div = document.createElement('div');
+                div.className = "relative w-full h-20 rounded-xl overflow-hidden border border-gray-200 shadow-sm group";
+                
+                const img = document.createElement('img');
+                img.src = url;
+                img.className = "w-full h-full object-cover";
+                
+                const overlay = document.createElement('div');
+                overlay.className = "absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center";
+                
+                const btn = document.createElement('button');
+                btn.className = "text-white hover:text-red-400 bg-black/50 w-8 h-8 rounded-full flex items-center justify-center";
+                btn.innerHTML = '<i class="fa-solid fa-trash-can"></i>';
+                btn.onclick = () => window.removerFoto(index);
+                
+                overlay.appendChild(btn);
+                div.appendChild(img);
+                div.appendChild(overlay);
+                container.appendChild(div);
             });
-            container.innerHTML = htmlFotos;
         } catch(e) {}
     };
 
@@ -660,7 +665,7 @@
             await set(novaOcorrenciaRef, payload);
             alert("✅ Relatório transmitido com sucesso!");
             
-            window.location.href = window.location.pathname + '?v=' + new Date().getTime();
+            window.location.href = window.location.pathname + '?reload=' + new Date().getTime();
 
         } catch (error) {
             console.error(error);
@@ -684,6 +689,7 @@
         } catch(e) {}
     };
 
+    // RENDERIZAR FOTOS DO ADMIN CRIANDO ELEMENTOS (PROTEGE O CELULAR)
     window.abrirDetalhes = (index) => {
         try {
             const occ = window.ocorrencias[index];
@@ -714,22 +720,30 @@
             const boxFoto = document.getElementById('box-foto-evidencia');
             
             let arrayFotos = [];
-            if (occ.fotos_urls) {
-                arrayFotos = Array.isArray(occ.fotos_urls) ? occ.fotos_urls : Object.values(occ.fotos_urls);
-            }
-            if (occ.foto_url && arrayFotos.length === 0) {
-                arrayFotos.push(occ.foto_url); 
-            }
+            try {
+                if (occ.fotos_urls) {
+                    if (typeof occ.fotos_urls === 'string') {
+                        arrayFotos = [occ.fotos_urls];
+                    } else if (Array.isArray(occ.fotos_urls)) {
+                        arrayFotos = occ.fotos_urls;
+                    } else if (typeof occ.fotos_urls === 'object') {
+                        arrayFotos = Object.values(occ.fotos_urls);
+                    }
+                } else if (occ.foto_url) {
+                    arrayFotos = [occ.foto_url];
+                }
+            } catch(e) {}
 
             if(arrayFotos.length > 0) {
                 boxFoto.style.display = 'block';
-                let htmlFotos = '';
-                arrayFotos.forEach(url => {
-                    htmlFotos += `
-                        <img src="${url}" onclick="window.ampliarFoto('${url}')" class="block rounded-xl overflow-hidden border border-gray-200 shadow-sm hover:border-shopee transition-colors h-24 w-full object-cover cursor-zoom-in shrink-0">
-                    `;
+                galeria.innerHTML = '';
+                arrayFotos.forEach((url) => {
+                    const imgEl = document.createElement('img');
+                    imgEl.src = url;
+                    imgEl.className = "block rounded-xl overflow-hidden border border-gray-200 shadow-sm hover:border-shopee transition-colors h-24 w-full object-cover cursor-zoom-in shrink-0";
+                    imgEl.onclick = () => window.ampliarFoto(url);
+                    galeria.appendChild(imgEl);
                 });
-                galeria.innerHTML = htmlFotos;
             } else {
                 boxFoto.style.display = 'none';
                 galeria.innerHTML = '';
