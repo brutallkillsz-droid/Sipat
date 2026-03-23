@@ -52,7 +52,7 @@
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* ESTILO DO ZOOM DE FOTO */
+        /* ZOOM DE FOTO */
         #photo-viewer { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 10000; align-items: center; justify-content: center; padding: 20px; cursor: zoom-out; }
         #photo-viewer img { max-width: 100%; max-height: 100%; border-radius: 8px; box-shadow: 0 0 50px rgba(0,0,0,0.5); object-fit: contain; }
     </style>
@@ -146,8 +146,8 @@
     </div>
 </div>
 
-<div id="app-layout" style="display: none;" class="flex-col h-full w-full bg-gray-50">
-    <header class="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-40 overflow-x-auto min-w-full">
+<div id="app-layout" style="display: none;" class="flex-col h-full w-full bg-gray-50 overflow-hidden">
+    <header class="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-40 w-full">
         <div class="max-w-6xl mx-auto flex justify-between items-center py-2 px-4 gap-2 whitespace-nowrap">
             <div class="flex items-center space-x-3 shrink-0">
                 <video autoplay loop muted playsinline class="h-10 w-auto rounded-lg"><source src="https://i.imgur.com/fMAvIvu.mp4" type="video/mp4"></video>
@@ -157,20 +157,20 @@
                 Segurança é Prioridade LMG-48
             </div>
             
-            <div class="flex items-center gap-4 shrink-0 ml-auto cursor-pointer hover:opacity-75 transition-opacity" onclick="window.sair()" title="Sair do Sistema" style="z-index: 9999;">
-                <div class="text-right hidden sm:block truncate max-w-[150px]">
-                    <h1 class="font-black text-xl text-gray-800 leading-none truncate hover:text-shopee">Sair</h1>
-                    <p class="text-[10px] font-bold text-gray-400 tracking-widest uppercase truncate" id="user-display-name">Nome</p>
+            <div class="flex items-center gap-4 shrink-0 ml-auto cursor-pointer hover:opacity-75 transition-opacity" onclick="window.sair()" title="Sair do Sistema">
+                <div class="text-right hidden sm:block">
+                    <h1 class="font-black text-xl text-gray-800 leading-none hover:text-shopee">Sair</h1>
+                    <p class="text-[10px] font-bold text-gray-400 tracking-widest uppercase truncate max-w-[150px]" id="user-display-name">Nome</p>
                 </div>
                 <div id="user-display-avatar" class="w-10 h-10 rounded-full bg-shopee-light text-shopee border-2 border-white shadow-md flex items-center justify-center font-bold uppercase shrink-0">??</div>
             </div>
         </div>
     </header>
 
-    <main class="flex-1 overflow-y-auto p-4 md:p-8">
+    <main class="flex-1 overflow-y-auto p-4 md:p-8 w-full h-full">
         <div class="max-w-6xl mx-auto w-full h-full relative">
 
-            <div id="aba-menu-inspetor" style="display: none;" class="h-full flex-col justify-center max-w-2xl mx-auto pt-4 overflow-y-auto gap-4">
+            <div id="aba-menu-inspetor" style="display: none;" class="flex-col justify-center max-w-2xl mx-auto pt-4 gap-4 h-full">
                 <div class="grid grid-cols-2 gap-4 md:gap-6">
                     <button onclick="window.mudarAba('registro')" class="card-interaction col-span-2 bg-white border-2 border-shopee rounded-3xl p-8 shadow-sm flex flex-col items-center justify-center space-y-4 group">
                         <i class="fa-solid fa-triangle-exclamation text-7xl text-shopee transition-colors"></i>
@@ -195,7 +195,7 @@
                 </div>
             </div>
 
-            <div id="aba-registro" style="display: none;" class="max-w-3xl mx-auto pb-10 overflow-y-auto">
+            <div id="aba-registro" style="display: none;" class="max-w-3xl mx-auto pb-10">
                 <div class="flex items-center gap-4 mb-6 sticky top-0 bg-gray-50 z-20 py-3">
                     <button onclick="window.voltarMenuInspetor()" class="w-12 h-12 rounded-2xl bg-white shadow-md border border-gray-200 flex items-center justify-center text-gray-700 hover:text-shopee hover:border-shopee hover:bg-shopee-light transition-all active:scale-95 shrink-0" title="Voltar ao Menu">
                         <i class="fa-solid fa-arrow-left text-xl"></i>
@@ -269,7 +269,7 @@
                 </div>
             </div>
 
-            <div id="aba-progresso" style="display: none;" class="max-w-4xl mx-auto pb-10 flex-col h-full gap-4">
+            <div id="aba-progresso" style="display: none;" class="flex-col h-full gap-4 pb-10">
                 <div class="flex items-center gap-4 mb-6 sticky top-0 bg-gray-50 z-20 py-3">
                     <button onclick="window.voltarMenuInspetor()" class="w-12 h-12 rounded-2xl bg-white shadow-md border border-gray-200 flex items-center justify-center text-gray-700 hover:text-shopee hover:border-shopee hover:bg-shopee-light transition-all active:scale-95 shrink-0" title="Voltar ao Menu">
                         <i class="fa-solid fa-arrow-left text-xl"></i>
@@ -301,7 +301,7 @@
                 </div>
             </div>
 
-            <div id="aba-dashboard" style="display: none;" class="space-y-6 pb-10 flex-col h-full overflow-y-auto min-h-full">
+            <div id="aba-dashboard" style="display: none;" class="flex-col h-full min-h-full pb-10 space-y-6">
                 
                 <div class="bg-white shadow-sm border-b mb-6 rounded-2xl flex overflow-hidden border border-gray-100 shrink-0">
                     <button onclick="window.mudarAba('dashboard')" class="flex-1 py-4 font-black text-shopee bg-shopee-light border-b-4 border-shopee transition-colors focus:outline-none">Visão Geral</button>
@@ -408,10 +408,8 @@
     window.nomeUsuarioAtual = '';
     window.indiceEmEdicao = null;
     window.fotosMiniaturasTemporarias = []; 
-    let graficoChartJS = null;
-    const MAX_FOTOS = 5;
-
-    // CARREGA DADOS DO BANCO AUTOMATICAMENTE (SEM PRECISAR DE F5)
+    
+    // ESCUTA DE BANCO DE DADOS EM TEMPO REAL
     onValue(ref(db, 'ocorrencias_lmg48'), (snapshot) => {
         try {
             const data = snapshot.val();
@@ -420,7 +418,7 @@
             if(window.usuarioAtual === 'admin') window.atualizarDashboardUI();
             else if(window.usuarioAtual !== '') window.renderizarMeuProgresso();
         } catch (error) {
-            console.error("Erro BD:", error);
+            console.error("Erro no DB:", error);
         }
     });
 
@@ -467,13 +465,8 @@
             }
             document.getElementById('user-display-avatar').innerText = iniciais;
             
-            // PAUSA O VÍDEO DO LOGIN PARA ALIVIAR O CELULAR
-            const telaLogin = document.getElementById('login-screen');
-            if(telaLogin) {
-                telaLogin.querySelectorAll('video').forEach(v => v.pause());
-                telaLogin.style.display = 'none';
-            }
-
+            // MUDA A TELA DE FORMA SEGURA (SEM TELA BRANCA)
+            document.getElementById('login-screen').style.display = 'none';
             document.getElementById('app-layout').style.display = 'flex';
 
             if(user === 'admin') {
@@ -495,7 +488,7 @@
     };
     window.verificarSessao();
 
-    // MODO SPA (SINGLE PAGE APPLICATION): SAIR SEM RECARREGAR A PÁGINA!
+    // BOTÃO SAIR MODO SPA: LIMPA A MEMÓRIA E TROCA A TELA MANUALMENTE SEM F5 (NÃO CONGELA MAIS)
     window.sair = () => {
         try {
             localStorage.clear();
@@ -507,15 +500,11 @@
             document.getElementById('password').value = '';
             
             document.getElementById('app-layout').style.display = 'none';
-            const telaLogin = document.getElementById('login-screen');
-            telaLogin.style.display = 'flex';
-            
-            // REATIVA OS VÍDEOS DE LOGIN
-            telaLogin.querySelectorAll('video').forEach(v => v.play());
-            
-        } catch(e) {}
+            document.getElementById('login-screen').style.display = 'flex';
+        } catch(e) { console.error(e); }
     };
 
+    // MUDANÇA DE ABAS TOTALMENTE SEGURA
     window.mudarAba = (aba) => {
         try {
             ['menu-inspetor', 'registro', 'progresso', 'dashboard', 'tratativas'].forEach(id => {
@@ -594,7 +583,7 @@
         } catch(e) {}
     };
 
-    // ENVIO MODO SPA: ZERO REFRESH (NUNCA DARÁ TELA BRANCA!)
+    // ENVIO SEM F5 FORÇADO: APROVEITA O MODO TEMPO REAL DO FIREBASE
     window.salvarFormulario = async () => {
         const hub = document.getElementById('hub_local').value;
         const cat = document.getElementById('categoria').value;
@@ -631,7 +620,6 @@
 
             await set(novaOcorrenciaRef, payload);
             
-            // LIMPA OS CAMPOS
             document.getElementById('hub_local').value = ""; document.getElementById('categoria').value = "";
             document.getElementById('data_ocorrencia').value = ""; document.getElementById('hora_ocorrencia').value = "";
             document.getElementById('detalhes').value = ""; 
@@ -640,7 +628,7 @@
 
             alert("✅ Relatório transmitido com sucesso!");
             
-            // TROCA A TELA SUAVEMENTE (SEM F5!)
+            // JOGA PARA A ABA DE PROGRESSO. O FIREBASE ATUALIZA A TELA SOZINHO!
             window.mudarAba('progresso');
 
         } catch (error) {
@@ -719,7 +707,9 @@
 
             document.getElementById('slide-overlay').classList.add('active');
             document.getElementById('slide-panel').classList.add('active');
-        } catch(e) {}
+        } catch(e) {
+            console.error("Erro detalhes:", e);
+        }
     };
 
     window.fecharDetalhes = () => { document.getElementById('slide-overlay').classList.remove('active'); document.getElementById('slide-panel').classList.remove('active'); };
@@ -746,7 +736,9 @@
             try {
                 await remove(ref(db, `ocorrencias_lmg48/${occ.id}`));
                 alert("🗑️ Relatório excluído com sucesso.");
-            } catch (error) {}
+            } catch (error) {
+                alert(`❌ Erro ao excluir: ${error.message}`);
+            }
         }
     };
 
@@ -768,7 +760,8 @@
                 return;
             }
 
-            const htmlRows = window.ocorrencias.map((item, index) => {
+            let htmlTabela = '';
+            window.ocorrencias.forEach((item, index) => {
                 const status = item.status || 'Pendente';
                 if(status === 'Pendente') p++; else if(status === 'Resolvido') r++; else c++;
                 
@@ -779,7 +772,7 @@
                 const local = item.local || '-';
                 const dataOcc = item.data || '-';
 
-                return `
+                htmlTabela += `
                     <tr class="hover:bg-gray-50/50 transition-colors group border-b border-gray-50">
                         <td class="px-6 py-4 truncate max-w-[200px]"><strong class="text-gray-800 truncate">${local}</strong></td>
                         <td class="px-6 py-4 truncate max-w-[200px]"><div class="flex items-center gap-3 shrink-0 truncate"><div class="w-8 h-8 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center font-bold text-xs uppercase shrink-0">${iniciais.toUpperCase()}</div><span class="text-sm font-medium text-gray-700 uppercase truncate">${autor}</span></div></td>
@@ -795,12 +788,14 @@
                 `;
             });
 
-            tbody.innerHTML = htmlRows.join('');
+            tbody.innerHTML = htmlTabela;
             document.getElementById('kpi-pendentes').innerText = p; document.getElementById('kpi-resolvidos').innerText = r;
             
-            setTimeout(() => { window.desenharGrafico(p, r, c); }, 50);
+            window.desenharGrafico(p, r, c);
 
-        } catch(e) { }
+        } catch(e) {
+            console.error("Erro Dashboard:", e);
+        }
     };
 
     window.desenharGrafico = (p, r, c) => {
@@ -818,12 +813,12 @@
             canvas.style.display = 'block';
             if(emptyState) emptyState.style.display = 'none';
 
-            if (graficoChartJS) {
-                graficoChartJS.data.datasets[0].data = [p, r, c];
-                graficoChartJS.update();
+            if (window.meuGrafico) {
+                window.meuGrafico.data.datasets[0].data = [p, r, c];
+                window.meuGrafico.update();
             } else {
                 const ctx = canvas.getContext('2d');
-                graficoChartJS = new Chart(ctx, {
+                window.meuGrafico = new Chart(ctx, {
                     type: 'doughnut',
                     data: { labels: ['Pendentes', 'Sanadas', 'Canceladas'], datasets: [{ data: [p, r, c], backgroundColor: ['#F59E0B', '#16a34a', '#EF4444'], borderWidth: 0 }] },
                     options: { 
@@ -835,7 +830,9 @@
                     }
                 });
             }
-        } catch(e) {}
+        } catch(e) {
+            console.error("Erro Gráfico:", e);
+        }
     };
 
     window.renderizarMeuProgresso = () => {
@@ -851,14 +848,15 @@
                 return;
             }
 
-            const htmlProgresso = minhasOcorrencias.map((item) => {
+            let htmlProgresso = '';
+            minhasOcorrencias.forEach((item) => {
                 const status = item.status || 'Pendente';
                 const badgeClass = getBadgeClasses(status);
                 const local = item.local || '-';
                 const cat = item.categoria || '-';
                 const dataOcc = item.data || '-';
 
-                return `
+                htmlProgresso += `
                     <tr class="hover:bg-gray-50/50 transition-colors border-b border-gray-50">
                         <td class="px-6 py-4"><strong class="text-gray-800">${local}</strong></td>
                         <td class="px-6 py-4 text-sm text-gray-600">${cat}</td>
@@ -868,8 +866,10 @@
                 `;
             });
             
-            tbody.innerHTML = htmlProgresso.join('');
-        } catch(e) {}
+            tbody.innerHTML = htmlProgresso;
+        } catch(e) {
+            console.error("Erro Progresso:", e);
+        }
     };
 </script>
 
