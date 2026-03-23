@@ -24,7 +24,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        body { font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        /* MODO SITE CONVENCIONAL: ROLAGEM LIVRE, SEM TRAVAS DE TELA */
+        body { font-family: 'Inter', sans-serif; background-color: #f9fafb; color: #1f2937; }
         
         .card-interaction { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; }
         .card-interaction:hover, .card-interaction:focus {
@@ -32,11 +33,6 @@
             box-shadow: 0 10px 15px -3px rgba(22, 163, 74, 0.4);
         }
         .card-interaction:hover i, .card-interaction:hover span { color: white !important; }
-
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
         input[type="date"]::-webkit-calendar-picker-indicator,
         input[type="time"]::-webkit-calendar-picker-indicator { cursor: pointer; opacity: 0.6; }
@@ -46,18 +42,14 @@
         .slide-panel { position: fixed; top: 0; right: 0; width: 100%; max-width: 450px; height: 100vh; background: #fff; box-shadow: -10px 0 30px rgba(0,0,0,0.2); z-index: 999; transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); display: flex; flex-direction: column; }
         .slide-panel.active { transform: translateX(0); }
         
-        .status-dropdown { position: fixed; background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 8px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.2); z-index: 9999; opacity: 0; transform: scale(0.95); pointer-events: none; transition: all 0.15s ease; display: flex; flex-direction: column; gap: 4px; min-width: 150px; }
-        .status-dropdown.active { opacity: 1; transform: scale(1); pointer-events: all; }
+        .status-dropdown { position: absolute; background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 8px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.2); z-index: 9999; display: none; flex-direction: column; gap: 4px; min-width: 150px; }
 
-        .hide-scrollbar::-webkit-scrollbar { display: none; }
-        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-        /* ZOOM DE FOTO */
+        /* ESTILO DO ZOOM DE FOTO */
         #photo-viewer { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 10000; align-items: center; justify-content: center; padding: 20px; cursor: zoom-out; }
         #photo-viewer img { max-width: 100%; max-height: 100%; border-radius: 8px; box-shadow: 0 0 50px rgba(0,0,0,0.5); object-fit: contain; }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800 flex flex-col h-screen w-full">
+<body class="min-h-screen flex flex-col">
 
 <div id="photo-viewer" style="display: none;" onclick="this.style.display='none'">
     <img id="viewer-img" src="">
@@ -109,7 +101,7 @@
     </div>
 </div>
 
-<div id="login-screen" style="display: flex;" class="w-full h-full absolute inset-0 z-50 bg-white">
+<div id="login-screen" style="display: flex;" class="w-full h-screen absolute inset-0 z-50 bg-white">
     <div class="hidden md:flex flex-1 bg-shopee flex-col justify-center items-center p-12 text-center relative overflow-hidden">
         <div class="absolute inset-0 bg-gradient-to-br from-shopee to-shopee-dark opacity-90"></div>
         <div class="relative z-10 text-white w-full flex flex-col items-center">
@@ -146,7 +138,7 @@
     </div>
 </div>
 
-<div id="app-layout" style="display: none;" class="flex-col h-full w-full bg-gray-50 overflow-hidden">
+<div id="app-layout" style="display: none;" class="flex-col min-h-screen w-full">
     <header class="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-40 w-full">
         <div class="max-w-6xl mx-auto flex justify-between items-center py-2 px-4 gap-2 whitespace-nowrap">
             <div class="flex items-center space-x-3 shrink-0">
@@ -157,25 +149,32 @@
                 Segurança é Prioridade LMG-48
             </div>
             
-            <div class="flex items-center gap-4 shrink-0 ml-auto cursor-pointer hover:opacity-75 transition-opacity" onclick="window.sair()" title="Sair do Sistema">
-                <div class="text-right hidden sm:block">
-                    <h1 class="font-black text-xl text-gray-800 leading-none hover:text-shopee">Sair</h1>
-                    <p class="text-[10px] font-bold text-gray-400 tracking-widest uppercase truncate max-w-[150px]" id="user-display-name">Nome</p>
+            <div class="flex items-center gap-4 shrink-0 ml-auto cursor-pointer hover:opacity-75 transition-opacity" 
+                 onclick="localStorage.clear(); sessionStorage.clear(); window.location.href = window.location.pathname;" 
+                 title="Sair do Sistema">
+                <div class="text-right hidden sm:block truncate max-w-[150px]">
+                    <h1 class="font-black text-xl text-gray-800 leading-none truncate hover:text-shopee">Sair</h1>
+                    <p class="text-[10px] font-bold text-gray-400 tracking-widest uppercase truncate" id="user-display-name">Nome</p>
                 </div>
                 <div id="user-display-avatar" class="w-10 h-10 rounded-full bg-shopee-light text-shopee border-2 border-white shadow-md flex items-center justify-center font-bold uppercase shrink-0">??</div>
             </div>
         </div>
     </header>
 
-    <main class="flex-1 overflow-y-auto p-4 md:p-8 w-full h-full">
-        <div class="max-w-6xl mx-auto w-full h-full relative">
+    <main class="w-full flex-grow p-4 md:p-8">
+        <div class="max-w-6xl mx-auto w-full">
 
-            <div id="aba-menu-inspetor" style="display: none;" class="flex-col justify-center max-w-2xl mx-auto pt-4 gap-4 h-full">
+            <div id="aba-menu-inspetor" style="display: none;" class="flex-col justify-center max-w-2xl mx-auto pt-4 gap-4">
                 <div class="grid grid-cols-2 gap-4 md:gap-6">
                     <button onclick="window.mudarAba('registro')" class="card-interaction col-span-2 bg-white border-2 border-shopee rounded-3xl p-8 shadow-sm flex flex-col items-center justify-center space-y-4 group">
                         <i class="fa-solid fa-triangle-exclamation text-7xl text-shopee transition-colors"></i>
                         <span class="font-black text-2xl text-gray-800 uppercase group-hover:text-white transition-colors tracking-tight">Relatar Risco Agora</span>
                     </button>
+                    <button onclick="window.mudarAba('inspecao')" class="card-interaction col-span-2 bg-white border-2 border-shopee rounded-3xl p-6 shadow-sm flex flex-col items-center justify-center space-y-3 group">
+                        <i class="fa-solid fa-clipboard-check text-5xl text-shopee transition-colors"></i>
+                        <span class="font-black text-xl text-gray-800 uppercase group-hover:text-white transition-colors tracking-tight">Inspeção Mensal</span>
+                    </button>
+
                     <button class="card-interaction bg-white rounded-3xl p-6 shadow-sm flex flex-col items-center justify-center space-y-3 border-b-4 border-shopee group">
                         <i class="fa-solid fa-file-shield text-4xl text-shopee transition-colors"></i>
                         <span class="font-bold text-sm text-gray-700 text-center leading-tight transition-colors">Procedimentos</span>
@@ -184,14 +183,51 @@
                         <i class="fa-solid fa-graduation-cap text-4xl text-shopee transition-colors"></i>
                         <span class="font-bold text-sm text-gray-700 text-center leading-tight transition-colors">Treinamento</span>
                     </button>
-                    <button onclick="window.mudarAba('progresso')" class="card-interaction bg-white rounded-3xl p-6 shadow-sm flex flex-col items-center justify-center space-y-3 border-b-4 border-shopee group">
+                    <button onclick="window.mudarAba('progresso')" class="card-interaction col-span-2 bg-white rounded-3xl p-6 shadow-sm flex flex-col items-center justify-center space-y-3 border-b-4 border-shopee group">
                         <i class="fa-solid fa-chart-simple text-4xl text-shopee transition-colors"></i>
                         <span class="font-bold text-sm text-gray-700 text-center leading-tight transition-colors">Meu Progresso</span>
                     </button>
-                    <button onclick="window.sair()" class="card-interaction bg-white rounded-3xl p-6 shadow-sm flex flex-col items-center justify-center space-y-3 border-b-4 border-gray-300 group">
-                        <i class="fa-solid fa-power-off text-4xl text-gray-400 transition-colors"></i>
-                        <span class="font-bold text-sm text-gray-500 text-center leading-tight transition-colors">Deslogar do Sistema</span>
+                    <button onclick="localStorage.clear(); window.location.href = window.location.pathname;" class="card-interaction col-span-2 bg-white rounded-3xl p-6 shadow-sm flex flex-col items-center justify-center space-y-3 border-b-4 border-gray-300 group">
+                        <i class="fa-solid fa-power-off text-3xl text-gray-400 transition-colors"></i>
+                        <span class="font-bold text-sm text-gray-500 text-center leading-tight transition-colors">Sair do Sistema</span>
                     </button>
+                </div>
+            </div>
+
+            <div id="aba-inspecao" style="display: none;" class="max-w-3xl mx-auto pb-10">
+                <div class="flex items-center gap-4 mb-6 sticky top-0 bg-gray-50 z-20 py-3">
+                    <button onclick="window.voltarMenuInspetor()" class="w-12 h-12 rounded-2xl bg-white shadow-md border border-gray-200 flex items-center justify-center text-gray-700 hover:text-shopee hover:border-shopee hover:bg-shopee-light transition-all active:scale-95 shrink-0">
+                        <i class="fa-solid fa-arrow-left text-xl"></i>
+                    </button>
+                    <div>
+                        <h2 class="text-2xl font-black text-gray-800 tracking-tight leading-tight">Inspeção Mensal</h2>
+                        <p class="text-sm text-gray-500 font-medium">Preencha o checklist de segurança.</p>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 space-y-6">
+                    <div class="p-4 border-l-4 border-shopee bg-shopee-light rounded-r-xl mb-6">
+                        <p class="text-sm font-bold text-shopee-dark"><i class="fa-solid fa-info-circle"></i> Módulo base criado! Aguardando o comando "inspeção" para montar o questionário oficial.</p>
+                    </div>
+                    
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">1. Título da Pergunta de Exemplo?</label>
+                            <select class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee font-medium text-gray-700">
+                                <option value="" disabled selected>Selecione uma opção...</option>
+                                <option>Conforme</option>
+                                <option>Não Conforme</option>
+                                <option>Não se Aplica</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Observações / Comentários</label>
+                            <textarea rows="3" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee font-medium text-gray-700 resize-none" placeholder="Digite detalhes adicionais se necessário..."></textarea>
+                        </div>
+                        <button class="w-full bg-gray-300 text-gray-500 font-black text-lg tracking-wide rounded-2xl py-4 mt-4 shadow-sm cursor-not-allowed">
+                            <i class="fa-solid fa-lock"></i> Finalizar Inspeção
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -269,7 +305,7 @@
                 </div>
             </div>
 
-            <div id="aba-progresso" style="display: none;" class="flex-col h-full gap-4 pb-10">
+            <div id="aba-progresso" style="display: none;" class="flex-col gap-4 pb-10">
                 <div class="flex items-center gap-4 mb-6 sticky top-0 bg-gray-50 z-20 py-3">
                     <button onclick="window.voltarMenuInspetor()" class="w-12 h-12 rounded-2xl bg-white shadow-md border border-gray-200 flex items-center justify-center text-gray-700 hover:text-shopee hover:border-shopee hover:bg-shopee-light transition-all active:scale-95 shrink-0" title="Voltar ao Menu">
                         <i class="fa-solid fa-arrow-left text-xl"></i>
@@ -280,14 +316,14 @@
                     </div>
                 </div>
 
-                <div class="bg-white rounded-3xl shadow-sm border border-gray-100 flex-grow overflow-hidden flex flex-col min-h-0">
+                <div class="bg-white rounded-3xl shadow-sm border border-gray-100 flex-grow overflow-hidden flex flex-col">
                     <div class="p-6 border-b border-gray-50 bg-gray-50/50">
                         <h3 class="font-bold text-gray-800 flex items-center gap-2"><i class="fa-solid fa-clock-rotate-left text-shopee"></i> Histórico Pessoal</h3>
                     </div>
-                    <div class="overflow-x-auto overflow-y-auto flex-grow table-scroll p-4">
+                    <div class="overflow-x-auto w-full p-4">
                         <table class="w-full text-left whitespace-nowrap min-w-[700px]">
                             <thead>
-                                <tr class="bg-white border-b border-gray-100 sticky top-0 z-10 py-2">
+                                <tr class="bg-white border-b border-gray-100 py-2">
                                     <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Unidade</th>
                                     <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Classificação</th>
                                     <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Data / Hora</th>
@@ -301,7 +337,7 @@
                 </div>
             </div>
 
-            <div id="aba-dashboard" style="display: none;" class="flex-col h-full min-h-full pb-10 space-y-6">
+            <div id="aba-dashboard" style="display: none;" class="space-y-6 pb-10 flex-col">
                 
                 <div class="bg-white shadow-sm border-b mb-6 rounded-2xl flex overflow-hidden border border-gray-100 shrink-0">
                     <button onclick="window.mudarAba('dashboard')" class="flex-1 py-4 font-black text-shopee bg-shopee-light border-b-4 border-shopee transition-colors focus:outline-none">Visão Geral</button>
@@ -309,7 +345,7 @@
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 shrink-0">
-                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center relative overflow-hidden min-h-[100px]">
+                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center relative overflow-hidden">
                         <div class="w-2 h-full bg-gray-800 absolute left-0 top-0"></div>
                         <div class="pl-2 truncate">
                             <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1 truncate">Ocorrências</h4>
@@ -317,7 +353,7 @@
                         </div>
                         <div class="w-14 h-14 rounded-2xl bg-gray-50 flex justify-center items-center text-gray-400 text-2xl shrink-0"><i class="fa-solid fa-layer-group"></i></div>
                     </div>
-                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center relative overflow-hidden min-h-[100px]">
+                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center relative overflow-hidden">
                         <div class="w-2 h-full bg-yellow-500 absolute left-0 top-0"></div>
                         <div class="pl-2 truncate">
                             <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1 truncate">Aguardando</h4>
@@ -325,7 +361,7 @@
                         </div>
                         <div class="w-14 h-14 rounded-2xl bg-yellow-50 flex justify-center items-center text-yellow-500 text-2xl shrink-0"><i class="fa-solid fa-clock-rotate-left"></i></div>
                     </div>
-                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center relative overflow-hidden min-h-[100px]">
+                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center relative overflow-hidden">
                         <div class="w-2 h-full bg-shopee absolute left-0 top-0"></div>
                         <div class="pl-2 truncate">
                             <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1 truncate">Sanadas</h4>
@@ -335,24 +371,24 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-grow min-h-0">
-                    <div class="lg:col-span-1 bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center justify-center shrink-0 min-h-[300px]">
-                        <h3 class="font-bold text-gray-800 mb-4 w-full flex items-center gap-2 sticky top-0 bg-white z-10 py-1"><i class="fa-solid fa-chart-pie text-shopee"></i> Distribuição</h3>
-                        <div class="relative w-full flex justify-center items-center h-[250px]">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-1 bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center justify-center shrink-0">
+                        <h3 class="font-bold text-gray-800 mb-4 w-full flex items-center gap-2"><i class="fa-solid fa-chart-pie text-shopee"></i> Distribuição</h3>
+                        <div class="relative w-full flex justify-center items-center" style="height: 250px;">
                             <canvas id="graficoStatus"></canvas>
-                            <div id="grafico-vazio" class="hidden absolute inset-0 flex items-center justify-center text-gray-400 font-bold text-sm bg-white z-10">Sem dados para exibir</div>
+                            <div id="grafico-vazio" class="hidden absolute inset-0 flex items-center justify-center text-gray-400 font-bold text-sm bg-white z-10">Sem dados</div>
                         </div>
                     </div>
 
-                    <div class="lg:col-span-2 bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex flex-col flex-grow min-h-0">
-                        <div class="p-6 border-b border-gray-50 flex justify-between items-center bg-gray-50/50 sticky top-0 z-10 py-2">
+                    <div class="lg:col-span-2 bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
+                        <div class="p-6 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
                             <h3 class="font-bold text-gray-800 flex items-center gap-2"><i class="fa-solid fa-cloud text-shopee"></i> Banco de Dados RTDB</h3>
                             <span class="text-xs font-bold bg-shopee-light text-shopee-dark px-3 py-1 rounded-full"><i class="fa-solid fa-circle-nodes"></i> Online</span>
                         </div>
-                        <div class="overflow-x-auto overflow-y-auto flex-grow table-scroll p-4">
+                        <div class="overflow-x-auto w-full p-4">
                             <table class="w-full text-left whitespace-nowrap min-w-[800px]">
                                 <thead>
-                                    <tr class="bg-white border-b border-gray-100 sticky top-0 z-10 py-2">
+                                    <tr class="bg-white border-b border-gray-100 py-2">
                                         <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Unidade</th>
                                         <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Inspetor</th>
                                         <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Data / Hora</th>
@@ -368,18 +404,18 @@
                 </div>
             </div>
 
-            <div id="aba-tratativas" style="display: none;" class="flex-col h-full min-h-full pb-10">
+            <div id="aba-tratativas" style="display: none;" class="flex-col pb-10">
                 <div class="bg-white shadow-sm border-b mb-6 rounded-2xl flex overflow-hidden border border-gray-100 shrink-0">
                     <button onclick="window.mudarAba('dashboard')" class="flex-1 py-4 font-bold text-gray-500 hover:bg-gray-50 border-b-4 border-transparent transition-colors focus:outline-none">Visão Geral</button>
                     <button onclick="window.mudarAba('tratativas')" class="flex-1 py-4 font-black text-shopee bg-shopee-light border-b-4 border-shopee transition-colors focus:outline-none">Tratativas</button>
                 </div>
                 
-                <div class="bg-white p-10 rounded-3xl border border-gray-100 shadow-sm flex flex-col items-center justify-center text-center flex-grow">
+                <div class="bg-white p-10 rounded-3xl border border-gray-100 shadow-sm flex flex-col items-center justify-center text-center">
                     <div class="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center text-shopee text-4xl mb-6 shadow-inner">
                         <i class="fa-solid fa-screwdriver-wrench"></i>
                     </div>
                     <h2 class="text-3xl font-black text-gray-800 mb-3 tracking-tight">Área de Tratativas</h2>
-                    <p class="text-gray-500 max-w-md font-medium">Esta aba foi reservada para o gerenciamento avançado dos casos.</p>
+                    <p class="text-gray-500 max-w-md font-medium">Esta aba foi reservada para o gerenciamento avançado dos casos e criação de planos de ação.</p>
                 </div>
             </div>
 
@@ -409,7 +445,7 @@
     window.indiceEmEdicao = null;
     window.fotosMiniaturasTemporarias = []; 
     
-    // ESCUTA DE BANCO DE DADOS EM TEMPO REAL
+    // ESCUTA BLINDADA DO BANCO DE DADOS
     onValue(ref(db, 'ocorrencias_lmg48'), (snapshot) => {
         try {
             const data = snapshot.val();
@@ -465,7 +501,6 @@
             }
             document.getElementById('user-display-avatar').innerText = iniciais;
             
-            // MUDA A TELA DE FORMA SEGURA (SEM TELA BRANCA)
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('app-layout').style.display = 'flex';
 
@@ -488,32 +523,16 @@
     };
     window.verificarSessao();
 
-    // BOTÃO SAIR MODO SPA: LIMPA A MEMÓRIA E TROCA A TELA MANUALMENTE SEM F5 (NÃO CONGELA MAIS)
-    window.sair = () => {
-        try {
-            localStorage.clear();
-            sessionStorage.clear();
-            window.usuarioAtual = '';
-            window.nomeUsuarioAtual = '';
-            
-            document.getElementById('username').value = '';
-            document.getElementById('password').value = '';
-            
-            document.getElementById('app-layout').style.display = 'none';
-            document.getElementById('login-screen').style.display = 'flex';
-        } catch(e) { console.error(e); }
-    };
-
-    // MUDANÇA DE ABAS TOTALMENTE SEGURA
+    // MUDAR ABA (SIMPLES, ESTÁVEL, SEM NAVEGADOR TRAVAR)
     window.mudarAba = (aba) => {
         try {
-            ['menu-inspetor', 'registro', 'progresso', 'dashboard', 'tratativas'].forEach(id => {
+            ['menu-inspetor', 'registro', 'progresso', 'dashboard', 'tratativas', 'inspecao'].forEach(id => {
                 const el = document.getElementById('aba-' + id);
                 if (el) el.style.display = 'none';
             });
             const target = document.getElementById('aba-' + aba);
             if (target) {
-                target.style.display = (aba === 'registro') ? 'block' : 'flex';
+                target.style.display = (aba === 'registro' || aba === 'inspecao') ? 'block' : 'flex';
             }
             window.scrollTo(0, 0);
         } catch(e) {}
@@ -583,7 +602,7 @@
         } catch(e) {}
     };
 
-    // ENVIO SEM F5 FORÇADO: APROVEITA O MODO TEMPO REAL DO FIREBASE
+    // ENVIO SEM F5: TELA MUDA NA HORA E BANCO ATUALIZA SOZINHO
     window.salvarFormulario = async () => {
         const hub = document.getElementById('hub_local').value;
         const cat = document.getElementById('categoria').value;
@@ -628,7 +647,7 @@
 
             alert("✅ Relatório transmitido com sucesso!");
             
-            // JOGA PARA A ABA DE PROGRESSO. O FIREBASE ATUALIZA A TELA SOZINHO!
+            // Vai para a tela de progresso instantaneamente sem recarregar a aba
             window.mudarAba('progresso');
 
         } catch (error) {
@@ -647,6 +666,7 @@
         return 'bg-gray-50 text-gray-600 border-gray-200';
     }
 
+    // ABRIR FOTO EM ZOOM
     window.ampliarFoto = (src) => {
         try {
             document.getElementById('viewer-img').src = src;
@@ -707,14 +727,12 @@
 
             document.getElementById('slide-overlay').classList.add('active');
             document.getElementById('slide-panel').classList.add('active');
-        } catch(e) {
-            console.error("Erro detalhes:", e);
-        }
+        } catch(e) {}
     };
 
     window.fecharDetalhes = () => { document.getElementById('slide-overlay').classList.remove('active'); document.getElementById('slide-panel').classList.remove('active'); };
-    window.abrirDropdownStatus = (e, i) => { e.stopPropagation(); window.indiceEmEdicao = i; const d = document.getElementById('statusDropdown'); d.style.left = e.clientX+'px'; d.style.top = e.clientY+'px'; d.classList.add('active'); };
-    window.fecharDropdownStatus = () => { document.getElementById('statusDropdown').classList.remove('active'); window.indiceEmEdicao = null; };
+    window.abrirDropdownStatus = (e, i) => { e.stopPropagation(); window.indiceEmEdicao = i; const d = document.getElementById('statusDropdown'); d.style.left = e.clientX+'px'; d.style.top = e.clientY+'px'; d.style.display = 'flex'; };
+    window.fecharDropdownStatus = () => { document.getElementById('statusDropdown').style.display = 'none'; window.indiceEmEdicao = null; };
     
     window.atualizarStatus = async (novoStatus) => {
         if(window.indiceEmEdicao !== null) { 
@@ -742,9 +760,13 @@
         }
     };
 
-    document.addEventListener('click', (e) => { if (document.getElementById('statusDropdown').classList.contains('active')) window.fecharDropdownStatus(); });
+    document.addEventListener('click', (e) => { 
+        const drop = document.getElementById('statusDropdown');
+        if (drop && drop.style.display === 'flex') window.fecharDropdownStatus(); 
+    });
     document.addEventListener('keydown', (e) => { if (e.key === "Escape") { window.fecharDetalhes(); window.fecharDropdownStatus(); } });
 
+    // DASHBOARD ADMIN
     window.atualizarDashboardUI = () => {
         try {
             const tbody = document.getElementById('tabela-dados');
@@ -773,7 +795,7 @@
                 const dataOcc = item.data || '-';
 
                 htmlTabela += `
-                    <tr class="hover:bg-gray-50/50 transition-colors group border-b border-gray-50">
+                    <tr class="hover:bg-gray-50/50 transition-colors border-b border-gray-50">
                         <td class="px-6 py-4 truncate max-w-[200px]"><strong class="text-gray-800 truncate">${local}</strong></td>
                         <td class="px-6 py-4 truncate max-w-[200px]"><div class="flex items-center gap-3 shrink-0 truncate"><div class="w-8 h-8 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center font-bold text-xs uppercase shrink-0">${iniciais.toUpperCase()}</div><span class="text-sm font-medium text-gray-700 uppercase truncate">${autor}</span></div></td>
                         <td class="px-6 py-4 text-sm text-gray-600 truncate whitespace-nowrap">${dataOcc}</td>
@@ -791,13 +813,12 @@
             tbody.innerHTML = htmlTabela;
             document.getElementById('kpi-pendentes').innerText = p; document.getElementById('kpi-resolvidos').innerText = r;
             
-            window.desenharGrafico(p, r, c);
+            setTimeout(() => { window.desenharGrafico(p, r, c); }, 50);
 
-        } catch(e) {
-            console.error("Erro Dashboard:", e);
-        }
+        } catch(e) { console.error("Erro Dashboard:", e); }
     };
 
+    let chartInstance = null;
     window.desenharGrafico = (p, r, c) => {
         try {
             const canvas = document.getElementById('graficoStatus');
@@ -813,12 +834,12 @@
             canvas.style.display = 'block';
             if(emptyState) emptyState.style.display = 'none';
 
-            if (window.meuGrafico) {
-                window.meuGrafico.data.datasets[0].data = [p, r, c];
-                window.meuGrafico.update();
+            if (chartInstance) {
+                chartInstance.data.datasets[0].data = [p, r, c];
+                chartInstance.update();
             } else {
                 const ctx = canvas.getContext('2d');
-                window.meuGrafico = new Chart(ctx, {
+                chartInstance = new Chart(ctx, {
                     type: 'doughnut',
                     data: { labels: ['Pendentes', 'Sanadas', 'Canceladas'], datasets: [{ data: [p, r, c], backgroundColor: ['#F59E0B', '#16a34a', '#EF4444'], borderWidth: 0 }] },
                     options: { 
@@ -830,11 +851,10 @@
                     }
                 });
             }
-        } catch(e) {
-            console.error("Erro Gráfico:", e);
-        }
+        } catch(e) {}
     };
 
+    // PROGRESSO DO INSPETOR
     window.renderizarMeuProgresso = () => {
         try {
             const tbody = document.getElementById('tabela-meu-progresso');
@@ -867,9 +887,7 @@
             });
             
             tbody.innerHTML = htmlProgresso;
-        } catch(e) {
-            console.error("Erro Progresso:", e);
-        }
+        } catch(e) {}
     };
 </script>
 
