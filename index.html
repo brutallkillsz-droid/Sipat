@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cipa LMG-48</title>
+    <title>CIPA LMG-48</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -24,7 +24,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        body { font-family: 'Inter', sans-serif; overflow: hidden; }
+        /* SITE CONVENCIONAL */
+        body { font-family: 'Inter', sans-serif; background-color: #f9fafb; color: #1f2937; margin: 0; padding: 0; }
         
         .card-interaction { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; }
         .card-interaction:hover, .card-interaction:focus {
@@ -43,22 +44,22 @@
 
         .slide-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(3px); z-index: 998; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
         .slide-overlay.active { opacity: 1; pointer-events: all; }
-        .slide-panel { position: fixed; top: 0; right: 0; width: 100%; max-width: 450px; height: 100vh; background: #fff; box-shadow: -10px 0 30px rgba(0,0,0,0.2); z-index: 999; transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); display: flex; flex-direction: column; }
+        .slide-panel { position: fixed; top: 0; right: 0; width: 100%; max-width: 480px; height: 100vh; background: #fff; box-shadow: -10px 0 30px rgba(0,0,0,0.2); z-index: 999; transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); display: flex; flex-direction: column; overflow-y: auto; }
         .slide-panel.active { transform: translateX(0); }
         
-        .status-dropdown { position: fixed; background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 8px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.2); z-index: 9999; opacity: 0; transform: scale(0.95); pointer-events: none; transition: all 0.15s ease; display: flex; flex-direction: column; gap: 4px; min-width: 150px; }
-        .status-dropdown.active { opacity: 1; transform: scale(1); pointer-events: all; }
-
-        .hide-scrollbar::-webkit-scrollbar { display: none; }
-        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .status-dropdown { position: absolute; background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 8px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.2); z-index: 9999; display: none; flex-direction: column; gap: 4px; min-width: 150px; }
 
         #photo-viewer { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 10000; align-items: center; justify-content: center; padding: 20px; cursor: zoom-out; }
         #photo-viewer img { max-width: 100%; max-height: 100%; border-radius: 8px; box-shadow: 0 0 50px rgba(0,0,0,0.5); object-fit: contain; }
+
+        .insp-section-title { font-weight: 900; color: #15803d; border-bottom: 2px solid #dcfce7; padding-bottom: 8px; margin-top: 24px; margin-bottom: 16px; font-size: 1.125rem; }
+        .insp-question-card { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px; margin-bottom: 16px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .insp-radio-group { display: flex; gap: 16px; margin-bottom: 12px; flex-wrap: wrap; }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800 flex flex-col h-screen">
+<body class="min-h-screen flex flex-col w-full">
 
-<div id="photo-viewer" class="hidden" onclick="this.classList.add('hidden'); this.classList.remove('flex');">
+<div id="photo-viewer" style="display: none;" onclick="this.style.display='none'">
     <img id="viewer-img" src="">
     <p class="absolute bottom-5 text-white font-bold opacity-50 pointer-events-none">Clique em qualquer lugar para fechar</p>
 </div>
@@ -71,11 +72,11 @@
 
 <div id="slide-overlay" class="slide-overlay" onclick="window.fecharDetalhes()"></div>
 <div id="slide-panel" class="slide-panel">
-    <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0 z-10">
+    <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0 z-10 shrink-0">
         <h2 class="font-bold text-lg text-gray-800 flex items-center gap-2"><i class="fa-solid fa-clipboard-list text-shopee"></i> Ficha da Ocorrência</h2>
         <button class="text-gray-400 hover:text-shopee transition-colors p-2" onclick="window.fecharDetalhes()" title="Fechar (ESC)"><i class="fa-solid fa-xmark text-xl"></i></button>
     </div>
-    <div class="p-6 overflow-y-auto flex-1 bg-gray-50 space-y-6">
+    <div class="p-6 flex-1 bg-gray-50 space-y-6">
         <div><span id="detalhe-badge-status" class="px-3 py-1 rounded-full text-xs font-bold border">Status</span></div>
         
         <div class="detail-block">
@@ -103,26 +104,59 @@
 
         <div class="detail-block" id="box-foto-evidencia" style="display: none;">
             <h5 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Evidências Fotográficas</h5>
-            <div id="detalhe-galeria-fotos" class="grid grid-cols-2 gap-3 mt-2 pb-10">
+            <div id="detalhe-galeria-fotos" class="grid grid-cols-2 gap-3 mt-2 pb-10"></div>
+        </div>
+    </div>
+</div>
+
+<div id="slide-overlay-insp" class="slide-overlay" onclick="window.fecharDetalhesInsp()"></div>
+<div id="slide-panel-insp" class="slide-panel">
+    <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0 z-10 shrink-0">
+        <h2 class="font-bold text-lg text-gray-800 flex items-center gap-2"><i class="fa-solid fa-clipboard-check text-shopee"></i> Ficha de Inspeção</h2>
+        <button class="text-gray-400 hover:text-shopee transition-colors p-2" onclick="window.fecharDetalhesInsp()" title="Fechar (ESC)"><i class="fa-solid fa-xmark text-xl"></i></button>
+    </div>
+    <div class="p-6 flex-1 bg-gray-50 space-y-6">
+        <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm space-y-3">
+            <div class="flex items-center gap-3">
+                <div id="detalhe-insp-avatar" class="w-10 h-10 rounded-full bg-shopee-light text-shopee flex items-center justify-center font-bold uppercase shrink-0">??</div>
+                <div>
+                    <p class="text-xs text-gray-400 font-bold uppercase">Inspetor</p>
+                    <strong id="detalhe-insp-autor" class="text-gray-800">Nome</strong>
+                </div>
+            </div>
+            <div class="pt-3 border-t flex justify-between">
+                <div>
+                    <p class="text-xs text-gray-400 font-bold uppercase">Unidade</p>
+                    <strong id="detalhe-insp-hub" class="text-shopee block">Hub</strong>
+                </div>
+                <div class="text-right">
+                    <p class="text-xs text-gray-400 font-bold uppercase">Data / Hora</p>
+                    <span id="detalhe-insp-data" class="text-gray-800 font-medium text-sm">00/00/0000</span>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <h5 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">Respostas da Inspeção</h5>
+            <div id="detalhe-insp-respostas" class="space-y-4 pb-10">
                 </div>
         </div>
     </div>
 </div>
 
-<div id="login-screen" class="flex w-full h-full absolute inset-0 z-50 bg-white">
-    <div class="hidden md:flex flex-1 bg-shopee flex-col justify-center items-center p-12 text-center relative overflow-hidden">
+<div id="login-screen" class="fixed inset-0 z-50 bg-white flex flex-col md:flex-row overflow-y-auto">
+    <div class="hidden md:flex flex-1 bg-shopee flex-col justify-center items-center p-12 text-center relative overflow-hidden min-h-[50vh]">
         <div class="absolute inset-0 bg-gradient-to-br from-shopee to-shopee-dark opacity-90"></div>
         <div class="relative z-10 text-white w-full flex flex-col items-center">
             <video autoplay loop muted playsinline class="w-80 lg:w-[26rem] h-auto rounded-3xl shadow-2xl mb-8 border-4 border-white/20 bg-white object-contain">
                 <source src="https://i.imgur.com/fMAvIvu.mp4" type="video/mp4">
             </video>
-            <h1 class="text-4xl font-black tracking-tight mb-2">Cipa LMG-48</h1>
+            <h1 class="text-4xl font-black tracking-tight mb-2">CIPA LMG-48</h1>
             <p class="text-shopee-light text-lg font-medium">Prevenção e Segurança é Prioridade</p>
         </div>
     </div>
-    <div class="flex-1 flex justify-center items-center p-6 bg-gray-50 overflow-y-auto">
-        <div class="w-full max-w-md bg-white p-8 rounded-3xl shadow-xl border border-gray-100 flex flex-col items-center my-auto py-4">
-            
+    <div class="flex-1 flex justify-center items-center p-6 bg-gray-50 min-h-screen md:min-h-full">
+        <div class="w-full max-w-md bg-white p-8 rounded-3xl shadow-xl border border-gray-100 flex flex-col items-center">
             <div class="md:hidden flex flex-col items-center mb-6 w-full">
                 <video autoplay loop muted playsinline class="w-56 sm:w-64 mx-auto h-auto rounded-3xl shadow-lg border-2 border-shopee bg-white object-contain">
                     <source src="https://i.imgur.com/fMAvIvu.mp4" type="video/mp4">
@@ -134,11 +168,11 @@
             <div class="space-y-5 w-full">
                 <div>
                     <label class="block text-sm font-bold text-gray-700 mb-2">ID do Usuário</label>
-                    <input type="text" id="username" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee focus:border-transparent transition-all text-center font-bold" placeholder="Digite seu ID">
+                    <input type="text" id="username" onkeypress="if(event.key === 'Enter') window.fazerLogin()" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee focus:border-transparent transition-all text-center font-bold" placeholder="Digite seu ID">
                 </div>
                 <div>
                     <label class="block text-sm font-bold text-gray-700 mb-2">Senha Segura</label>
-                    <input type="password" id="password" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee focus:border-transparent transition-all text-center font-bold" placeholder="••••••••">
+                    <input type="password" id="password" onkeypress="if(event.key === 'Enter') window.fazerLogin()" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee focus:border-transparent transition-all text-center font-bold" placeholder="••••••••">
                 </div>
                 <button onclick="window.fazerLogin()" class="w-full bg-shopee hover:bg-shopee-dark text-white font-bold rounded-xl py-4 mt-4 shadow-lg shadow-shopee/30 transition-all active:scale-95 uppercase tracking-wide">Entrar no Sistema</button>
             </div>
@@ -146,8 +180,8 @@
     </div>
 </div>
 
-<div id="app-layout" class="hidden flex-col h-full w-full bg-gray-50">
-    <header class="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-40 overflow-x-auto min-w-full">
+<div id="app-layout" style="display: none;" class="flex-col min-h-screen w-full">
+    <header class="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-40 w-full">
         <div class="max-w-6xl mx-auto flex justify-between items-center py-2 px-4 gap-2 whitespace-nowrap">
             <div class="flex items-center space-x-3 shrink-0">
                 <video autoplay loop muted playsinline class="h-10 w-auto rounded-lg"><source src="https://i.imgur.com/fMAvIvu.mp4" type="video/mp4"></video>
@@ -157,9 +191,7 @@
                 Segurança é Prioridade LMG-48
             </div>
             
-            <div class="flex items-center gap-4 shrink-0 ml-auto cursor-pointer hover:opacity-75 transition-opacity" 
-                 onclick="localStorage.clear(); sessionStorage.clear(); window.location.href = window.location.pathname + '?v=' + new Date().getTime();" 
-                 title="Sair do Sistema" style="z-index: 9999;">
+            <div class="flex items-center gap-4 shrink-0 ml-auto cursor-pointer hover:opacity-75 transition-opacity" onclick="window.fazerLogout()" title="Sair do Sistema">
                 <div class="text-right hidden sm:block truncate max-w-[150px]">
                     <h1 class="font-black text-xl text-gray-800 leading-none truncate hover:text-shopee">Sair</h1>
                     <p class="text-[10px] font-bold text-gray-400 tracking-widest uppercase truncate" id="user-display-name">Nome</p>
@@ -169,42 +201,46 @@
         </div>
     </header>
 
-    <main class="flex-1 overflow-y-auto p-4 md:p-8">
-        <div class="max-w-6xl mx-auto w-full h-full relative">
+    <main class="w-full flex-grow p-4 md:p-8">
+        <div class="max-w-6xl mx-auto w-full">
 
-            <div id="aba-menu-inspetor" class="hidden flex-col justify-center max-w-2xl mx-auto pt-4 overflow-y-auto gap-4 h-full">
-                <div class="grid grid-cols-2 gap-4 md:gap-6">
-                    <button onclick="window.mudarAba('registro')" class="card-interaction col-span-2 bg-white border-2 border-shopee rounded-3xl p-8 shadow-sm flex flex-col items-center justify-center space-y-4 group">
+            <div id="aba-menu-inspetor" style="display: none;">
+                <div class="grid grid-cols-2 gap-4 md:gap-6 pt-4">
+                    <button onclick="window.mudarAba('aba-registro')" class="card-interaction col-span-2 bg-white border-2 border-shopee rounded-3xl p-8 shadow-sm flex flex-col items-center justify-center space-y-4 group">
                         <i class="fa-solid fa-triangle-exclamation text-7xl text-shopee transition-colors"></i>
                         <span class="font-black text-2xl text-gray-800 uppercase group-hover:text-white transition-colors tracking-tight">Relatar Risco Agora</span>
                     </button>
-                    <button onclick="window.mudarAba('inspecao')" class="card-interaction col-span-2 bg-white border-2 border-shopee rounded-3xl p-6 shadow-sm flex flex-col items-center justify-center space-y-3 group">
+                    
+                    <button onclick="window.mudarAba('aba-inspecao')" class="card-interaction col-span-2 md:col-span-1 bg-white border-2 border-shopee rounded-3xl p-6 shadow-sm flex flex-col items-center justify-center space-y-3 group">
                         <i class="fa-solid fa-clipboard-check text-5xl text-shopee transition-colors"></i>
                         <span class="font-black text-xl text-gray-800 uppercase group-hover:text-white transition-colors tracking-tight">Inspeção Mensal</span>
                     </button>
-                    
+
+                    <button onclick="window.mudarAba('aba-progresso')" class="card-interaction col-span-2 md:col-span-1 bg-white rounded-3xl p-6 shadow-sm flex flex-col items-center justify-center space-y-3 border-b-4 border-shopee group">
+                        <i class="fa-solid fa-chart-simple text-4xl text-shopee transition-colors"></i>
+                        <span class="font-bold text-sm text-gray-700 text-center leading-tight transition-colors">Meu Progresso</span>
+                    </button>
+
                     <button class="card-interaction bg-white rounded-3xl p-6 shadow-sm flex flex-col items-center justify-center space-y-3 border-b-4 border-shopee group">
                         <i class="fa-solid fa-file-shield text-4xl text-shopee transition-colors"></i>
                         <span class="font-bold text-sm text-gray-700 text-center leading-tight transition-colors">Procedimentos</span>
                     </button>
+                    
                     <button class="card-interaction bg-white rounded-3xl p-6 shadow-sm flex flex-col items-center justify-center space-y-3 border-b-4 border-shopee group">
                         <i class="fa-solid fa-graduation-cap text-4xl text-shopee transition-colors"></i>
                         <span class="font-bold text-sm text-gray-700 text-center leading-tight transition-colors">Treinamento</span>
                     </button>
-                    <button onclick="window.mudarAba('progresso')" class="card-interaction col-span-2 bg-white rounded-3xl p-6 shadow-sm flex flex-col items-center justify-center space-y-3 border-b-4 border-shopee group">
-                        <i class="fa-solid fa-chart-simple text-4xl text-shopee transition-colors"></i>
-                        <span class="font-bold text-sm text-gray-700 text-center leading-tight transition-colors">Meu Progresso</span>
-                    </button>
-                    <button onclick="localStorage.clear(); sessionStorage.clear(); window.location.href = window.location.pathname + '?v=' + new Date().getTime();" class="card-interaction col-span-2 bg-white rounded-3xl p-6 shadow-sm flex flex-col items-center justify-center space-y-3 border-b-4 border-gray-300 group">
-                        <i class="fa-solid fa-power-off text-4xl text-gray-400 transition-colors"></i>
-                        <span class="font-bold text-sm text-gray-500 text-center leading-tight transition-colors">Deslogar do Sistema</span>
+                    
+                    <button onclick="window.fazerLogout()" class="card-interaction col-span-2 bg-white rounded-3xl p-6 shadow-sm flex flex-col items-center justify-center space-y-3 border-b-4 border-gray-300 group">
+                        <i class="fa-solid fa-power-off text-3xl text-gray-400 transition-colors"></i>
+                        <span class="font-bold text-sm text-gray-500 text-center leading-tight transition-colors">Sair do Sistema</span>
                     </button>
                 </div>
             </div>
 
-            <div id="aba-inspecao" class="hidden max-w-3xl mx-auto pb-10 w-full">
-                <div class="flex items-center gap-4 mb-6 sticky top-0 bg-gray-50 z-20 py-3">
-                    <button onclick="window.voltarMenuInspetor()" class="w-12 h-12 rounded-2xl bg-white shadow-md border border-gray-200 flex items-center justify-center text-gray-700 hover:text-shopee hover:border-shopee hover:bg-shopee-light transition-all active:scale-95 shrink-0" title="Voltar ao Menu">
+            <div id="aba-inspecao" style="display: none;" class="max-w-3xl mx-auto pb-10">
+                <div class="flex items-center gap-4 mb-6 py-3">
+                    <button onclick="window.voltarMenuInspetor()" class="w-12 h-12 rounded-2xl bg-white shadow-md border border-gray-200 flex items-center justify-center text-gray-700 hover:text-shopee hover:border-shopee hover:bg-shopee-light transition-all active:scale-95 shrink-0">
                         <i class="fa-solid fa-arrow-left text-xl"></i>
                     </button>
                     <div>
@@ -212,259 +248,283 @@
                         <p class="text-sm text-gray-500 font-medium">Preencha o checklist de segurança oficial.</p>
                     </div>
                 </div>
-                
-                <div class="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100">
+
+                <div class="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 space-y-6">
                     
-                    <h3 class="font-black text-lg text-shopee-dark border-b-2 border-shopee-light pb-2 mb-4 flex items-center gap-2"><i class="fa-solid fa-clipboard-check text-shopee"></i> Formulário de Inspeção CIPA</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Unidade Logística (Hub)</label>
+                            <select id="insp_hub_local" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee focus:border-transparent appearance-none font-medium text-gray-700">
+                                <option value="" disabled selected>Selecionar Base...</option>
+                                <option>Hub Uberaba</option>
+                                <option>Hub Uberlândia</option>
+                                <option>Hub Divinópolis</option>
+                                <option>Hub Lagoa da Prata</option>
+                                <option>Hub Patos de Minas</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Data da Inspeção</label>
+                            <input type="date" id="insp_data" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee text-gray-700 font-medium">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Horário</label>
+                            <input type="time" id="insp_hora" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee text-gray-700 font-medium">
+                        </div>
+                    </div>
+
+                    <h3 class="insp-section-title"><i class="fa-solid fa-clipboard-check text-shopee mr-2"></i> Formulário de Inspeção CIPA</h3>
                     
-                    <div class="mb-5 p-5 border border-gray-100 rounded-2xl bg-gray-50/50 shadow-sm">
-                        <label class="block text-sm font-bold text-gray-800 mb-3">1. As reuniões da CIPA e Brigada possuem Ata e Lista de Presença?</label>
-                        <div class="flex flex-wrap gap-4 mb-4">
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_1" value="Sim" class="w-4 h-4 text-shopee focus:ring-shopee"> <span class="text-sm font-bold text-gray-700">Sim</span></label>
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_1" value="Não" class="w-4 h-4 text-red-600 focus:ring-red-600"> <span class="text-sm font-bold text-gray-700">Não</span></label>
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_1" value="N/A" class="w-4 h-4 text-gray-400 focus:ring-gray-400"> <span class="text-sm font-bold text-gray-700">N/A</span></label>
+                    <div class="insp-question-card">
+                        <label id="tit_q1" class="block text-sm font-bold text-gray-800 mb-3">1. As reuniões da CIPA e Brigada possuem Ata e Lista de Presença?</label>
+                        <div class="insp-radio-group">
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q1" value="Sim" class="w-4 h-4 text-shopee"> <span class="text-sm font-medium">Sim</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q1" value="Não" class="w-4 h-4 text-red-600"> <span class="text-sm font-medium">Não</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q1" value="N/A" class="w-4 h-4 text-gray-500"> <span class="text-sm font-medium">N/A</span></label>
                         </div>
-                        <textarea class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações (opcional)..."></textarea>
+                        <textarea id="obs_1" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações..."></textarea>
                     </div>
 
-                    <div class="mb-5 p-5 border border-gray-100 rounded-2xl bg-gray-50/50 shadow-sm">
-                        <label class="block text-sm font-bold text-gray-800 mb-3">2. As fichas de EPI estão atualizadas?</label>
-                        <div class="flex flex-wrap gap-4 mb-4">
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_2" value="Sim" class="w-4 h-4 text-shopee focus:ring-shopee"> <span class="text-sm font-bold text-gray-700">Sim</span></label>
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_2" value="Não" class="w-4 h-4 text-red-600 focus:ring-red-600"> <span class="text-sm font-bold text-gray-700">Não</span></label>
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_2" value="N/A" class="w-4 h-4 text-gray-400 focus:ring-gray-400"> <span class="text-sm font-bold text-gray-700">N/A</span></label>
+                    <div class="insp-question-card">
+                        <label id="tit_q2" class="block text-sm font-bold text-gray-800 mb-3">2. As fichas de EPI estão atualizadas?</label>
+                        <div class="insp-radio-group">
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q2" value="Sim" class="w-4 h-4 text-shopee"> <span class="text-sm font-medium">Sim</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q2" value="Não" class="w-4 h-4 text-red-600"> <span class="text-sm font-medium">Não</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q2" value="N/A" class="w-4 h-4 text-gray-500"> <span class="text-sm font-medium">N/A</span></label>
                         </div>
-                        <textarea class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações (opcional)..."></textarea>
+                        <textarea id="obs_2" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações..."></textarea>
                     </div>
 
-                    <div class="mb-5 p-5 border border-gray-100 rounded-2xl bg-gray-50/50 shadow-sm">
-                        <label class="block text-sm font-bold text-gray-800 mb-3">3. O Banner das "Regras de Ouro" está fixado e visível?</label>
-                        <div class="flex flex-wrap gap-4 mb-4">
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_3" value="Sim" class="w-4 h-4 text-shopee focus:ring-shopee"> <span class="text-sm font-bold text-gray-700">Sim</span></label>
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_3" value="Não" class="w-4 h-4 text-red-600 focus:ring-red-600"> <span class="text-sm font-bold text-gray-700">Não</span></label>
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_3" value="N/A" class="w-4 h-4 text-gray-400 focus:ring-gray-400"> <span class="text-sm font-bold text-gray-700">N/A</span></label>
+                    <div class="insp-question-card">
+                        <label id="tit_q3" class="block text-sm font-bold text-gray-800 mb-3">3. O Banner das "Regras de Ouro" está fixado e visível?</label>
+                        <div class="insp-radio-group">
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q3" value="Sim" class="w-4 h-4 text-shopee"> <span class="text-sm font-medium">Sim</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q3" value="Não" class="w-4 h-4 text-red-600"> <span class="text-sm font-medium">Não</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q3" value="N/A" class="w-4 h-4 text-gray-500"> <span class="text-sm font-medium">N/A</span></label>
                         </div>
-                        <textarea class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações (opcional)..."></textarea>
+                        <textarea id="obs_3" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações..."></textarea>
                     </div>
 
-                    <h3 class="font-black text-lg text-shopee-dark border-b-2 border-shopee-light pb-2 mt-8 mb-4 flex items-center gap-2"><i class="fa-solid fa-plug text-shopee"></i> Elétrica e Equipamentos</h3>
+                    <h3 class="insp-section-title"><i class="fa-solid fa-plug text-shopee mr-2"></i> Elétrica e Equipamentos</h3>
 
-                    <div class="mb-5 p-5 border border-gray-100 rounded-2xl bg-gray-50/50 shadow-sm">
-                        <label class="block text-sm font-bold text-gray-800 mb-3">4. Quadros elétricos estão trancados, desobstruídos e sem fios expostos?</label>
-                        <div class="flex flex-wrap gap-4 mb-4">
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_4" value="Sim" class="w-4 h-4 text-shopee focus:ring-shopee"> <span class="text-sm font-bold text-gray-700">Sim</span></label>
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_4" value="Não" class="w-4 h-4 text-red-600 focus:ring-red-600"> <span class="text-sm font-bold text-gray-700">Não</span></label>
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_4" value="N/A" class="w-4 h-4 text-gray-400 focus:ring-gray-400"> <span class="text-sm font-bold text-gray-700">N/A</span></label>
+                    <div class="insp-question-card">
+                        <label id="tit_q4" class="block text-sm font-bold text-gray-800 mb-3">4. Quadros elétricos estão trancados, desobstruídos e sem fios expostos?</label>
+                        <div class="insp-radio-group">
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q4" value="Sim" class="w-4 h-4 text-shopee"> <span class="text-sm font-medium">Sim</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q4" value="Não" class="w-4 h-4 text-red-600"> <span class="text-sm font-medium">Não</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q4" value="N/A" class="w-4 h-4 text-gray-500"> <span class="text-sm font-medium">N/A</span></label>
                         </div>
-                        <textarea class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações (opcional)..."></textarea>
+                        <textarea id="obs_4" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações..."></textarea>
                     </div>
 
-                    <div class="mb-5 p-5 border border-gray-100 rounded-2xl bg-gray-50/50 shadow-sm">
-                        <label class="block text-sm font-bold text-gray-800 mb-3">5. Tomadas possuem identificação de voltagem e fiação adequada?</label>
-                        <div class="flex flex-wrap gap-4 mb-4">
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_5" value="Sim" class="w-4 h-4 text-shopee focus:ring-shopee"> <span class="text-sm font-bold text-gray-700">Sim</span></label>
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_5" value="Não" class="w-4 h-4 text-red-600 focus:ring-red-600"> <span class="text-sm font-bold text-gray-700">Não</span></label>
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_5" value="N/A" class="w-4 h-4 text-gray-400 focus:ring-gray-400"> <span class="text-sm font-bold text-gray-700">N/A</span></label>
+                    <div class="insp-question-card">
+                        <label id="tit_q5" class="block text-sm font-bold text-gray-800 mb-3">5. Tomadas possuem identificação de voltagem e fiação adequada?</label>
+                        <div class="insp-radio-group">
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q5" value="Sim" class="w-4 h-4 text-shopee"> <span class="text-sm font-medium">Sim</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q5" value="Não" class="w-4 h-4 text-red-600"> <span class="text-sm font-medium">Não</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q5" value="N/A" class="w-4 h-4 text-gray-500"> <span class="text-sm font-medium">N/A</span></label>
                         </div>
-                        <textarea class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações (opcional)..."></textarea>
+                        <textarea id="obs_5" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações..."></textarea>
                     </div>
 
-                    <div class="mb-5 p-5 border border-gray-100 rounded-2xl bg-gray-50/50 shadow-sm">
-                        <label class="block text-sm font-bold text-gray-800 mb-3">6. Ventiladores possuem proteção e placa de "Proibido Ajustes"?</label>
-                        <div class="flex flex-wrap gap-4 mb-4">
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_6" value="Sim" class="w-4 h-4 text-shopee focus:ring-shopee"> <span class="text-sm font-bold text-gray-700">Sim</span></label>
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_6" value="Não" class="w-4 h-4 text-red-600 focus:ring-red-600"> <span class="text-sm font-bold text-gray-700">Não</span></label>
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_6" value="N/A" class="w-4 h-4 text-gray-400 focus:ring-gray-400"> <span class="text-sm font-bold text-gray-700">N/A</span></label>
+                    <div class="insp-question-card">
+                        <label id="tit_q6" class="block text-sm font-bold text-gray-800 mb-3">6. Ventiladores possuem proteção e placa de "Proibido Ajustes"?</label>
+                        <div class="insp-radio-group">
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q6" value="Sim" class="w-4 h-4 text-shopee"> <span class="text-sm font-medium">Sim</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q6" value="Não" class="w-4 h-4 text-red-600"> <span class="text-sm font-medium">Não</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q6" value="N/A" class="w-4 h-4 text-gray-500"> <span class="text-sm font-medium">N/A</span></label>
                         </div>
-                        <textarea class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações (opcional)..."></textarea>
+                        <textarea id="obs_6" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações..."></textarea>
                     </div>
 
-                    <div class="mb-5 p-5 border border-gray-100 rounded-2xl bg-gray-50/50 shadow-sm">
-                        <label class="block text-sm font-bold text-gray-800 mb-3">7. Esteiras possuem proteção na junção e cordão de emergência?</label>
-                        <div class="flex flex-wrap gap-4 mb-4">
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_7" value="Sim" class="w-4 h-4 text-shopee focus:ring-shopee"> <span class="text-sm font-bold text-gray-700">Sim</span></label>
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_7" value="Não" class="w-4 h-4 text-red-600 focus:ring-red-600"> <span class="text-sm font-bold text-gray-700">Não</span></label>
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_7" value="N/A" class="w-4 h-4 text-gray-400 focus:ring-gray-400"> <span class="text-sm font-bold text-gray-700">N/A</span></label>
+                    <div class="insp-question-card">
+                        <label id="tit_q7" class="block text-sm font-bold text-gray-800 mb-3">7. Esteiras possuem proteção na junção e cordão de emergência?</label>
+                        <div class="insp-radio-group">
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q7" value="Sim" class="w-4 h-4 text-shopee"> <span class="text-sm font-medium">Sim</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q7" value="Não" class="w-4 h-4 text-red-600"> <span class="text-sm font-medium">Não</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q7" value="N/A" class="w-4 h-4 text-gray-500"> <span class="text-sm font-medium">N/A</span></label>
                         </div>
-                        <textarea class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações (opcional)..."></textarea>
+                        <textarea id="obs_7" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações..."></textarea>
                     </div>
 
-                    <div class="mb-5 p-5 border border-gray-100 rounded-2xl bg-gray-50/50 shadow-sm">
-                        <label class="block text-sm font-bold text-gray-800 mb-3">8. Os colaboradores estão utilizando os EPI corretamente?</label>
-                        <div class="flex flex-wrap gap-4 mb-4">
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_8" value="Sim" class="w-4 h-4 text-shopee focus:ring-shopee"> <span class="text-sm font-bold text-gray-700">Sim</span></label>
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_8" value="Não" class="w-4 h-4 text-red-600 focus:ring-red-600"> <span class="text-sm font-bold text-gray-700">Não</span></label>
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_8" value="N/A" class="w-4 h-4 text-gray-400 focus:ring-gray-400"> <span class="text-sm font-bold text-gray-700">N/A</span></label>
+                    <div class="insp-question-card">
+                        <label id="tit_q8" class="block text-sm font-bold text-gray-800 mb-3">8. Os colaboradores estão utilizando os EPI corretamente?</label>
+                        <div class="insp-radio-group">
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q8" value="Sim" class="w-4 h-4 text-shopee"> <span class="text-sm font-medium">Sim</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q8" value="Não" class="w-4 h-4 text-red-600"> <span class="text-sm font-medium">Não</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q8" value="N/A" class="w-4 h-4 text-gray-500"> <span class="text-sm font-medium">N/A</span></label>
                         </div>
-                        <textarea class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações (opcional)..."></textarea>
+                        <textarea id="obs_8" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações..."></textarea>
                     </div>
 
-                    <div class="mb-5 p-5 border border-gray-100 rounded-2xl bg-gray-50/50 shadow-sm">
-                        <label class="block text-sm font-bold text-gray-800 mb-3">9. Operadores de máquinas realizam checklist antes da operação?</label>
-                        <div class="flex flex-wrap gap-4 mb-4">
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_9" value="Sim" class="w-4 h-4 text-shopee focus:ring-shopee"> <span class="text-sm font-bold text-gray-700">Sim</span></label>
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_9" value="Não" class="w-4 h-4 text-red-600 focus:ring-red-600"> <span class="text-sm font-bold text-gray-700">Não</span></label>
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_9" value="N/A" class="w-4 h-4 text-gray-400 focus:ring-gray-400"> <span class="text-sm font-bold text-gray-700">N/A</span></label>
+                    <div class="insp-question-card">
+                        <label id="tit_q9" class="block text-sm font-bold text-gray-800 mb-3">9. Operadores de máquinas realizam checklist antes da operação?</label>
+                        <div class="insp-radio-group">
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q9" value="Sim" class="w-4 h-4 text-shopee"> <span class="text-sm font-medium">Sim</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q9" value="Não" class="w-4 h-4 text-red-600"> <span class="text-sm font-medium">Não</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q9" value="N/A" class="w-4 h-4 text-gray-500"> <span class="text-sm font-medium">N/A</span></label>
                         </div>
-                        <textarea class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações (opcional)..."></textarea>
+                        <textarea id="obs_9" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações..."></textarea>
                     </div>
 
-                    <h3 class="font-black text-lg text-shopee-dark border-b-2 border-shopee-light pb-2 mt-8 mb-4 flex items-center gap-2"><i class="fa-solid fa-truck-medical text-shopee"></i> Emergência e Saúde</h3>
+                    <h3 class="insp-section-title"><i class="fa-solid fa-truck-medical text-shopee mr-2"></i> Emergência e Saúde</h3>
 
-                    <div class="mb-5 p-5 border border-gray-100 rounded-2xl bg-gray-50/50 shadow-sm">
-                        <label class="block text-sm font-bold text-gray-800 mb-3">10. Equipamentos de incêndio estão no prazo e o Líder sabe operar a central?</label>
-                        <div class="flex flex-wrap gap-4 mb-4">
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_10" value="Sim" class="w-4 h-4 text-shopee focus:ring-shopee"> <span class="text-sm font-bold text-gray-700">Sim</span></label>
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_10" value="Não" class="w-4 h-4 text-red-600 focus:ring-red-600"> <span class="text-sm font-bold text-gray-700">Não</span></label>
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_10" value="N/A" class="w-4 h-4 text-gray-400 focus:ring-gray-400"> <span class="text-sm font-bold text-gray-700">N/A</span></label>
+                    <div class="insp-question-card">
+                        <label id="tit_q10" class="block text-sm font-bold text-gray-800 mb-3">10. Equipamentos de incêndio estão no prazo e o Líder sabe operar a central?</label>
+                        <div class="insp-radio-group">
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q10" value="Sim" class="w-4 h-4 text-shopee"> <span class="text-sm font-medium">Sim</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q10" value="Não" class="w-4 h-4 text-red-600"> <span class="text-sm font-medium">Não</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q10" value="N/A" class="w-4 h-4 text-gray-500"> <span class="text-sm font-medium">N/A</span></label>
                         </div>
-                        <textarea class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações (opcional)..."></textarea>
+                        <textarea id="obs_10" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações..."></textarea>
                     </div>
 
-                    <div class="mb-5 p-5 border border-gray-100 rounded-2xl bg-gray-50/50 shadow-sm">
-                        <label class="block text-sm font-bold text-gray-800 mb-3">11. Portas de emergência estão destrancadas e desobstruídas?</label>
-                        <div class="flex flex-wrap gap-4 mb-4">
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_11" value="Sim" class="w-4 h-4 text-shopee focus:ring-shopee"> <span class="text-sm font-bold text-gray-700">Sim</span></label>
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_11" value="Não" class="w-4 h-4 text-red-600 focus:ring-red-600"> <span class="text-sm font-bold text-gray-700">Não</span></label>
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_11" value="N/A" class="w-4 h-4 text-gray-400 focus:ring-gray-400"> <span class="text-sm font-bold text-gray-700">N/A</span></label>
+                    <div class="insp-question-card">
+                        <label id="tit_q11" class="block text-sm font-bold text-gray-800 mb-3">11. Portas de emergência estão destrancadas e desobstruídas?</label>
+                        <div class="insp-radio-group">
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q11" value="Sim" class="w-4 h-4 text-shopee"> <span class="text-sm font-medium">Sim</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q11" value="Não" class="w-4 h-4 text-red-600"> <span class="text-sm font-medium">Não</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q11" value="N/A" class="w-4 h-4 text-gray-500"> <span class="text-sm font-medium">N/A</span></label>
                         </div>
-                        <textarea class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações (opcional)..."></textarea>
+                        <textarea id="obs_11" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações..."></textarea>
                     </div>
 
-                    <div class="mb-5 p-5 border border-gray-100 rounded-2xl bg-gray-50/50 shadow-sm">
-                        <label class="block text-sm font-bold text-gray-800 mb-3">12. O Kit de Primeiros Socorros está completo e sinalizado (faixa verde)?</label>
-                        <div class="flex flex-wrap gap-4 mb-4">
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_12" value="Sim" class="w-4 h-4 text-shopee focus:ring-shopee"> <span class="text-sm font-bold text-gray-700">Sim</span></label>
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_12" value="Não" class="w-4 h-4 text-red-600 focus:ring-red-600"> <span class="text-sm font-bold text-gray-700">Não</span></label>
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_12" value="N/A" class="w-4 h-4 text-gray-400 focus:ring-gray-400"> <span class="text-sm font-bold text-gray-700">N/A</span></label>
+                    <div class="insp-question-card">
+                        <label id="tit_q12" class="block text-sm font-bold text-gray-800 mb-3">12. O Kit de Primeiros Socorros está completo e sinalizado (faixa verde)?</label>
+                        <div class="insp-radio-group">
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q12" value="Sim" class="w-4 h-4 text-shopee"> <span class="text-sm font-medium">Sim</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q12" value="Não" class="w-4 h-4 text-red-600"> <span class="text-sm font-medium">Não</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q12" value="N/A" class="w-4 h-4 text-gray-500"> <span class="text-sm font-medium">N/A</span></label>
                         </div>
-                        <textarea class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações (opcional)..."></textarea>
+                        <textarea id="obs_12" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações..."></textarea>
                     </div>
 
-                    <div class="mb-5 p-5 border border-gray-100 rounded-2xl bg-gray-50/50 shadow-sm">
-                        <label class="block text-sm font-bold text-gray-800 mb-3">13. Banheiros e bebedouros estão limpos e em bom estado?</label>
-                        <div class="flex flex-wrap gap-4 mb-4">
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_13" value="Sim" class="w-4 h-4 text-shopee focus:ring-shopee"> <span class="text-sm font-bold text-gray-700">Sim</span></label>
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_13" value="Não" class="w-4 h-4 text-red-600 focus:ring-red-600"> <span class="text-sm font-bold text-gray-700">Não</span></label>
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_13" value="N/A" class="w-4 h-4 text-gray-400 focus:ring-gray-400"> <span class="text-sm font-bold text-gray-700">N/A</span></label>
+                    <div class="insp-question-card">
+                        <label id="tit_q13" class="block text-sm font-bold text-gray-800 mb-3">13. Banheiros e bebedouros estão limpos e em bom estado?</label>
+                        <div class="insp-radio-group">
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q13" value="Sim" class="w-4 h-4 text-shopee"> <span class="text-sm font-medium">Sim</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q13" value="Não" class="w-4 h-4 text-red-600"> <span class="text-sm font-medium">Não</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q13" value="N/A" class="w-4 h-4 text-gray-500"> <span class="text-sm font-medium">N/A</span></label>
                         </div>
-                        <textarea class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações (opcional)..."></textarea>
+                        <textarea id="obs_13" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações..."></textarea>
                     </div>
 
-                    <h3 class="font-black text-lg text-shopee-dark border-b-2 border-shopee-light pb-2 mt-8 mb-4 flex items-center gap-2"><i class="fa-solid fa-truck-ramp-box text-shopee"></i> Operação e Docas</h3>
+                    <h3 class="insp-section-title"><i class="fa-solid fa-truck-ramp-box text-shopee mr-2"></i> Operação e Docas</h3>
 
-                    <div class="mb-5 p-5 border border-gray-100 rounded-2xl bg-gray-50/50 shadow-sm">
-                        <label class="block text-sm font-bold text-gray-800 mb-3">14. Nas docas: calços de rodas são usados e chaves são recolhidas?</label>
-                        <div class="flex flex-wrap gap-4 mb-4">
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_14" value="Sim" class="w-4 h-4 text-shopee focus:ring-shopee"> <span class="text-sm font-bold text-gray-700">Sim</span></label>
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_14" value="Não" class="w-4 h-4 text-red-600 focus:ring-red-600"> <span class="text-sm font-bold text-gray-700">Não</span></label>
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_14" value="N/A" class="w-4 h-4 text-gray-400 focus:ring-gray-400"> <span class="text-sm font-bold text-gray-700">N/A</span></label>
+                    <div class="insp-question-card">
+                        <label id="tit_q14" class="block text-sm font-bold text-gray-800 mb-3">14. Nas docas: calços de rodas são usados e chaves são recolhidas?</label>
+                        <div class="insp-radio-group">
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q14" value="Sim" class="w-4 h-4 text-shopee"> <span class="text-sm font-medium">Sim</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q14" value="Não" class="w-4 h-4 text-red-600"> <span class="text-sm font-medium">Não</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q14" value="N/A" class="w-4 h-4 text-gray-500"> <span class="text-sm font-medium">N/A</span></label>
                         </div>
-                        <textarea class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações (opcional)..."></textarea>
+                        <textarea id="obs_14" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações..."></textarea>
                     </div>
 
-                    <div class="mb-5 p-5 border border-gray-100 rounded-2xl bg-gray-50/50 shadow-sm">
-                        <label class="block text-sm font-bold text-gray-800 mb-3">15. Portas e niveladoras das docas estão sem defeitos?</label>
-                        <div class="flex flex-wrap gap-4 mb-4">
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_15" value="Sim" class="w-4 h-4 text-shopee focus:ring-shopee"> <span class="text-sm font-bold text-gray-700">Sim</span></label>
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_15" value="Não" class="w-4 h-4 text-red-600 focus:ring-red-600"> <span class="text-sm font-bold text-gray-700">Não</span></label>
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_15" value="N/A" class="w-4 h-4 text-gray-400 focus:ring-gray-400"> <span class="text-sm font-bold text-gray-700">N/A</span></label>
+                    <div class="insp-question-card">
+                        <label id="tit_q15" class="block text-sm font-bold text-gray-800 mb-3">15. Portas e niveladoras das docas estão sem defeitos?</label>
+                        <div class="insp-radio-group">
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q15" value="Sim" class="w-4 h-4 text-shopee"> <span class="text-sm font-medium">Sim</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q15" value="Não" class="w-4 h-4 text-red-600"> <span class="text-sm font-medium">Não</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q15" value="N/A" class="w-4 h-4 text-gray-500"> <span class="text-sm font-medium">N/A</span></label>
                         </div>
-                        <textarea class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações (opcional)..."></textarea>
+                        <textarea id="obs_15" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações..."></textarea>
                     </div>
 
-                    <div class="mb-5 p-5 border border-gray-100 rounded-2xl bg-gray-50/50 shadow-sm">
-                        <label class="block text-sm font-bold text-gray-800 mb-3">16. Empilhamento de paletes (10/15) e gaiolas estão em bom estado?</label>
-                        <div class="flex flex-wrap gap-4 mb-4">
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_16" value="Sim" class="w-4 h-4 text-shopee focus:ring-shopee"> <span class="text-sm font-bold text-gray-700">Sim</span></label>
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_16" value="Não" class="w-4 h-4 text-red-600 focus:ring-red-600"> <span class="text-sm font-bold text-gray-700">Não</span></label>
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_16" value="N/A" class="w-4 h-4 text-gray-400 focus:ring-gray-400"> <span class="text-sm font-bold text-gray-700">N/A</span></label>
+                    <div class="insp-question-card">
+                        <label id="tit_q16" class="block text-sm font-bold text-gray-800 mb-3">16. Empilhamento de paletes (10/15) e gaiolas estão em bom estado?</label>
+                        <div class="insp-radio-group">
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q16" value="Sim" class="w-4 h-4 text-shopee"> <span class="text-sm font-medium">Sim</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q16" value="Não" class="w-4 h-4 text-red-600"> <span class="text-sm font-medium">Não</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q16" value="N/A" class="w-4 h-4 text-gray-500"> <span class="text-sm font-medium">N/A</span></label>
                         </div>
-                        <textarea class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações (opcional)..."></textarea>
+                        <textarea id="obs_16" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações..."></textarea>
                     </div>
 
-                    <div class="mb-5 p-5 border border-gray-100 rounded-2xl bg-gray-50/50 shadow-sm">
-                        <label class="block text-sm font-bold text-gray-800 mb-3">17. Caminhos seguros e faixas de sinalização estão conservados?</label>
-                        <div class="flex flex-wrap gap-4 mb-4">
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_17" value="Sim" class="w-4 h-4 text-shopee focus:ring-shopee"> <span class="text-sm font-bold text-gray-700">Sim</span></label>
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_17" value="Não" class="w-4 h-4 text-red-600 focus:ring-red-600"> <span class="text-sm font-bold text-gray-700">Não</span></label>
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_17" value="N/A" class="w-4 h-4 text-gray-400 focus:ring-gray-400"> <span class="text-sm font-bold text-gray-700">N/A</span></label>
+                    <div class="insp-question-card">
+                        <label id="tit_q17" class="block text-sm font-bold text-gray-800 mb-3">17. Caminhos seguros e faixas de sinalização estão conservados?</label>
+                        <div class="insp-radio-group">
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q17" value="Sim" class="w-4 h-4 text-shopee"> <span class="text-sm font-medium">Sim</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q17" value="Não" class="w-4 h-4 text-red-600"> <span class="text-sm font-medium">Não</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q17" value="N/A" class="w-4 h-4 text-gray-500"> <span class="text-sm font-medium">N/A</span></label>
                         </div>
-                        <textarea class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações (opcional)..."></textarea>
+                        <textarea id="obs_17" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações..."></textarea>
                     </div>
 
-                    <h3 class="font-black text-lg text-shopee-dark border-b-2 border-shopee-light pb-2 mt-8 mb-4 flex items-center gap-2"><i class="fa-solid fa-users-gear text-shopee"></i> Comportamento e Segurança do Time</h3>
+                    <h3 class="insp-section-title"><i class="fa-solid fa-users-gear text-shopee mr-2"></i> Comportamento e Segurança do Time</h3>
 
-                    <div class="mb-5 p-5 border border-gray-100 rounded-2xl bg-gray-50/50 shadow-sm">
-                        <label class="block text-sm font-bold text-gray-800 mb-3">18. O time utiliza EPIs corretamente (colete fechado e cabelo preso)?</label>
-                        <div class="flex flex-wrap gap-4 mb-4">
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_18" value="Sim" class="w-4 h-4 text-shopee focus:ring-shopee"> <span class="text-sm font-bold text-gray-700">Sim</span></label>
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_18" value="Não" class="w-4 h-4 text-red-600 focus:ring-red-600"> <span class="text-sm font-bold text-gray-700">Não</span></label>
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_18" value="N/A" class="w-4 h-4 text-gray-400 focus:ring-gray-400"> <span class="text-sm font-bold text-gray-700">N/A</span></label>
+                    <div class="insp-question-card">
+                        <label id="tit_q18" class="block text-sm font-bold text-gray-800 mb-3">18. O time utiliza EPIs corretamente (colete fechado e cabelo preso)?</label>
+                        <div class="insp-radio-group">
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q18" value="Sim" class="w-4 h-4 text-shopee"> <span class="text-sm font-medium">Sim</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q18" value="Não" class="w-4 h-4 text-red-600"> <span class="text-sm font-medium">Não</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q18" value="N/A" class="w-4 h-4 text-gray-500"> <span class="text-sm font-medium">N/A</span></label>
                         </div>
-                        <textarea class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações (opcional)..."></textarea>
+                        <textarea id="obs_18" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações..."></textarea>
                     </div>
 
-                    <div class="mb-5 p-5 border border-gray-100 rounded-2xl bg-gray-50/50 shadow-sm">
-                        <label class="block text-sm font-bold text-gray-800 mb-3">19. Colaboradores evitam correr ou usar celular durante a caminhada?</label>
-                        <div class="flex flex-wrap gap-4 mb-4">
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_19" value="Sim" class="w-4 h-4 text-shopee focus:ring-shopee"> <span class="text-sm font-bold text-gray-700">Sim</span></label>
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_19" value="Não" class="w-4 h-4 text-red-600 focus:ring-red-600"> <span class="text-sm font-bold text-gray-700">Não</span></label>
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_19" value="N/A" class="w-4 h-4 text-gray-400 focus:ring-gray-400"> <span class="text-sm font-bold text-gray-700">N/A</span></label>
+                    <div class="insp-question-card">
+                        <label id="tit_q19" class="block text-sm font-bold text-gray-800 mb-3">19. Colaboradores evitam correr ou usar celular durante a caminhada?</label>
+                        <div class="insp-radio-group">
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q19" value="Sim" class="w-4 h-4 text-shopee"> <span class="text-sm font-medium">Sim</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q19" value="Não" class="w-4 h-4 text-red-600"> <span class="text-sm font-medium">Não</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q19" value="N/A" class="w-4 h-4 text-gray-500"> <span class="text-sm font-medium">N/A</span></label>
                         </div>
-                        <textarea class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações (opcional)..."></textarea>
+                        <textarea id="obs_19" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações..."></textarea>
                     </div>
 
-                    <div class="mb-5 p-5 border border-gray-100 rounded-2xl bg-gray-50/50 shadow-sm">
-                        <label class="block text-sm font-bold text-gray-800 mb-3">20. O manuseio de pacotes e tração de gaiolas é feito corretamente?</label>
-                        <div class="flex flex-wrap gap-4 mb-4">
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_20" value="Sim" class="w-4 h-4 text-shopee focus:ring-shopee"> <span class="text-sm font-bold text-gray-700">Sim</span></label>
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_20" value="Não" class="w-4 h-4 text-red-600 focus:ring-red-600"> <span class="text-sm font-bold text-gray-700">Não</span></label>
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_20" value="N/A" class="w-4 h-4 text-gray-400 focus:ring-gray-400"> <span class="text-sm font-bold text-gray-700">N/A</span></label>
+                    <div class="insp-question-card">
+                        <label id="tit_q20" class="block text-sm font-bold text-gray-800 mb-3">20. O manuseio de pacotes e tração de gaiolas é feito corretamente?</label>
+                        <div class="insp-radio-group">
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q20" value="Sim" class="w-4 h-4 text-shopee"> <span class="text-sm font-medium">Sim</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q20" value="Não" class="w-4 h-4 text-red-600"> <span class="text-sm font-medium">Não</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q20" value="N/A" class="w-4 h-4 text-gray-500"> <span class="text-sm font-medium">N/A</span></label>
                         </div>
-                        <textarea class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações (opcional)..."></textarea>
+                        <textarea id="obs_20" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações..."></textarea>
                     </div>
 
-                    <h3 class="font-black text-lg text-shopee-dark border-b-2 border-shopee-light pb-2 mt-8 mb-4 flex items-center gap-2"><i class="fa-solid fa-flask text-shopee"></i> Químicos e Ambiental</h3>
+                    <h3 class="insp-section-title"><i class="fa-solid fa-flask text-shopee mr-2"></i> Químicos e Ambiental</h3>
 
-                    <div class="mb-5 p-5 border border-gray-100 rounded-2xl bg-gray-50/50 shadow-sm">
-                        <label class="block text-sm font-bold text-gray-800 mb-3">21. Produtos químicos estão adequados e sinalizados?</label>
-                        <div class="flex flex-wrap gap-4 mb-4">
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_21" value="Sim" class="w-4 h-4 text-shopee focus:ring-shopee"> <span class="text-sm font-bold text-gray-700">Sim</span></label>
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_21" value="Não" class="w-4 h-4 text-red-600 focus:ring-red-600"> <span class="text-sm font-bold text-gray-700">Não</span></label>
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_21" value="N/A" class="w-4 h-4 text-gray-400 focus:ring-gray-400"> <span class="text-sm font-bold text-gray-700">N/A</span></label>
+                    <div class="insp-question-card">
+                        <label id="tit_q21" class="block text-sm font-bold text-gray-800 mb-3">21. Produtos químicos estão adequados e sinalizados?</label>
+                        <div class="insp-radio-group">
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q21" value="Sim" class="w-4 h-4 text-shopee"> <span class="text-sm font-medium">Sim</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q21" value="Não" class="w-4 h-4 text-red-600"> <span class="text-sm font-medium">Não</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q21" value="N/A" class="w-4 h-4 text-gray-500"> <span class="text-sm font-medium">N/A</span></label>
                         </div>
-                        <textarea class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações (opcional)..."></textarea>
+                        <textarea id="obs_21" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações..."></textarea>
                     </div>
 
-                    <div class="mb-5 p-5 border border-gray-100 rounded-2xl bg-gray-50/50 shadow-sm">
-                        <label class="block text-sm font-bold text-gray-800 mb-3">22. Bombonas estão sobre paletes de contenção e sinalizadas?</label>
-                        <div class="flex flex-wrap gap-4 mb-4">
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_22" value="Sim" class="w-4 h-4 text-shopee focus:ring-shopee"> <span class="text-sm font-bold text-gray-700">Sim</span></label>
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_22" value="Não" class="w-4 h-4 text-red-600 focus:ring-red-600"> <span class="text-sm font-bold text-gray-700">Não</span></label>
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_22" value="N/A" class="w-4 h-4 text-gray-400 focus:ring-gray-400"> <span class="text-sm font-bold text-gray-700">N/A</span></label>
+                    <div class="insp-question-card">
+                        <label id="tit_q22" class="block text-sm font-bold text-gray-800 mb-3">22. Bombonas estão sobre paletes de contenção e sinalizadas?</label>
+                        <div class="insp-radio-group">
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q22" value="Sim" class="w-4 h-4 text-shopee"> <span class="text-sm font-medium">Sim</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q22" value="Não" class="w-4 h-4 text-red-600"> <span class="text-sm font-medium">Não</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q22" value="N/A" class="w-4 h-4 text-gray-500"> <span class="text-sm font-medium">N/A</span></label>
                         </div>
-                        <textarea class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações (opcional)..."></textarea>
+                        <textarea id="obs_22" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações..."></textarea>
                     </div>
 
-                    <div class="mb-5 p-5 border border-gray-100 rounded-2xl bg-gray-50/50 shadow-sm">
-                        <label class="block text-sm font-bold text-gray-800 mb-3">23. O Kit Ambiental está organizado e sinalizado?</label>
-                        <div class="flex flex-wrap gap-4 mb-4">
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_23" value="Sim" class="w-4 h-4 text-shopee focus:ring-shopee"> <span class="text-sm font-bold text-gray-700">Sim</span></label>
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_23" value="Não" class="w-4 h-4 text-red-600 focus:ring-red-600"> <span class="text-sm font-bold text-gray-700">Não</span></label>
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="insp_23" value="N/A" class="w-4 h-4 text-gray-400 focus:ring-gray-400"> <span class="text-sm font-bold text-gray-700">N/A</span></label>
+                    <div class="insp-question-card">
+                        <label id="tit_q23" class="block text-sm font-bold text-gray-800 mb-3">23. O Kit Ambiental está organizado e sinalizado?</label>
+                        <div class="insp-radio-group">
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q23" value="Sim" class="w-4 h-4 text-shopee"> <span class="text-sm font-medium">Sim</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q23" value="Não" class="w-4 h-4 text-red-600"> <span class="text-sm font-medium">Não</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="q23" value="N/A" class="w-4 h-4 text-gray-500"> <span class="text-sm font-medium">N/A</span></label>
                         </div>
-                        <textarea class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações (opcional)..."></textarea>
+                        <textarea id="obs_23" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-shopee resize-none" rows="2" placeholder="Observações..."></textarea>
                     </div>
 
-                    <button onclick="alert('Módulo de Inspeção em construção. O envio será ativado em breve.')" class="w-full bg-shopee hover:bg-shopee-dark text-white font-black text-lg tracking-wide rounded-2xl py-4 mt-4 shadow-lg shadow-shopee/30 transition-all active:scale-95 flex justify-center items-center gap-2">
-                        <i class="fa-solid fa-paper-plane"></i> Finalizar Inspeção
+                    <button id="btn-enviar-insp" onclick="window.salvarInspecao()" class="w-full bg-shopee hover:bg-shopee-dark text-white font-black text-lg tracking-wide rounded-2xl py-4 mt-6 shadow-lg shadow-shopee/30 transition-all active:scale-95 flex justify-center items-center gap-2">
+                        <i class="fa-solid fa-paper-plane"></i> Finalizar e Enviar Inspeção
                     </button>
                 </div>
             </div>
 
-            <div id="aba-registro" class="hidden max-w-3xl mx-auto pb-10">
-                <div class="flex items-center gap-4 mb-6 sticky top-0 bg-gray-50 z-20 py-3">
+            <div id="aba-registro" style="display: none;" class="max-w-3xl mx-auto pb-10">
+                <div class="flex items-center gap-4 mb-6 py-3">
                     <button onclick="window.voltarMenuInspetor()" class="w-12 h-12 rounded-2xl bg-white shadow-md border border-gray-200 flex items-center justify-center text-gray-700 hover:text-shopee hover:border-shopee hover:bg-shopee-light transition-all active:scale-95 shrink-0" title="Voltar ao Menu">
                         <i class="fa-solid fa-arrow-left text-xl"></i>
                     </button>
@@ -521,9 +581,7 @@
                             <label class="block text-sm font-bold text-gray-700">Evidências Visuais (Fotos)</label>
                             <span class="text-xs text-gray-400 font-bold bg-gray-100 px-2 py-1 rounded-md" id="contador-fotos">0/5</span>
                         </div>
-                        
                         <div id="preview-fotos-container" class="grid grid-cols-3 sm:grid-cols-5 gap-3 mb-3 empty:hidden"></div>
-
                         <div class="relative border-2 border-dashed border-gray-300 bg-gray-50 rounded-2xl p-6 text-center hover:bg-shopee-light hover:border-shopee transition-colors cursor-pointer group">
                             <i class="fa-solid fa-camera-retro text-3xl text-gray-400 group-hover:text-shopee mb-2 transition-colors"></i>
                             <p class="text-xs font-medium text-gray-500" id="upload-text">Toque para adicionar foto</p>
@@ -537,8 +595,8 @@
                 </div>
             </div>
 
-            <div id="aba-progresso" class="hidden flex-col h-full gap-4 pb-10">
-                <div class="flex items-center gap-4 mb-6 sticky top-0 bg-gray-50 z-20 py-3">
+            <div id="aba-progresso" style="display: none;" class="max-w-4xl mx-auto pb-10">
+                <div class="flex items-center gap-4 mb-6 py-3">
                     <button onclick="window.voltarMenuInspetor()" class="w-12 h-12 rounded-2xl bg-white shadow-md border border-gray-200 flex items-center justify-center text-gray-700 hover:text-shopee hover:border-shopee hover:bg-shopee-light transition-all active:scale-95 shrink-0" title="Voltar ao Menu">
                         <i class="fa-solid fa-arrow-left text-xl"></i>
                     </button>
@@ -548,14 +606,14 @@
                     </div>
                 </div>
 
-                <div class="bg-white rounded-3xl shadow-sm border border-gray-100 flex-grow overflow-hidden flex flex-col min-h-0">
+                <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex flex-col min-h-[500px]">
                     <div class="p-6 border-b border-gray-50 bg-gray-50/50">
                         <h3 class="font-bold text-gray-800 flex items-center gap-2"><i class="fa-solid fa-clock-rotate-left text-shopee"></i> Histórico Pessoal</h3>
                     </div>
-                    <div class="overflow-x-auto overflow-y-auto flex-grow table-scroll p-4">
+                    <div class="overflow-x-auto w-full p-4 flex-grow">
                         <table class="w-full text-left whitespace-nowrap min-w-[700px]">
                             <thead>
-                                <tr class="bg-white border-b border-gray-100 sticky top-0 z-10 py-2">
+                                <tr class="bg-white border-b border-gray-100 py-2">
                                     <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Unidade</th>
                                     <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Classificação</th>
                                     <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Data / Hora</th>
@@ -569,15 +627,15 @@
                 </div>
             </div>
 
-            <div id="aba-dashboard" class="hidden flex-col h-full overflow-y-auto min-h-full pb-10">
-                
-                <div class="bg-white shadow-sm border-b mb-6 rounded-2xl flex overflow-hidden border border-gray-100 shrink-0">
-                    <button onclick="window.mudarAba('dashboard')" class="flex-1 py-4 font-black text-shopee bg-shopee-light border-b-4 border-shopee transition-colors focus:outline-none">Visão Geral</button>
-                    <button onclick="window.mudarAba('tratativas')" class="flex-1 py-4 font-bold text-gray-500 hover:bg-gray-50 border-b-4 border-transparent transition-colors focus:outline-none">Tratativas (Novo)</button>
+            <div id="aba-dashboard" style="display: none;" class="pb-10">
+                <div class="bg-white shadow-sm border-b mb-6 rounded-2xl flex overflow-hidden border border-gray-100">
+                    <button onclick="window.mudarAba('aba-dashboard')" class="flex-1 py-4 font-black text-shopee bg-shopee-light border-b-4 border-shopee transition-colors focus:outline-none">Visão Geral</button>
+                    <button onclick="window.mudarAba('aba-admin-inspecoes')" class="flex-1 py-4 font-bold text-gray-500 hover:bg-gray-50 border-b-4 border-transparent transition-colors focus:outline-none">Inspeções</button>
+                    <button onclick="window.mudarAba('aba-tratativas')" class="flex-1 py-4 font-bold text-gray-500 hover:bg-gray-50 border-b-4 border-transparent transition-colors focus:outline-none">Tratativas</button>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 shrink-0 mb-6">
-                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center relative overflow-hidden min-h-[100px]">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center relative overflow-hidden">
                         <div class="w-2 h-full bg-gray-800 absolute left-0 top-0"></div>
                         <div class="pl-2 truncate">
                             <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1 truncate">Ocorrências</h4>
@@ -585,7 +643,7 @@
                         </div>
                         <div class="w-14 h-14 rounded-2xl bg-gray-50 flex justify-center items-center text-gray-400 text-2xl shrink-0"><i class="fa-solid fa-layer-group"></i></div>
                     </div>
-                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center relative overflow-hidden min-h-[100px]">
+                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center relative overflow-hidden">
                         <div class="w-2 h-full bg-yellow-500 absolute left-0 top-0"></div>
                         <div class="pl-2 truncate">
                             <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1 truncate">Aguardando</h4>
@@ -593,7 +651,7 @@
                         </div>
                         <div class="w-14 h-14 rounded-2xl bg-yellow-50 flex justify-center items-center text-yellow-500 text-2xl shrink-0"><i class="fa-solid fa-clock-rotate-left"></i></div>
                     </div>
-                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center relative overflow-hidden min-h-[100px]">
+                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center relative overflow-hidden">
                         <div class="w-2 h-full bg-shopee absolute left-0 top-0"></div>
                         <div class="pl-2 truncate">
                             <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1 truncate">Sanadas</h4>
@@ -603,24 +661,24 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-grow min-h-0">
-                    <div class="lg:col-span-1 bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center justify-center shrink-0 min-h-[300px]">
-                        <h3 class="font-bold text-gray-800 mb-4 w-full flex items-center gap-2 sticky top-0 bg-white z-10 py-1"><i class="fa-solid fa-chart-pie text-shopee"></i> Distribuição</h3>
-                        <div class="relative w-full flex justify-center items-center h-[250px]">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-1 bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center justify-center">
+                        <h3 class="font-bold text-gray-800 mb-4 w-full flex items-center gap-2"><i class="fa-solid fa-chart-pie text-shopee"></i> Distribuição</h3>
+                        <div style="width: 100%; height: 250px; position: relative; margin: 0 auto;">
                             <canvas id="graficoStatus"></canvas>
                             <div id="grafico-vazio" class="hidden absolute inset-0 flex items-center justify-center text-gray-400 font-bold text-sm bg-white z-10">Sem dados para exibir</div>
                         </div>
                     </div>
 
-                    <div class="lg:col-span-2 bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex flex-col flex-grow min-h-0">
-                        <div class="p-6 border-b border-gray-50 flex justify-between items-center bg-gray-50/50 sticky top-0 z-10 py-2">
+                    <div class="lg:col-span-2 bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex flex-col min-h-[500px]">
+                        <div class="p-6 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
                             <h3 class="font-bold text-gray-800 flex items-center gap-2"><i class="fa-solid fa-cloud text-shopee"></i> Banco de Dados RTDB</h3>
                             <span class="text-xs font-bold bg-shopee-light text-shopee-dark px-3 py-1 rounded-full"><i class="fa-solid fa-circle-nodes"></i> Online</span>
                         </div>
-                        <div class="overflow-x-auto overflow-y-auto flex-grow table-scroll p-4">
+                        <div class="overflow-x-auto w-full p-4 flex-grow">
                             <table class="w-full text-left whitespace-nowrap min-w-[800px]">
                                 <thead>
-                                    <tr class="bg-white border-b border-gray-100 sticky top-0 z-10 py-2">
+                                    <tr class="bg-white border-b border-gray-100 py-2">
                                         <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Unidade</th>
                                         <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Inspetor</th>
                                         <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Data / Hora</th>
@@ -636,18 +694,48 @@
                 </div>
             </div>
 
-            <div id="aba-tratativas" class="hidden flex-col h-full min-h-full pb-10">
-                <div class="bg-white shadow-sm border-b mb-6 rounded-2xl flex overflow-hidden border border-gray-100 shrink-0">
-                    <button onclick="window.mudarAba('dashboard')" class="flex-1 py-4 font-bold text-gray-500 hover:bg-gray-50 border-b-4 border-transparent transition-colors focus:outline-none">Visão Geral</button>
-                    <button onclick="window.mudarAba('tratativas')" class="flex-1 py-4 font-black text-shopee bg-shopee-light border-b-4 border-shopee transition-colors focus:outline-none">Tratativas (Novo)</button>
+            <div id="aba-admin-inspecoes" style="display: none;" class="pb-10">
+                <div class="bg-white shadow-sm border-b mb-6 rounded-2xl flex overflow-hidden border border-gray-100">
+                    <button onclick="window.mudarAba('aba-dashboard')" class="flex-1 py-4 font-bold text-gray-500 hover:bg-gray-50 border-b-4 border-transparent transition-colors focus:outline-none">Visão Geral</button>
+                    <button onclick="window.mudarAba('aba-admin-inspecoes')" class="flex-1 py-4 font-black text-shopee bg-shopee-light border-b-4 border-shopee transition-colors focus:outline-none">Inspeções</button>
+                    <button onclick="window.mudarAba('aba-tratativas')" class="flex-1 py-4 font-bold text-gray-500 hover:bg-gray-50 border-b-4 border-transparent transition-colors focus:outline-none">Tratativas</button>
                 </div>
                 
-                <div class="bg-white p-10 rounded-3xl border border-gray-100 shadow-sm flex flex-col items-center justify-center text-center flex-grow">
+                <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex flex-col min-h-[500px]">
+                    <div class="p-6 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
+                        <h3 class="font-bold text-gray-800 flex items-center gap-2"><i class="fa-solid fa-clipboard-check text-shopee"></i> Registros de Inspeção Mensal</h3>
+                        <span class="text-xs font-bold bg-shopee-light text-shopee-dark px-3 py-1 rounded-full"><i class="fa-solid fa-circle-nodes"></i> RTDB</span>
+                    </div>
+                    <div class="overflow-x-auto w-full p-4 flex-grow">
+                        <table class="w-full text-left whitespace-nowrap min-w-[800px]">
+                            <thead>
+                                <tr class="bg-white border-b border-gray-100 py-2">
+                                    <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Unidade</th>
+                                    <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Inspetor</th>
+                                    <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Data / Hora</th>
+                                    <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-center">Ação</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabela-inspecoes" class="divide-y divide-gray-50">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="aba-tratativas" style="display: none;" class="pb-10">
+                <div class="bg-white shadow-sm border-b mb-6 rounded-2xl flex overflow-hidden border border-gray-100">
+                    <button onclick="window.mudarAba('aba-dashboard')" class="flex-1 py-4 font-bold text-gray-500 hover:bg-gray-50 border-b-4 border-transparent transition-colors focus:outline-none">Visão Geral</button>
+                    <button onclick="window.mudarAba('aba-admin-inspecoes')" class="flex-1 py-4 font-bold text-gray-500 hover:bg-gray-50 border-b-4 border-transparent transition-colors focus:outline-none">Inspeções</button>
+                    <button onclick="window.mudarAba('aba-tratativas')" class="flex-1 py-4 font-black text-shopee bg-shopee-light border-b-4 border-shopee transition-colors focus:outline-none">Tratativas</button>
+                </div>
+                
+                <div class="bg-white p-10 rounded-3xl border border-gray-100 shadow-sm flex flex-col items-center justify-center text-center min-h-[400px]">
                     <div class="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center text-shopee text-4xl mb-6 shadow-inner">
                         <i class="fa-solid fa-screwdriver-wrench"></i>
                     </div>
                     <h2 class="text-3xl font-black text-gray-800 mb-3 tracking-tight">Área de Tratativas</h2>
-                    <p class="text-gray-500 max-w-md font-medium">Esta aba foi criada e reservada com sucesso para o gerenciamento avançado dos casos.</p>
+                    <p class="text-gray-500 max-w-md font-medium">Esta aba foi reservada para o gerenciamento avançado dos casos e criação de planos de ação.</p>
                 </div>
             </div>
 
@@ -672,6 +760,7 @@
     const db = getDatabase(app);
 
     window.ocorrencias = [];
+    window.inspecoes = []; // Novo banco de dados de inspeções
     window.usuarioAtual = '';
     window.nomeUsuarioAtual = '';
     window.indiceEmEdicao = null;
@@ -679,6 +768,7 @@
     let graficoChartJS = null;
     const MAX_FOTOS = 5;
 
+    // ESCUTA DE OCORRENCIAS
     onValue(ref(db, 'ocorrencias_lmg48'), (snapshot) => {
         try {
             const data = snapshot.val();
@@ -686,9 +776,17 @@
             
             if(window.usuarioAtual === 'admin') window.atualizarDashboardUI();
             else if(window.usuarioAtual !== '') window.renderizarMeuProgresso();
-        } catch (error) {
-            console.error("Erro na leitura do BD:", error);
-        }
+        } catch (error) {}
+    });
+
+    // ESCUTA DE INSPEÇÕES
+    onValue(ref(db, 'inspecoes_lmg48'), (snapshot) => {
+        try {
+            const data = snapshot.val();
+            window.inspecoes = data ? Object.keys(data).map(key => ({ id: key, ...data[key] })).reverse() : [];
+            
+            if(window.usuarioAtual === 'admin') window.atualizarInspecoesUI();
+        } catch (error) {}
     });
 
     window.fazerLogin = () => {
@@ -734,17 +832,15 @@
             }
             document.getElementById('user-display-avatar').innerText = iniciais;
             
-            document.getElementById('login-screen').classList.add('hidden');
-            document.getElementById('login-screen').classList.remove('flex');
-            
-            document.getElementById('app-layout').classList.remove('hidden');
-            document.getElementById('app-layout').classList.add('flex');
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('app-layout').style.display = 'flex';
 
             if(user === 'admin') {
-                window.mudarAba('dashboard');
+                window.mudarAba('aba-dashboard');
                 window.atualizarDashboardUI();
+                window.atualizarInspecoesUI();
             } else {
-                window.mudarAba('menu-inspetor');
+                window.mudarAba('aba-menu-inspetor');
                 window.renderizarMeuProgresso();
             }
         } catch(e) {}
@@ -759,74 +855,75 @@
     };
     window.verificarSessao();
 
-    window.mudarAba = (aba) => {
+    window.fazerLogout = () => {
         try {
-            ['menu-inspetor', 'registro', 'progresso', 'dashboard', 'tratativas', 'inspecao'].forEach(id => {
-                const el = document.getElementById('aba-' + id);
-                if (el) {
-                    el.classList.add('hidden');
-                    el.classList.remove('flex', 'block');
-                }
+            localStorage.clear();
+            sessionStorage.clear();
+        } catch(e) {}
+        window.location.reload(); 
+    };
+
+    window.mudarAba = (abaId) => {
+        try {
+            const todasAbas = ['aba-menu-inspetor', 'aba-registro', 'aba-progresso', 'aba-dashboard', 'aba-admin-inspecoes', 'aba-tratativas', 'aba-inspecao'];
+            todasAbas.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.style.display = 'none';
             });
-            const target = document.getElementById('aba-' + aba);
+            const target = document.getElementById(abaId);
             if (target) {
-                target.classList.remove('hidden');
-                if(aba === 'registro' || aba === 'inspecao') {
-                    target.classList.add('block');
-                } else {
-                    target.classList.add('flex');
-                }
+                target.style.display = 'block';
+                if(abaId === 'aba-menu-inspetor') target.style.display = 'flex'; 
             }
             window.scrollTo(0, 0);
         } catch(e) {}
     };
 
     window.voltarMenuInspetor = () => {
-        if(window.usuarioAtual !== 'admin') window.mudarAba('menu-inspetor');
+        if(window.usuarioAtual !== 'admin') window.mudarAba('aba-menu-inspetor');
     };
 
-    // A FOTO AGORA SOBE 100% SEGURA USANDO FILEREADER E APARECE NO ADMIN
-    window.processarNovaFoto = (e) => {
+    async function comprimirBase64(file) {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            const url = URL.createObjectURL(file);
+            img.onload = () => {
+                URL.revokeObjectURL(url);
+                const canvas = document.createElement('canvas');
+                const MAX = 800; 
+                let w = img.width, h = img.height;
+                if(w > h) {
+                    if(w > MAX) { h *= MAX/w; w = MAX; }
+                } else {
+                    if(h > MAX) { w *= MAX/h; h = MAX; }
+                }
+                canvas.width = w; canvas.height = h;
+                canvas.getContext('2d').drawImage(img, 0,0,w,h);
+                resolve(canvas.toDataURL('image/jpeg', 0.6));
+            };
+            img.onerror = reject;
+            img.src = url;
+        });
+    }
+
+    window.processarNovaFoto = async (e) => {
         try {
             const file = e.target.files[0];
             if(!file) return;
             if(window.fotosMiniaturasTemporarias.length >= MAX_FOTOS) { alert(`Você atingiu o limite de ${MAX_FOTOS} fotos.`); return; }
             
-            document.getElementById('upload-text').innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Otimizando...`;
+            const uploadText = document.getElementById('upload-text');
+            uploadText.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Otimizando...`;
             
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                const img = new Image();
-                img.onload = function() {
-                    const canvas = document.createElement('canvas');
-                    const MAX = 640; 
-                    let w = img.width, h = img.height;
-                    if(w > MAX) { h *= MAX/w; w = MAX; }
-                    canvas.width = w; canvas.height = h;
-                    
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0,0,w,h);
-                    
-                    const base64Final = canvas.toDataURL('image/jpeg', 0.5);
-                    window.fotosMiniaturasTemporarias.push(base64Final);
-                    
-                    window.renderizarGradeDeFotos();
-                    document.getElementById('upload-text').innerText = "Toque para adicionar foto";
-                };
-                img.onerror = function() {
-                    alert("Erro ao ler a foto.");
-                    document.getElementById('upload-text').innerText = "Toque para adicionar foto";
-                };
-                img.src = event.target.result;
-            };
-            reader.onerror = function() {
-                alert("Erro ao acessar a foto do celular.");
-                document.getElementById('upload-text').innerText = "Toque para adicionar foto";
-            };
-            reader.readAsDataURL(file);
+            const previewBase64 = await comprimirBase64(file);
+            window.fotosMiniaturasTemporarias.push(previewBase64);
+            window.renderizarGradeDeFotos();
+            
+            uploadText.innerText = "Toque para adicionar foto";
             e.target.value = ''; 
-        } catch(err) {
-            console.error(err);
+        } catch (error) {
+            console.error("Erro na foto:", error);
+            alert("Erro ao processar a foto. Tente novamente.");
             document.getElementById('upload-text').innerText = "Toque para adicionar foto";
         }
     };
@@ -836,7 +933,6 @@
         window.renderizarGradeDeFotos();
     };
 
-    // BOTÃO X PERMANENTEMENTE VISÍVEL (OPACITY-100)
     window.renderizarGradeDeFotos = () => {
         try {
             const container = document.getElementById('preview-fotos-container');
@@ -845,9 +941,9 @@
             let htmlFotos = '';
             window.fotosMiniaturasTemporarias.forEach((url, index) => {
                 htmlFotos += `
-                    <div class="relative w-full h-24 rounded-xl overflow-hidden border border-gray-200 shadow-sm">
+                    <div class="relative w-full h-24 rounded-xl overflow-hidden border border-gray-300 shadow-sm">
                         <img src="${url}" class="w-full h-full object-cover">
-                        <button type="button" onclick="window.removerFoto(${index})" class="absolute top-1 right-1 text-white bg-red-600 hover:bg-red-700 w-8 h-8 rounded-full flex items-center justify-center border-2 border-white cursor-pointer opacity-100" style="z-index: 20;">
+                        <button type="button" onclick="window.removerFoto(${index})" class="absolute top-1 right-1 bg-red-600 active:bg-red-700 text-white w-8 h-8 rounded-full flex items-center justify-center shadow-lg border-2 border-white z-20 cursor-pointer" style="opacity: 1 !important; display: flex !important;">
                             <i class="fa-solid fa-xmark text-sm font-black"></i>
                         </button>
                     </div>
@@ -857,7 +953,7 @@
         } catch(e) {}
     };
 
-    // ENVIO SEM CONGELAR TELA (MUDANDO DE ABA SUAVEMENTE)
+    // ENVIO OCORRENCIA NORMAL
     window.salvarFormulario = async () => {
         const hub = document.getElementById('hub_local').value;
         const cat = document.getElementById('categoria').value;
@@ -893,24 +989,69 @@
             };
 
             await set(novaOcorrenciaRef, payload);
-            
-            document.getElementById('hub_local').value = ""; document.getElementById('categoria').value = "";
-            document.getElementById('data_ocorrencia').value = ""; document.getElementById('hora_ocorrencia').value = "";
-            document.getElementById('detalhes').value = ""; 
-            window.fotosMiniaturasTemporarias = [];
-            window.renderizarGradeDeFotos();
-
             alert("✅ Relatório transmitido com sucesso!");
             
-            // JOGA O USUARIO PARA O PROGRESSO SUAVEMENTE SEM F5 (NÃO CONGELA A TELA)
-            window.mudarAba('progresso');
+            window.location.reload();
 
         } catch (error) {
-            console.error(error);
             alert(`❌ Erro no banco de dados: ${error.message}`);
-        } finally {
             btn.disabled = false;
             btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up shrink-0"></i> <span class="truncate">Transmitir Relatório</span>`;
+        }
+    };
+
+    // NOVO: ENVIO DA INSPEÇÃO MENSAL
+    window.salvarInspecao = async () => {
+        const hub = document.getElementById('insp_hub_local').value;
+        const dat = document.getElementById('insp_data').value;
+        const hor = document.getElementById('insp_hora').value;
+        const btn = document.getElementById('btn-enviar-insp');
+
+        if(!hub || !dat || !hor) {
+            alert("⚠️ Por favor, preencha o Hub, Data e Horário no topo do formulário.");
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin shrink-0"></i> Enviando...`;
+
+        try {
+            let arrayRespostas = [];
+            
+            for(let i = 1; i <= 23; i++) {
+                const titulo = document.getElementById(`tit_q${i}`) ? document.getElementById(`tit_q${i}`).innerText : `Pergunta ${i}`;
+                const radioSelecionado = document.querySelector(`input[name="q${i}"]:checked`);
+                const resposta = radioSelecionado ? radioSelecionado.value : "Não Respondido";
+                const obs = document.getElementById(`obs_${i}`) ? document.getElementById(`obs_${i}`).value : "";
+                
+                arrayRespostas.push({
+                    pergunta: titulo,
+                    resposta: resposta,
+                    observacao: obs
+                });
+            }
+
+            const partesData = dat.split('-');
+            const dataFormatada = `${partesData[2]}/${partesData[1]}/${partesData[0]} às ${hor}`;
+            
+            const novaInspecaoRef = push(ref(db, 'inspecoes_lmg48'));
+            
+            const payload = {
+                local: hub,
+                data: dataFormatada,
+                autor: window.nomeUsuarioAtual,
+                respostas: arrayRespostas,
+                timestamp: serverTimestamp()
+            };
+
+            await set(novaInspecaoRef, payload);
+            alert("✅ Inspeção Mensal transmitida com sucesso!");
+            window.location.reload();
+
+        } catch (error) {
+            alert(`❌ Erro ao enviar inspeção: ${error.message}`);
+            btn.disabled = false;
+            btn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> Finalizar e Enviar Inspeção`;
         }
     };
 
@@ -924,11 +1065,11 @@
     window.ampliarFoto = (src) => {
         try {
             document.getElementById('viewer-img').src = src;
-            document.getElementById('photo-viewer').classList.remove('hidden');
-            document.getElementById('photo-viewer').classList.add('flex');
+            document.getElementById('photo-viewer').style.display = 'flex';
         } catch(e) {}
     };
 
+    // ABRIR DETALHES OCORRENCIA
     window.abrirDetalhes = (index) => {
         try {
             const occ = window.ocorrencias[index];
@@ -960,21 +1101,29 @@
             
             let arrayFotos = [];
             if (occ.fotos_urls) {
-                arrayFotos = Array.isArray(occ.fotos_urls) ? occ.fotos_urls : Object.values(occ.fotos_urls);
-            }
-            if (occ.foto_url && arrayFotos.length === 0) {
-                arrayFotos.push(occ.foto_url); 
+                if (Array.isArray(occ.fotos_urls)) {
+                    arrayFotos = occ.fotos_urls;
+                } else if (typeof occ.fotos_urls === 'object') {
+                    arrayFotos = Object.values(occ.fotos_urls);
+                } else {
+                    arrayFotos = [occ.fotos_urls];
+                }
+            } else if (occ.foto_url) {
+                arrayFotos = [occ.foto_url];
             }
 
-            if(arrayFotos.length > 0) {
+            if(arrayFotos && arrayFotos.length > 0) {
                 boxFoto.style.display = 'block';
-                let htmlFotos = '';
-                arrayFotos.forEach(url => {
-                    htmlFotos += `
-                        <img src="${url}" onclick="window.ampliarFoto('${url}')" class="block rounded-xl overflow-hidden border border-gray-200 shadow-sm hover:border-shopee transition-colors h-24 w-full object-cover cursor-zoom-in shrink-0">
-                    `;
+                galeria.innerHTML = '';
+                arrayFotos.forEach((url) => {
+                    if (url && typeof url === 'string') {
+                        const imgEl = document.createElement('img');
+                        imgEl.src = url;
+                        imgEl.className = "block rounded-xl overflow-hidden border border-gray-200 shadow-sm hover:border-shopee transition-colors h-24 w-full object-cover cursor-zoom-in shrink-0";
+                        imgEl.onclick = () => window.ampliarFoto(url);
+                        galeria.appendChild(imgEl);
+                    }
                 });
-                galeria.innerHTML = htmlFotos;
             } else {
                 boxFoto.style.display = 'none';
                 galeria.innerHTML = '';
@@ -982,14 +1131,63 @@
 
             document.getElementById('slide-overlay').classList.add('active');
             document.getElementById('slide-panel').classList.add('active');
-        } catch(e) {
-            console.error("Erro detalhes:", e);
-        }
+        } catch(e) {}
     };
 
     window.fecharDetalhes = () => { document.getElementById('slide-overlay').classList.remove('active'); document.getElementById('slide-panel').classList.remove('active'); };
-    window.abrirDropdownStatus = (e, i) => { e.stopPropagation(); window.indiceEmEdicao = i; const d = document.getElementById('statusDropdown'); d.style.left = e.clientX+'px'; d.style.top = e.clientY+'px'; d.classList.add('active'); };
-    window.fecharDropdownStatus = () => { document.getElementById('statusDropdown').classList.remove('active'); window.indiceEmEdicao = null; };
+    
+    // ABRIR DETALHES INSPEÇÃO MENSAL NO ADMIN
+    window.abrirDetalhesInsp = (index) => {
+        try {
+            const insp = window.inspecoes[index];
+            if(!insp) return;
+
+            const autorNome = insp.autor || 'Usuário';
+            const localNome = insp.local || '-';
+            const dataNome = insp.data || '-';
+            const arrayRespostas = insp.respostas || [];
+
+            document.getElementById('detalhe-insp-hub').innerText = localNome;
+            document.getElementById('detalhe-insp-data').innerText = dataNome;
+            document.getElementById('detalhe-insp-autor').innerText = autorNome;
+            
+            const partes = autorNome.trim().split(/\s+/);
+            const ini = partes.length > 1 && partes[1].length > 0 ? partes[0][0] + partes[1][0] : autorNome.substring(0,2);
+            document.getElementById('detalhe-insp-avatar').innerText = ini.toUpperCase();
+
+            const containerRespostas = document.getElementById('detalhe-insp-respostas');
+            let htmlResp = '';
+
+            arrayRespostas.forEach((r) => {
+                let corResp = 'text-gray-600';
+                let iconResp = '<i class="fa-solid fa-minus text-gray-400"></i>';
+                
+                if(r.resposta === 'Sim' || r.resposta === 'Conforme') { corResp = 'text-shopee'; iconResp = '<i class="fa-solid fa-check text-shopee"></i>'; }
+                if(r.resposta === 'Não' || r.resposta === 'Não Conforme') { corResp = 'text-red-500'; iconResp = '<i class="fa-solid fa-xmark text-red-500"></i>'; }
+                
+                htmlResp += `
+                    <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                        <p class="text-sm font-bold text-gray-800 mb-2">${r.pergunta}</p>
+                        <div class="flex items-center gap-2 mb-2 font-bold ${corResp}">
+                            ${iconResp} <span>${r.resposta}</span>
+                        </div>
+                        ${r.observacao ? `<p class="text-sm text-gray-600 bg-gray-50 p-2 rounded-lg border border-gray-100"><strong>Obs:</strong> ${r.observacao}</p>` : ''}
+                    </div>
+                `;
+            });
+
+            containerRespostas.innerHTML = htmlResp;
+
+            document.getElementById('slide-overlay-insp').classList.add('active');
+            document.getElementById('slide-panel-insp').classList.add('active');
+
+        } catch(e) { console.error("Erro detalhes inspeção", e); }
+    };
+    
+    window.fecharDetalhesInsp = () => { document.getElementById('slide-overlay-insp').classList.remove('active'); document.getElementById('slide-panel-insp').classList.remove('active'); };
+
+    window.abrirDropdownStatus = (e, i) => { e.stopPropagation(); window.indiceEmEdicao = i; const d = document.getElementById('statusDropdown'); d.style.left = e.clientX+'px'; d.style.top = e.clientY+'px'; d.style.display = 'flex'; };
+    window.fecharDropdownStatus = () => { document.getElementById('statusDropdown').style.display = 'none'; window.indiceEmEdicao = null; };
     
     window.atualizarStatus = async (novoStatus) => {
         if(window.indiceEmEdicao !== null) { 
@@ -1010,15 +1208,31 @@
         if(confirm(`⚠️ AÇÃO IRREVERSÍVEL!\nTem certeza que deseja excluir permanentemente o relatório de ${occ.local}?`)) {
             try {
                 await remove(ref(db, `ocorrencias_lmg48/${occ.id}`));
-                alert("🗑️ Relatório excluído com sucesso.");
-            } catch (error) {
-                alert(`❌ Erro ao excluir: ${error.message}`);
-            }
+            } catch (error) {}
         }
     };
 
-    document.addEventListener('click', (e) => { if (document.getElementById('statusDropdown').classList.contains('active')) window.fecharDropdownStatus(); });
-    document.addEventListener('keydown', (e) => { if (e.key === "Escape") { window.fecharDetalhes(); window.fecharDropdownStatus(); } });
+    window.excluirInspecao = async (index) => {
+        const insp = window.inspecoes[index];
+        if(!insp) return;
+        if(confirm(`⚠️ AÇÃO IRREVERSÍVEL!\nTem certeza que deseja excluir a Inspeção Mensal de ${insp.local}?`)) {
+            try {
+                await remove(ref(db, `inspecoes_lmg48/${insp.id}`));
+            } catch (error) {}
+        }
+    };
+
+    document.addEventListener('click', (e) => { 
+        const drop = document.getElementById('statusDropdown');
+        if (drop && drop.style.display === 'flex') window.fecharDropdownStatus(); 
+    });
+    document.addEventListener('keydown', (e) => { 
+        if (e.key === "Escape") { 
+            window.fecharDetalhes(); 
+            window.fecharDetalhesInsp();
+            window.fecharDropdownStatus(); 
+        } 
+    });
 
     window.atualizarDashboardUI = () => {
         try {
@@ -1067,9 +1281,44 @@
             
             setTimeout(() => { window.desenharGrafico(p, r, c); }, 50);
 
-        } catch(e) {
-            console.error("Erro Dashboard:", e);
-        }
+        } catch(e) {}
+    };
+
+    // DASHBOARD ADMIN: INSPEÇÕES
+    window.atualizarInspecoesUI = () => {
+        try {
+            const tbody = document.getElementById('tabela-inspecoes');
+            if(!tbody) return;
+
+            if(window.inspecoes.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="text-center py-10 text-gray-400 font-medium whitespace-nowrap">Nenhuma inspeção mensal registrada.</td></tr>`;
+                return;
+            }
+
+            const htmlRows = window.inspecoes.map((item, index) => {
+                const autor = item.autor || 'Usuário';
+                const partes = autor.trim().split(/\s+/);
+                const iniciais = partes.length > 1 && partes[1].length > 0 ? partes[0][0] + partes[1][0] : autor.substring(0,2);
+                const local = item.local || '-';
+                const dataOcc = item.data || '-';
+
+                return `
+                    <tr class="hover:bg-gray-50/50 transition-colors group border-b border-gray-50">
+                        <td class="px-6 py-4 truncate max-w-[200px]"><strong class="text-gray-800 truncate">${local}</strong></td>
+                        <td class="px-6 py-4 truncate max-w-[200px]"><div class="flex items-center gap-3 shrink-0 truncate"><div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-xs uppercase shrink-0">${iniciais.toUpperCase()}</div><span class="text-sm font-medium text-gray-700 uppercase truncate">${autor}</span></div></td>
+                        <td class="px-6 py-4 text-sm text-gray-600 truncate whitespace-nowrap">${dataOcc}</td>
+                        <td class="px-6 py-4 text-center shrink-0 whitespace-nowrap w-[150px]">
+                            <div class="flex items-center justify-center gap-2 max-w-full shrink-0">
+                                <button onclick="window.abrirDetalhesInsp(${index})" class="w-8 h-8 rounded-lg border border-gray-200 text-gray-400 hover:text-shopee hover:border-shopee hover:bg-shopee-light transition-all flex items-center justify-center shrink-0" title="Ver Inspeção Completa"><i class="fa-solid fa-list-check"></i></button>
+                                <button onclick="window.excluirInspecao(${index})" class="w-8 h-8 rounded-lg border border-gray-200 text-gray-400 hover:text-red-500 hover:border-red-500 hover:bg-red-50 transition-all flex items-center justify-center shrink-0" title="Excluir Inspeção"><i class="fa-solid fa-trash-can"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tbody.innerHTML = htmlRows.join('');
+        } catch(e) { console.error("Erro Inspecoes:", e); }
     };
 
     let chartInstance = null;
@@ -1080,13 +1329,13 @@
             if(!canvas) return;
 
             if (p === 0 && r === 0 && c === 0) {
-                 canvas.classList.add('hidden');
-                 if(emptyState) emptyState.classList.remove('hidden');
+                 canvas.style.display = 'none';
+                 if(emptyState) emptyState.style.display = 'flex';
                  return;
             }
             
-            canvas.classList.remove('hidden');
-            if(emptyState) emptyState.classList.add('hidden');
+            canvas.style.display = 'block';
+            if(emptyState) emptyState.style.display = 'none';
 
             if (chartInstance) {
                 chartInstance.data.datasets[0].data = [p, r, c];
@@ -1101,13 +1350,11 @@
                         maintainAspectRatio: false,
                         animation: false, 
                         cutout: '75%', 
-                        plugins: { legend: { display: false }, tooltip: { cornerRadius: 8, padding: 12, boxPadding: 8, titleFont: { family: "'Inter', sans-serif", size: 13 }, bodyFont: { family: "'Inter', sans-serif", size: 13 } } } 
+                        plugins: { legend: { display: false } } 
                     }
                 });
             }
-        } catch(e) {
-            console.error("Erro Gráfico:", e);
-        }
+        } catch(e) {}
     };
 
     window.renderizarMeuProgresso = () => {
@@ -1141,9 +1388,7 @@
             });
             
             tbody.innerHTML = htmlProgresso.join('');
-        } catch(e) {
-            console.error("Erro Progresso:", e);
-        }
+        } catch(e) {}
     };
 </script>
 
