@@ -24,7 +24,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* MODO SITE CONVENCIONAL: ROLAGEM LIVRE, SEM TELA CONGELADA/BRANCA */
+        /* SITE CONVENCIONAL: Rolagem livre, sem travar a tela */
         body { font-family: 'Inter', sans-serif; background-color: #f9fafb; color: #1f2937; margin: 0; padding: 0; }
         
         .card-interaction { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; }
@@ -130,11 +130,11 @@
             <div class="space-y-5 w-full">
                 <div>
                     <label class="block text-sm font-bold text-gray-700 mb-2">ID do Usuário</label>
-                    <input type="text" id="username" onkeypress="if(event.key === 'Enter') window.fazerLogin()" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee focus:border-transparent transition-all text-center font-bold" placeholder="Digite seu ID">
+                    <input type="text" id="username" onkeypress="if(event.key === 'Enter' || event.keyCode === 13) window.fazerLogin()" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee focus:border-transparent transition-all text-center font-bold" placeholder="Digite seu ID">
                 </div>
                 <div>
                     <label class="block text-sm font-bold text-gray-700 mb-2">Senha Segura</label>
-                    <input type="password" id="password" onkeypress="if(event.key === 'Enter') window.fazerLogin()" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee focus:border-transparent transition-all text-center font-bold" placeholder="••••••••">
+                    <input type="password" id="password" onkeypress="if(event.key === 'Enter' || event.keyCode === 13) window.fazerLogin()" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee focus:border-transparent transition-all text-center font-bold" placeholder="••••••••">
                 </div>
                 <button onclick="window.fazerLogin()" class="w-full bg-shopee hover:bg-shopee-dark text-white font-bold rounded-xl py-4 mt-4 shadow-lg shadow-shopee/30 transition-all active:scale-95 uppercase tracking-wide">Entrar no Sistema</button>
             </div>
@@ -153,9 +153,7 @@
                 Segurança é Prioridade LMG-48
             </div>
             
-            <div class="flex items-center gap-4 shrink-0 ml-auto cursor-pointer hover:opacity-75 transition-opacity" 
-                 onclick="localStorage.clear(); sessionStorage.clear(); window.location.href = window.location.pathname;" 
-                 title="Sair do Sistema">
+            <div class="flex items-center gap-4 shrink-0 ml-auto cursor-pointer hover:opacity-75 transition-opacity" onclick="window.fazerLogout()" title="Sair do Sistema">
                 <div class="text-right hidden sm:block truncate max-w-[150px]">
                     <h1 class="font-black text-xl text-gray-800 leading-none truncate hover:text-shopee">Sair</h1>
                     <p class="text-[10px] font-bold text-gray-400 tracking-widest uppercase truncate" id="user-display-name">Nome</p>
@@ -417,7 +415,7 @@
                 <button onclick="window.mudarAba('aba-tratativas')" class="flex-1 py-4 font-black text-shopee bg-shopee-light border-b-4 border-shopee transition-colors focus:outline-none">Tratativas</button>
             </div>
             
-            <div class="bg-white p-10 rounded-3xl border border-gray-100 shadow-sm flex flex-col items-center justify-center text-center">
+            <div class="bg-white p-10 rounded-3xl border border-gray-100 shadow-sm flex flex-col items-center justify-center text-center min-h-[400px]">
                 <div class="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center text-shopee text-4xl mb-6 shadow-inner">
                     <i class="fa-solid fa-screwdriver-wrench"></i>
                 </div>
@@ -452,7 +450,7 @@
     window.indiceEmEdicao = null;
     window.fotosMiniaturasTemporarias = []; 
     
-    // ESCUTA BLINDADA DO BANCO DE DADOS
+    // ESCUTA DO BANCO DE DADOS EM TEMPO REAL
     onValue(ref(db, 'ocorrencias_lmg48'), (snapshot) => {
         try {
             const data = snapshot.val();
@@ -508,6 +506,7 @@
             }
             document.getElementById('user-display-avatar').innerText = iniciais;
             
+            // ESCONDE O LOGIN E MOSTRA O PAINEL DE FORMA SEGURA
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('app-layout').style.display = 'flex';
 
@@ -530,12 +529,13 @@
     };
     window.verificarSessao();
 
+    // BOTÃO SAIR DE FORÇA BRUTA (RECARREGA O SITE LIMPANDO O CACHE)
     window.fazerLogout = () => {
         try {
             localStorage.clear();
             sessionStorage.clear();
         } catch(e) {}
-        window.location.href = window.location.pathname; 
+        window.location.href = window.location.pathname + '?v=' + new Date().getTime(); 
     };
 
     window.mudarAba = (abaId) => {
@@ -562,7 +562,7 @@
             img.onload = () => {
                 URL.revokeObjectURL(url);
                 const canvas = document.createElement('canvas');
-                const MAX = 640; 
+                const MAX = 480; 
                 let w = img.width, h = img.height;
                 if(w > MAX) { h *= MAX/w; w = MAX; }
                 canvas.width = w; canvas.height = h;
@@ -651,6 +651,8 @@
 
             await set(novaOcorrenciaRef, payload);
             alert("✅ Relatório transmitido com sucesso!");
+            
+            // FURA O CACHE DO NAVEGADOR PARA GARANTIR A ATUALIZAÇÃO SEM CONGELAR
             window.location.href = window.location.pathname + '?reload=' + new Date().getTime();
 
         } catch (error) {
@@ -675,6 +677,7 @@
         } catch(e) {}
     };
 
+    // CARREGADOR DE FOTOS BLINDADO PARA TEXTO BASE64 GIGANTE
     window.abrirDetalhes = (index) => {
         try {
             const occ = window.ocorrencias[index];
@@ -705,22 +708,37 @@
             const boxFoto = document.getElementById('box-foto-evidencia');
             
             let arrayFotos = [];
-            if (occ.fotos_urls) {
-                arrayFotos = Array.isArray(occ.fotos_urls) ? occ.fotos_urls : Object.values(occ.fotos_urls);
-            }
-            if (occ.foto_url && arrayFotos.length === 0) {
-                arrayFotos.push(occ.foto_url); 
-            }
+            try {
+                if (occ.fotos_urls) {
+                    if (typeof occ.fotos_urls === 'string') {
+                        arrayFotos = [occ.fotos_urls];
+                    } else if (Array.isArray(occ.fotos_urls)) {
+                        arrayFotos = occ.fotos_urls;
+                    } else if (typeof occ.fotos_urls === 'object') {
+                        arrayFotos = Object.values(occ.fotos_urls);
+                    }
+                } else if (occ.foto_url) {
+                    arrayFotos = [occ.foto_url];
+                }
+            } catch(e) { console.error("Erro extraindo fotos:", e); }
 
             if(arrayFotos.length > 0) {
                 boxFoto.style.display = 'block';
                 let htmlFotos = '';
-                arrayFotos.forEach(url => {
-                    htmlFotos += `
-                        <img src="${url}" onclick="window.ampliarFoto('${url}')" class="block rounded-xl overflow-hidden border border-gray-200 shadow-sm hover:border-shopee transition-colors h-24 w-full object-cover cursor-zoom-in shrink-0">
-                    `;
+                // Prepara a grade sem injetar o Base64 gigante direto no onclick (Evita colapso)
+                arrayFotos.forEach((url, i) => {
+                    htmlFotos += `<img id="img-zoom-dinamico-${i}" class="block rounded-xl overflow-hidden border border-gray-200 shadow-sm hover:border-shopee transition-colors h-24 w-full object-cover cursor-zoom-in shrink-0">`;
                 });
                 galeria.innerHTML = htmlFotos;
+                
+                // Injeta a foto e o click pela memória Javascript
+                arrayFotos.forEach((url, i) => {
+                    const imgEl = document.getElementById(`img-zoom-dinamico-${i}`);
+                    if(imgEl) {
+                        imgEl.src = url;
+                        imgEl.onclick = () => window.ampliarFoto(url);
+                    }
+                });
             } else {
                 boxFoto.style.display = 'none';
                 galeria.innerHTML = '';
@@ -794,7 +812,7 @@
                 const dataOcc = item.data || '-';
 
                 return `
-                    <tr class="hover:bg-gray-50/50 transition-colors group border-b border-gray-50">
+                    <tr class="hover:bg-gray-50/50 transition-colors border-b border-gray-50">
                         <td class="px-6 py-4 truncate max-w-[200px]"><strong class="text-gray-800 truncate">${local}</strong></td>
                         <td class="px-6 py-4 truncate max-w-[200px]"><div class="flex items-center gap-3 shrink-0 truncate"><div class="w-8 h-8 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center font-bold text-xs uppercase shrink-0">${iniciais.toUpperCase()}</div><span class="text-sm font-medium text-gray-700 uppercase truncate">${autor}</span></div></td>
                         <td class="px-6 py-4 text-sm text-gray-600 truncate whitespace-nowrap">${dataOcc}</td>
