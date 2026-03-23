@@ -24,7 +24,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* SITE CONVENCIONAL */
         body { font-family: 'Inter', sans-serif; background-color: #f9fafb; color: #1f2937; margin: 0; padding: 0; }
         
         .card-interaction { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; }
@@ -53,7 +52,7 @@
         #photo-viewer img { max-width: 100%; max-height: 100%; border-radius: 8px; box-shadow: 0 0 50px rgba(0,0,0,0.5); object-fit: contain; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col">
+<body class="min-h-screen flex flex-col w-full">
 
 <div id="photo-viewer" style="display: none;" onclick="this.style.display='none'">
     <img id="viewer-img" src="">
@@ -451,7 +450,6 @@
     window.indiceEmEdicao = null;
     window.fotosMiniaturasTemporarias = []; 
     
-    // ESCUTA BLINDADA DO BANCO DE DADOS
     onValue(ref(db, 'ocorrencias_lmg48'), (snapshot) => {
         try {
             const data = snapshot.val();
@@ -534,7 +532,7 @@
             localStorage.clear();
             sessionStorage.clear();
         } catch(e) {}
-        window.location.reload(); 
+        window.location.href = window.location.pathname; 
     };
 
     window.mudarAba = (abaId) => {
@@ -557,44 +555,52 @@
         if(window.usuarioAtual !== 'admin') window.mudarAba('aba-menu-inspetor');
     };
 
-    // A MÁGICA ESTÁ AQUI: MOTOR DE FOTO CLÁSSICO - RÁPIDO, LEVE E SEGURO
+    // A SOLUÇÃO DEFINITIVA DA FOTO: LÊ, REDIMENSIONA, MOSTRA A MINIATURA E CRIA O BOTÃO DE EXCLUIR PERMANENTE
     window.processarNovaFoto = (e) => {
         try {
             const file = e.target.files[0];
             if(!file) return;
             if(window.fotosMiniaturasTemporarias.length >= MAX_FOTOS) { alert(`Você atingiu o limite de ${MAX_FOTOS} fotos.`); return; }
             
-            document.getElementById('upload-text').innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Anexando...`;
+            document.getElementById('upload-text').innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Processando foto...`;
             
             const reader = new FileReader();
             reader.onload = function(event) {
                 const img = new Image();
                 img.onload = function() {
                     const canvas = document.createElement('canvas');
-                    const MAX = 640; 
+                    const MAX = 800; 
                     let w = img.width, h = img.height;
                     
-                    if(w > MAX) { h *= MAX/w; w = MAX; }
+                    if (w > h) {
+                        if (w > MAX) { h *= MAX / w; w = MAX; }
+                    } else {
+                        if (h > MAX) { w *= MAX / h; h = MAX; }
+                    }
                     
                     canvas.width = w; canvas.height = h;
-                    canvas.getContext('2d').drawImage(img, 0,0,w,h);
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0,0,w,h);
                     
-                    // Compressão em 0.5 (Excelente tamanho/qualidade para banco de dados)
-                    const base64Final = canvas.toDataURL('image/jpeg', 0.5);
+                    const base64Final = canvas.toDataURL('image/jpeg', 0.6);
                     window.fotosMiniaturasTemporarias.push(base64Final);
                     
                     window.renderizarGradeDeFotos();
                     document.getElementById('upload-text').innerText = "Toque para adicionar foto";
                 };
                 img.onerror = function() {
-                    alert("⚠️ Ocorreu um erro ao ler a imagem. Tente novamente.");
+                    alert("⚠️ Ocorreu um erro ao ler a imagem. Tente outra foto.");
                     document.getElementById('upload-text').innerText = "Toque para adicionar foto";
                 }
                 img.src = event.target.result;
             };
+            reader.onerror = function() {
+                alert("⚠️ Erro ao acessar o arquivo do celular.");
+                document.getElementById('upload-text').innerText = "Toque para adicionar foto";
+            };
             reader.readAsDataURL(file);
             
-            e.target.value = ''; // Libera o botão para a mesma foto, se precisar
+            e.target.value = ''; 
         } catch(err) {
             console.error("Erro na foto:", err);
             document.getElementById('upload-text').innerText = "Toque para adicionar foto";
@@ -606,7 +612,7 @@
         window.renderizarGradeDeFotos();
     };
 
-    // BOTÃO DE EXCLUIR "X" AGORA É PERMANENTE E VISÍVEL EM CELULARES
+    // CONSTRUÇÃO DO BOTÃO "X" DE APAGAR FOTO (LIVRE DE ERROS E SEMPRE VISÍVEL)
     window.renderizarGradeDeFotos = () => {
         try {
             const container = document.getElementById('preview-fotos-container');
@@ -615,19 +621,18 @@
             let htmlFotos = '';
             window.fotosMiniaturasTemporarias.forEach((url, index) => {
                 htmlFotos += `
-                    <div class="relative w-full h-24 rounded-xl overflow-hidden border border-gray-200 shadow-sm">
+                    <div class="relative w-full h-24 rounded-xl overflow-hidden border border-gray-300 shadow-sm">
                         <img src="${url}" class="w-full h-full object-cover">
-                        <button onclick="window.removerFoto(${index})" class="absolute top-1 right-1 bg-red-500 hover:bg-red-600 text-white w-7 h-7 rounded-full flex items-center justify-center shadow-md z-10 border-2 border-white">
-                            <i class="fa-solid fa-xmark text-sm"></i>
+                        <button type="button" onclick="window.removerFoto(${index})" class="absolute top-1 right-1 bg-red-600 active:bg-red-700 text-white w-8 h-8 rounded-full flex items-center justify-center shadow-lg z-10 border-2 border-white cursor-pointer" style="opacity: 1 !important; visibility: visible !important;">
+                            <i class="fa-solid fa-trash-can text-xs"></i>
                         </button>
                     </div>
                 `;
             });
             container.innerHTML = htmlFotos;
-        } catch(e) { console.error("Erro render grade:", e); }
+        } catch(e) { console.error("Erro ao renderizar fotos:", e); }
     };
 
-    // ENVIO SEGURO DE VERDADE SEM PISCAR A TELA
     window.salvarFormulario = async () => {
         const hub = document.getElementById('hub_local').value;
         const cat = document.getElementById('categoria').value;
@@ -645,7 +650,6 @@
         btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin shrink-0"></i> <span class="truncate">Enviando para Nuvem...</span>`;
 
         try {
-            // Clona o array com segurança
             const urlsDasFotos = window.fotosMiniaturasTemporarias.length > 0 ? [...window.fotosMiniaturasTemporarias] : null;
             const partesData = dat.split('-');
             const dataFormatada = `${partesData[2]}/${partesData[1]}/${partesData[0]} às ${hor}`;
@@ -665,7 +669,6 @@
 
             await set(novaOcorrenciaRef, payload);
             
-            // Limpeza rápida da tela para ficar pronto para o próximo
             document.getElementById('hub_local').value = ""; document.getElementById('categoria').value = "";
             document.getElementById('data_ocorrencia').value = ""; document.getElementById('hora_ocorrencia').value = "";
             document.getElementById('detalhes').value = ""; 
@@ -674,13 +677,11 @@
 
             alert("✅ Relatório transmitido com sucesso!");
             
-            // Vai para a tela de progresso suavemente. O Banco de dados puxa o dado na mesma hora.
-            window.mudarAba('aba-progresso');
+            window.location.href = window.location.pathname + '?reload=' + new Date().getTime();
 
         } catch (error) {
             console.error(error);
             alert(`❌ Erro no banco de dados: ${error.message}`);
-        } finally {
             btn.disabled = false;
             btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up shrink-0"></i> <span class="truncate">Transmitir Relatório</span>`;
         }
@@ -700,7 +701,6 @@
         } catch(e) {}
     };
 
-    // LEITURA DO ADMIN BLINDADA (LÊ QUALQUER TIPO DE FOTO ANTIGA OU NOVA)
     window.abrirDetalhes = (index) => {
         try {
             const occ = window.ocorrencias[index];
@@ -740,7 +740,7 @@
                     arrayFotos = [occ.fotos_urls];
                 }
             } else if (occ.foto_url) {
-                arrayFotos = [occ.foto_url]; // Compatibilidade com código de 2 meses atrás
+                arrayFotos = [occ.foto_url];
             }
 
             if(arrayFotos && arrayFotos.length > 0) {
