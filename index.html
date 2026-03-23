@@ -24,7 +24,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* SITE CONVENCIONAL: Rolagem livre, sem travar a tela */
         body { font-family: 'Inter', sans-serif; background-color: #f9fafb; color: #1f2937; margin: 0; padding: 0; }
         
         .card-interaction { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; }
@@ -49,12 +48,11 @@
         
         .status-dropdown { position: absolute; background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 8px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.2); z-index: 9999; display: none; flex-direction: column; gap: 4px; min-width: 150px; }
 
-        /* ESTILO DO ZOOM DE FOTO */
         #photo-viewer { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 10000; align-items: center; justify-content: center; padding: 20px; cursor: zoom-out; }
         #photo-viewer img { max-width: 100%; max-height: 100%; border-radius: 8px; box-shadow: 0 0 50px rgba(0,0,0,0.5); object-fit: contain; }
     </style>
 </head>
-<body>
+<body class="min-h-screen flex flex-col">
 
 <div id="photo-viewer" style="display: none;" onclick="this.style.display='none'">
     <img id="viewer-img" src="">
@@ -73,7 +71,7 @@
         <h2 class="font-bold text-lg text-gray-800 flex items-center gap-2"><i class="fa-solid fa-clipboard-list text-shopee"></i> Ficha da Ocorrência</h2>
         <button class="text-gray-400 hover:text-shopee transition-colors p-2" onclick="window.fecharDetalhes()" title="Fechar (ESC)"><i class="fa-solid fa-xmark text-xl"></i></button>
     </div>
-    <div class="p-6 flex-1 bg-gray-50 space-y-6">
+    <div class="p-6 overflow-y-auto flex-1 bg-gray-50 space-y-6">
         <div><span id="detalhe-badge-status" class="px-3 py-1 rounded-full text-xs font-bold border">Status</span></div>
         
         <div class="detail-block">
@@ -130,11 +128,11 @@
             <div class="space-y-5 w-full">
                 <div>
                     <label class="block text-sm font-bold text-gray-700 mb-2">ID do Usuário</label>
-                    <input type="text" id="username" onkeypress="if(event.key === 'Enter' || event.keyCode === 13) window.fazerLogin()" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee focus:border-transparent transition-all text-center font-bold" placeholder="Digite seu ID">
+                    <input type="text" id="username" onkeypress="if(event.key === 'Enter') window.fazerLogin()" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee focus:border-transparent transition-all text-center font-bold" placeholder="Digite seu ID">
                 </div>
                 <div>
                     <label class="block text-sm font-bold text-gray-700 mb-2">Senha Segura</label>
-                    <input type="password" id="password" onkeypress="if(event.key === 'Enter' || event.keyCode === 13) window.fazerLogin()" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee focus:border-transparent transition-all text-center font-bold" placeholder="••••••••">
+                    <input type="password" id="password" onkeypress="if(event.key === 'Enter') window.fazerLogin()" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-shopee focus:border-transparent transition-all text-center font-bold" placeholder="••••••••">
                 </div>
                 <button onclick="window.fazerLogin()" class="w-full bg-shopee hover:bg-shopee-dark text-white font-bold rounded-xl py-4 mt-4 shadow-lg shadow-shopee/30 transition-all active:scale-95 uppercase tracking-wide">Entrar no Sistema</button>
             </div>
@@ -450,7 +448,6 @@
     window.indiceEmEdicao = null;
     window.fotosMiniaturasTemporarias = []; 
     
-    // ESCUTA DO BANCO DE DADOS EM TEMPO REAL
     onValue(ref(db, 'ocorrencias_lmg48'), (snapshot) => {
         try {
             const data = snapshot.val();
@@ -506,7 +503,6 @@
             }
             document.getElementById('user-display-avatar').innerText = iniciais;
             
-            // ESCONDE O LOGIN E MOSTRA O PAINEL DE FORMA SEGURA
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('app-layout').style.display = 'flex';
 
@@ -529,13 +525,12 @@
     };
     window.verificarSessao();
 
-    // BOTÃO SAIR DE FORÇA BRUTA (RECARREGA O SITE LIMPANDO O CACHE)
     window.fazerLogout = () => {
         try {
             localStorage.clear();
             sessionStorage.clear();
         } catch(e) {}
-        window.location.href = window.location.pathname + '?v=' + new Date().getTime(); 
+        window.location.href = window.location.pathname; 
     };
 
     window.mudarAba = (abaId) => {
@@ -555,25 +550,8 @@
         if(window.usuarioAtual !== 'admin') window.mudarAba('aba-menu-inspetor');
     };
 
-    async function comprimirBase64(file) {
-        return new Promise(resolve => {
-            const img = new Image();
-            const url = URL.createObjectURL(file);
-            img.onload = () => {
-                URL.revokeObjectURL(url);
-                const canvas = document.createElement('canvas');
-                const MAX = 480; 
-                let w = img.width, h = img.height;
-                if(w > MAX) { h *= MAX/w; w = MAX; }
-                canvas.width = w; canvas.height = h;
-                canvas.getContext('2d').drawImage(img, 0,0,w,h);
-                resolve(canvas.toDataURL('image/jpeg', 0.4));
-            };
-            img.src = url;
-        });
-    }
-
-    window.processarNovaFoto = async (e) => {
+    // MOTOR DE FOTOS CLÁSSICO E INQUEBRÁVEL (FileReader nativo)
+    window.processarNovaFoto = (e) => {
         try {
             const file = e.target.files[0];
             if(!file) return;
@@ -581,13 +559,31 @@
             
             document.getElementById('upload-text').innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Otimizando...`;
             
-            const previewBase64 = await comprimirBase64(file);
-            window.fotosMiniaturasTemporarias.push(previewBase64);
-            
-            window.renderizarGradeDeFotos();
-            document.getElementById('upload-text').innerText = "Toque para adicionar foto";
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const MAX = 640; 
+                    let w = img.width, h = img.height;
+                    if(w > MAX) { h *= MAX/w; w = MAX; }
+                    canvas.width = w; canvas.height = h;
+                    canvas.getContext('2d').drawImage(img, 0,0,w,h);
+                    
+                    const b64 = canvas.toDataURL('image/jpeg', 0.5);
+                    window.fotosMiniaturasTemporarias.push(b64);
+                    
+                    window.renderizarGradeDeFotos();
+                    document.getElementById('upload-text').innerText = "Toque para adicionar foto";
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
             e.target.value = '';
-        } catch(err) {}
+        } catch(err) {
+            console.error(err);
+            document.getElementById('upload-text').innerText = "Toque para adicionar foto";
+        }
     };
 
     window.removerFoto = (index) => {
@@ -652,12 +648,13 @@
             await set(novaOcorrenciaRef, payload);
             alert("✅ Relatório transmitido com sucesso!");
             
-            // FURA O CACHE DO NAVEGADOR PARA GARANTIR A ATUALIZAÇÃO SEM CONGELAR
-            window.location.href = window.location.pathname + '?reload=' + new Date().getTime();
+            window.fotosMiniaturasTemporarias = [];
+            window.mudarAba('aba-progresso');
 
         } catch (error) {
             console.error(error);
             alert(`❌ Erro no banco de dados: ${error.message}`);
+        } finally {
             btn.disabled = false;
             btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up shrink-0"></i> <span class="truncate">Transmitir Relatório</span>`;
         }
@@ -677,7 +674,6 @@
         } catch(e) {}
     };
 
-    // CARREGADOR DE FOTOS BLINDADO PARA TEXTO BASE64 GIGANTE
     window.abrirDetalhes = (index) => {
         try {
             const occ = window.ocorrencias[index];
@@ -708,32 +704,23 @@
             const boxFoto = document.getElementById('box-foto-evidencia');
             
             let arrayFotos = [];
-            try {
-                if (occ.fotos_urls) {
-                    if (typeof occ.fotos_urls === 'string') {
-                        arrayFotos = [occ.fotos_urls];
-                    } else if (Array.isArray(occ.fotos_urls)) {
-                        arrayFotos = occ.fotos_urls;
-                    } else if (typeof occ.fotos_urls === 'object') {
-                        arrayFotos = Object.values(occ.fotos_urls);
-                    }
-                } else if (occ.foto_url) {
-                    arrayFotos = [occ.foto_url];
-                }
-            } catch(e) { console.error("Erro extraindo fotos:", e); }
+            if (occ.fotos_urls) {
+                arrayFotos = Array.isArray(occ.fotos_urls) ? occ.fotos_urls : Object.values(occ.fotos_urls);
+            }
+            if (occ.foto_url && arrayFotos.length === 0) {
+                arrayFotos.push(occ.foto_url); 
+            }
 
             if(arrayFotos.length > 0) {
                 boxFoto.style.display = 'block';
                 let htmlFotos = '';
-                // Prepara a grade sem injetar o Base64 gigante direto no onclick (Evita colapso)
                 arrayFotos.forEach((url, i) => {
-                    htmlFotos += `<img id="img-zoom-dinamico-${i}" class="block rounded-xl overflow-hidden border border-gray-200 shadow-sm hover:border-shopee transition-colors h-24 w-full object-cover cursor-zoom-in shrink-0">`;
+                    htmlFotos += `<img id="img-zoom-${i}" class="block rounded-xl overflow-hidden border border-gray-200 shadow-sm hover:border-shopee transition-colors h-24 w-full object-cover cursor-zoom-in shrink-0">`;
                 });
                 galeria.innerHTML = htmlFotos;
                 
-                // Injeta a foto e o click pela memória Javascript
                 arrayFotos.forEach((url, i) => {
-                    const imgEl = document.getElementById(`img-zoom-dinamico-${i}`);
+                    const imgEl = document.getElementById(`img-zoom-${i}`);
                     if(imgEl) {
                         imgEl.src = url;
                         imgEl.onclick = () => window.ampliarFoto(url);
@@ -812,7 +799,7 @@
                 const dataOcc = item.data || '-';
 
                 return `
-                    <tr class="hover:bg-gray-50/50 transition-colors border-b border-gray-50">
+                    <tr class="hover:bg-gray-50/50 transition-colors group border-b border-gray-50">
                         <td class="px-6 py-4 truncate max-w-[200px]"><strong class="text-gray-800 truncate">${local}</strong></td>
                         <td class="px-6 py-4 truncate max-w-[200px]"><div class="flex items-center gap-3 shrink-0 truncate"><div class="w-8 h-8 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center font-bold text-xs uppercase shrink-0">${iniciais.toUpperCase()}</div><span class="text-sm font-medium text-gray-700 uppercase truncate">${autor}</span></div></td>
                         <td class="px-6 py-4 text-sm text-gray-600 truncate whitespace-nowrap">${dataOcc}</td>
@@ -870,9 +857,7 @@
                     }
                 });
             }
-        } catch(e) {
-            console.error("Erro Gráfico:", e);
-        }
+        } catch(e) {}
     };
 
     window.renderizarMeuProgresso = () => {
@@ -906,9 +891,7 @@
             });
             
             tbody.innerHTML = htmlProgresso.join('');
-        } catch(e) {
-            console.error("Erro Progresso:", e);
-        }
+        } catch(e) {}
     };
 </script>
 
