@@ -24,6 +24,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
+        /* SITE CONVENCIONAL */
         body { font-family: 'Inter', sans-serif; background-color: #f9fafb; color: #1f2937; margin: 0; padding: 0; }
         
         .card-interaction { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; }
@@ -450,6 +451,7 @@
     window.indiceEmEdicao = null;
     window.fotosMiniaturasTemporarias = []; 
     
+    // ESCUTA DE BANCO DE DADOS
     onValue(ref(db, 'ocorrencias_lmg48'), (snapshot) => {
         try {
             const data = snapshot.val();
@@ -545,7 +547,7 @@
             const target = document.getElementById(abaId);
             if (target) {
                 target.style.display = 'block';
-                if (abaId === 'aba-menu-inspetor') target.style.display = 'flex';
+                if(abaId === 'aba-menu-inspetor') target.style.display = 'flex';
             }
             window.scrollTo(0, 0);
         } catch(e) {}
@@ -555,54 +557,75 @@
         if(window.usuarioAtual !== 'admin') window.mudarAba('aba-menu-inspetor');
     };
 
-    // A SOLUÇÃO DEFINITIVA DA FOTO: LÊ, REDIMENSIONA, MOSTRA A MINIATURA E CRIA O BOTÃO DE EXCLUIR PERMANENTE
+    // CARREGADOR DE FOTO 100% BLINDADO E NATIVO (FILEREADER)
     window.processarNovaFoto = (e) => {
         try {
             const file = e.target.files[0];
             if(!file) return;
-            if(window.fotosMiniaturasTemporarias.length >= MAX_FOTOS) { alert(`Você atingiu o limite de ${MAX_FOTOS} fotos.`); return; }
             
-            document.getElementById('upload-text').innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Processando foto...`;
+            if(window.fotosMiniaturasTemporarias.length >= MAX_FOTOS) { 
+                alert(`Você atingiu o limite de ${MAX_FOTOS} fotos.`); 
+                return; 
+            }
+            
+            const statusText = document.getElementById('upload-text');
+            statusText.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Processando...`;
             
             const reader = new FileReader();
             reader.onload = function(event) {
                 const img = new Image();
                 img.onload = function() {
-                    const canvas = document.createElement('canvas');
-                    const MAX = 800; 
-                    let w = img.width, h = img.height;
-                    
-                    if (w > h) {
-                        if (w > MAX) { h *= MAX / w; w = MAX; }
-                    } else {
-                        if (h > MAX) { w *= MAX / h; h = MAX; }
+                    try {
+                        const canvas = document.createElement('canvas');
+                        const MAX_WIDTH = 800; 
+                        const MAX_HEIGHT = 800;
+                        let width = img.width;
+                        let height = img.height;
+                        
+                        if (width > height) {
+                            if (width > MAX_WIDTH) {
+                                height *= MAX_WIDTH / width;
+                                width = MAX_WIDTH;
+                            }
+                        } else {
+                            if (height > MAX_HEIGHT) {
+                                width *= MAX_HEIGHT / height;
+                                height = MAX_HEIGHT;
+                            }
+                        }
+                        
+                        canvas.width = width; 
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        
+                        // Compressão balanceada
+                        const base64Final = canvas.toDataURL('image/jpeg', 0.6);
+                        window.fotosMiniaturasTemporarias.push(base64Final);
+                        
+                        window.renderizarGradeDeFotos();
+                        statusText.innerText = "Toque para adicionar foto";
+                    } catch(canvasErr) {
+                        console.error("Erro Canvas:", canvasErr);
+                        alert("Erro ao comprimir imagem. Tente uma foto menor.");
+                        statusText.innerText = "Toque para adicionar foto";
                     }
-                    
-                    canvas.width = w; canvas.height = h;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0,0,w,h);
-                    
-                    const base64Final = canvas.toDataURL('image/jpeg', 0.6);
-                    window.fotosMiniaturasTemporarias.push(base64Final);
-                    
-                    window.renderizarGradeDeFotos();
-                    document.getElementById('upload-text').innerText = "Toque para adicionar foto";
                 };
                 img.onerror = function() {
-                    alert("⚠️ Ocorreu um erro ao ler a imagem. Tente outra foto.");
-                    document.getElementById('upload-text').innerText = "Toque para adicionar foto";
+                    alert("Erro ao ler a imagem da câmera/galeria.");
+                    statusText.innerText = "Toque para adicionar foto";
                 }
                 img.src = event.target.result;
             };
             reader.onerror = function() {
-                alert("⚠️ Erro ao acessar o arquivo do celular.");
-                document.getElementById('upload-text').innerText = "Toque para adicionar foto";
-            };
+                alert("Erro ao acessar o arquivo do celular.");
+                statusText.innerText = "Toque para adicionar foto";
+            }
             reader.readAsDataURL(file);
             
-            e.target.value = ''; 
+            e.target.value = ''; // Reseta o input de foto
         } catch(err) {
-            console.error("Erro na foto:", err);
+            console.error("Erro foto:", err);
             document.getElementById('upload-text').innerText = "Toque para adicionar foto";
         }
     };
@@ -612,7 +635,7 @@
         window.renderizarGradeDeFotos();
     };
 
-    // CONSTRUÇÃO DO BOTÃO "X" DE APAGAR FOTO (LIVRE DE ERROS E SEMPRE VISÍVEL)
+    // BOTÃO "X" PERMANENTE PARA APAGAR A FOTO
     window.renderizarGradeDeFotos = () => {
         try {
             const container = document.getElementById('preview-fotos-container');
@@ -623,16 +646,17 @@
                 htmlFotos += `
                     <div class="relative w-full h-24 rounded-xl overflow-hidden border border-gray-300 shadow-sm">
                         <img src="${url}" class="w-full h-full object-cover">
-                        <button type="button" onclick="window.removerFoto(${index})" class="absolute top-1 right-1 bg-red-600 active:bg-red-700 text-white w-8 h-8 rounded-full flex items-center justify-center shadow-lg z-10 border-2 border-white cursor-pointer" style="opacity: 1 !important; visibility: visible !important;">
+                        <button type="button" onclick="window.removerFoto(${index})" class="absolute top-1 right-1 bg-red-600 text-white w-8 h-8 rounded-full flex items-center justify-center shadow-lg z-10 border-2 border-white cursor-pointer" style="opacity: 1 !important; visibility: visible !important;">
                             <i class="fa-solid fa-trash-can text-xs"></i>
                         </button>
                     </div>
                 `;
             });
             container.innerHTML = htmlFotos;
-        } catch(e) { console.error("Erro ao renderizar fotos:", e); }
+        } catch(e) {}
     };
 
+    // ENVIO SEGURO - SEM PISCAR A TELA
     window.salvarFormulario = async () => {
         const hub = document.getElementById('hub_local').value;
         const cat = document.getElementById('categoria').value;
@@ -676,12 +700,12 @@
             window.renderizarGradeDeFotos();
 
             alert("✅ Relatório transmitido com sucesso!");
-            
-            window.location.href = window.location.pathname + '?reload=' + new Date().getTime();
+            window.mudarAba('aba-progresso');
 
         } catch (error) {
             console.error(error);
             alert(`❌ Erro no banco de dados: ${error.message}`);
+        } finally {
             btn.disabled = false;
             btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up shrink-0"></i> <span class="truncate">Transmitir Relatório</span>`;
         }
